@@ -1,0 +1,1325 @@
+﻿[
+    {
+        "siteId":  "1",
+        "optimusScore":  0.679,
+        "optimusTier":  "C",
+        "fy25Volume":  6389,
+        "fy25Utilization":  0.676,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "15",
+        "optimusScore":  0.664,
+        "optimusTier":  "C",
+        "fy25Volume":  2896,
+        "fy25Utilization":  0.795,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "18",
+        "optimusScore":  0.616,
+        "optimusTier":  "C",
+        "fy25Volume":  4762,
+        "fy25Utilization":  0.787,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "23",
+        "optimusScore":  0.678,
+        "optimusTier":  "C",
+        "fy25Volume":  2594,
+        "fy25Utilization":  0.79,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "25",
+        "optimusScore":  0.75,
+        "optimusTier":  "B",
+        "fy25Volume":  3373,
+        "fy25Utilization":  0.693,
+        "priority":  null,
+        "quickWins":  "Organize visible wires to reduce clutter.; Remove cleaning supplies from visible areas to enhance appearance.; Organize supplies to reduce clutter.; Replace generic signs with branded versions.; Organize and secure cables."
+    },
+    {
+        "siteId":  "26",
+        "optimusScore":  0.583,
+        "optimusTier":  "C",
+        "fy25Volume":  2355,
+        "fy25Utilization":  0.825,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "29",
+        "optimusScore":  0.677,
+        "optimusTier":  "C",
+        "fy25Volume":  5731,
+        "fy25Utilization":  0.7,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "31",
+        "optimusScore":  0.661,
+        "optimusTier":  "C",
+        "fy25Volume":  3014,
+        "fy25Utilization":  0.719,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "32",
+        "optimusScore":  0.534,
+        "optimusTier":  "C",
+        "fy25Volume":  2058,
+        "fy25Utilization":  0.682,
+        "priority":  "N",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "33",
+        "optimusScore":  0.584,
+        "optimusTier":  "C",
+        "fy25Volume":  2321,
+        "fy25Utilization":  0.686,
+        "priority":  "Y",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "35",
+        "optimusScore":  0.623,
+        "optimusTier":  "C",
+        "fy25Volume":  2505,
+        "fy25Utilization":  0.663,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "41",
+        "optimusScore":  0.669,
+        "optimusTier":  "C",
+        "fy25Volume":  2541,
+        "fy25Utilization":  0.565,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "42",
+        "optimusScore":  0.527,
+        "optimusTier":  "C",
+        "fy25Volume":  2436,
+        "fy25Utilization":  0.572,
+        "priority":  "Y",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "43",
+        "optimusScore":  0.617,
+        "optimusTier":  "C",
+        "fy25Volume":  2266,
+        "fy25Utilization":  0.611,
+        "priority":  "N",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "45",
+        "optimusScore":  0.632,
+        "optimusTier":  "C",
+        "fy25Volume":  1276,
+        "fy25Utilization":  0.633,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "48",
+        "optimusScore":  0.539,
+        "optimusTier":  "C",
+        "fy25Volume":  406,
+        "fy25Utilization":  0.348,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "49",
+        "optimusScore":  0.608,
+        "optimusTier":  "C",
+        "fy25Volume":  1886,
+        "fy25Utilization":  0.64,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "50",
+        "optimusScore":  0.689,
+        "optimusTier":  "C",
+        "fy25Volume":  2583,
+        "fy25Utilization":  0.649,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "53",
+        "optimusScore":  0.167,
+        "optimusTier":  "C",
+        "fy25Volume":  2027,
+        "fy25Utilization":  0.461,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "53",
+        "optimusScore":  0.61,
+        "optimusTier":  "C",
+        "fy25Volume":  2027,
+        "fy25Utilization":  0.461,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "57",
+        "optimusScore":  0.607,
+        "optimusTier":  "C",
+        "fy25Volume":  2939,
+        "fy25Utilization":  0.862,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "57",
+        "optimusScore":  0.577,
+        "optimusTier":  "C",
+        "fy25Volume":  2939,
+        "fy25Utilization":  0.862,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "59",
+        "optimusScore":  0.725,
+        "optimusTier":  "B",
+        "fy25Volume":  1471,
+        "fy25Utilization":  0.586,
+        "priority":  "N",
+        "quickWins":  "Organize the proctor station to reduce clutter."
+    },
+    {
+        "siteId":  "59",
+        "optimusScore":  0.577,
+        "optimusTier":  "C",
+        "fy25Volume":  1471,
+        "fy25Utilization":  0.586,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "60",
+        "optimusScore":  0.409,
+        "optimusTier":  "C",
+        "fy25Volume":  1799,
+        "fy25Utilization":  0.596,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "60",
+        "optimusScore":  0.667,
+        "optimusTier":  "C",
+        "fy25Volume":  1799,
+        "fy25Utilization":  0.596,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "63",
+        "optimusScore":  0.645,
+        "optimusTier":  "C",
+        "fy25Volume":  6337,
+        "fy25Utilization":  0.691,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "63",
+        "optimusScore":  0.736,
+        "optimusTier":  "B",
+        "fy25Volume":  6337,
+        "fy25Utilization":  0.691,
+        "priority":  null,
+        "quickWins":  "Organize the proctor station to reduce clutter.; Repair or replace worn-out carpet sections.; Repair or replace damaged carpet."
+    },
+    {
+        "siteId":  "64",
+        "optimusScore":  0.631,
+        "optimusTier":  "C",
+        "fy25Volume":  3769,
+        "fy25Utilization":  0.785,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "64",
+        "optimusScore":  0.675,
+        "optimusTier":  "C",
+        "fy25Volume":  3769,
+        "fy25Utilization":  0.785,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "65",
+        "optimusScore":  0.652,
+        "optimusTier":  "C",
+        "fy25Volume":  1627,
+        "fy25Utilization":  0.625,
+        "priority":  "N",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "69",
+        "optimusScore":  0.55,
+        "optimusTier":  "C",
+        "fy25Volume":  220,
+        "fy25Utilization":  0.416,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "71",
+        "optimusScore":  0.643,
+        "optimusTier":  "C",
+        "fy25Volume":  6366,
+        "fy25Utilization":  0.718,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "72",
+        "optimusScore":  0.472,
+        "optimusTier":  "C",
+        "fy25Volume":  3064,
+        "fy25Utilization":  0.719,
+        "priority":  "Y",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "73",
+        "optimusScore":  0.667,
+        "optimusTier":  "C",
+        "fy25Volume":  7124,
+        "fy25Utilization":  0.784,
+        "priority":  "Y",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "74",
+        "optimusScore":  0.597,
+        "optimusTier":  "C",
+        "fy25Volume":  2577,
+        "fy25Utilization":  0.716,
+        "priority":  "Y",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "93",
+        "optimusScore":  0.679,
+        "optimusTier":  "C",
+        "fy25Volume":  3782,
+        "fy25Utilization":  0.714,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "96",
+        "optimusScore":  0.66,
+        "optimusTier":  "C",
+        "fy25Volume":  5483,
+        "fy25Utilization":  0.695,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "97",
+        "optimusScore":  0.569,
+        "optimusTier":  "C",
+        "fy25Volume":  2298,
+        "fy25Utilization":  0.617,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "98",
+        "optimusScore":  0.575,
+        "optimusTier":  "C",
+        "fy25Volume":  4436,
+        "fy25Utilization":  0.649,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "98",
+        "optimusScore":  0.588,
+        "optimusTier":  "C",
+        "fy25Volume":  4436,
+        "fy25Utilization":  0.649,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "116",
+        "optimusScore":  0.533,
+        "optimusTier":  "C",
+        "fy25Volume":  9250,
+        "fy25Utilization":  0.824,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "117",
+        "optimusScore":  0.738,
+        "optimusTier":  "B",
+        "fy25Volume":  952,
+        "fy25Utilization":  0.689,
+        "priority":  null,
+        "quickWins":  "Remove visible clutter such as water bottles and papers.; Ensure cleaning supplies are stored out of sight to maintain a professional appearance.; Remove clutter from the proctor station to enhance cleanliness.; Remove personal items from window sills to reduce clutter.; Organize cables and boxes to"
+    },
+    {
+        "siteId":  "128",
+        "optimusScore":  0.67,
+        "optimusTier":  "C",
+        "fy25Volume":  8249,
+        "fy25Utilization":  0.788,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "130",
+        "optimusScore":  0.664,
+        "optimusTier":  "C",
+        "fy25Volume":  7394,
+        "fy25Utilization":  0.898,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "135",
+        "optimusScore":  0.695,
+        "optimusTier":  "C",
+        "fy25Volume":  2044,
+        "fy25Utilization":  0.801,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "136",
+        "optimusScore":  0.733,
+        "optimusTier":  "B",
+        "fy25Volume":  808,
+        "fy25Utilization":  0.555,
+        "priority":  null,
+        "quickWins":  ""
+    },
+    {
+        "siteId":  "140",
+        "optimusScore":  0.705,
+        "optimusTier":  "B",
+        "fy25Volume":  8781,
+        "fy25Utilization":  0.763,
+        "priority":  null,
+        "quickWins":  "Organize visible wires to reduce clutter."
+    },
+    {
+        "siteId":  "142",
+        "optimusScore":  0.581,
+        "optimusTier":  "C",
+        "fy25Volume":  532,
+        "fy25Utilization":  0.585,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "143",
+        "optimusScore":  0.634,
+        "optimusTier":  "C",
+        "fy25Volume":  1388,
+        "fy25Utilization":  0.655,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "143",
+        "optimusScore":  0.636,
+        "optimusTier":  "C",
+        "fy25Volume":  1388,
+        "fy25Utilization":  0.655,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "152",
+        "optimusScore":  0.75,
+        "optimusTier":  "B",
+        "fy25Volume":  2789,
+        "fy25Utilization":  0.732,
+        "priority":  null,
+        "quickWins":  "Organize and reduce visible clutter.; Remove visible clutter such as boxes and organize cables.; Repair or replace damaged carpet.; Clean and maintain restroom facilities."
+    },
+    {
+        "siteId":  "154",
+        "optimusScore":  0.552,
+        "optimusTier":  "C",
+        "fy25Volume":  2698,
+        "fy25Utilization":  0.71,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "160",
+        "optimusScore":  0.637,
+        "optimusTier":  "C",
+        "fy25Volume":  6352,
+        "fy25Utilization":  0.91,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "163",
+        "optimusScore":  0.678,
+        "optimusTier":  "C",
+        "fy25Volume":  2503,
+        "fy25Utilization":  0.617,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5002",
+        "optimusScore":  0.717,
+        "optimusTier":  "B",
+        "fy25Volume":  8059,
+        "fy25Utilization":  0.713,
+        "priority":  null,
+        "quickWins":  "Organize items on the reception desk to reduce clutter.; Remove clutter from tables and window sills."
+    },
+    {
+        "siteId":  "5003",
+        "optimusScore":  0.694,
+        "optimusTier":  "C",
+        "fy25Volume":  2898,
+        "fy25Utilization":  0.795,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5004",
+        "optimusScore":  0.691,
+        "optimusTier":  "C",
+        "fy25Volume":  1336,
+        "fy25Utilization":  0.686,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5008",
+        "optimusScore":  0.736,
+        "optimusTier":  "B",
+        "fy25Volume":  3372,
+        "fy25Utilization":  0.655,
+        "priority":  null,
+        "quickWins":  "Organize cables and wires at the proctor station to reduce clutter.; Remove any visible papers from workstations to reduce clutter.; Organize and conceal exposed wires near signage.; Remove personal items from areas near signage."
+    },
+    {
+        "siteId":  "5010",
+        "optimusScore":  0.483,
+        "optimusTier":  "C",
+        "fy25Volume":  2972,
+        "fy25Utilization":  0.788,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5011",
+        "optimusScore":  0.541,
+        "optimusTier":  "C",
+        "fy25Volume":  1842,
+        "fy25Utilization":  0.684,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5018",
+        "optimusScore":  0.609,
+        "optimusTier":  "C",
+        "fy25Volume":  3543,
+        "fy25Utilization":  0.838,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5019",
+        "optimusScore":  0.734,
+        "optimusTier":  "B",
+        "fy25Volume":  7132,
+        "fy25Utilization":  0.924,
+        "priority":  null,
+        "quickWins":  "Clean or replace stained chairs in the waiting area.; Secure and organize exposed wires to reduce clutter.; Organize and declutter the breakroom area.; Ensure all signs are well-organized to avoid information overlap."
+    },
+    {
+        "siteId":  "5020",
+        "optimusScore":  0.702,
+        "optimusTier":  "B",
+        "fy25Volume":  9697,
+        "fy25Utilization":  0.933,
+        "priority":  null,
+        "quickWins":  "Repair or replace the elevator; Clean or replace discolored ceiling tiles; Repaint or clean marked walls; Organize cables and items on the proctor station desk.; Organize and secure exposed wires to reduce clutter.; Ensure all surfaces are thoroughly cleaned.; Remove excess water bottles to reduce c"
+    },
+    {
+        "siteId":  "5022",
+        "optimusScore":  0.761,
+        "optimusTier":  "B",
+        "fy25Volume":  3297,
+        "fy25Utilization":  0.779,
+        "priority":  null,
+        "quickWins":  "Consider reducing overlapping signage for a cleaner appearance.; Organize loose wires and items to reduce clutter.; Organize and reduce visible clutter."
+    },
+    {
+        "siteId":  "5025",
+        "optimusScore":  0.709,
+        "optimusTier":  "B",
+        "fy25Volume":  22097,
+        "fy25Utilization":  0.913,
+        "priority":  null,
+        "quickWins":  "Organize and declutter the reception desk.; Secure and organize exposed wires to prevent hazards.; Remove personal items from tables to reduce clutter.; Remove clutter near signage to improve visibility.; Consider repainting or cleaning the marked wall area."
+    },
+    {
+        "siteId":  "5026",
+        "optimusScore":  0.6,
+        "optimusTier":  "C",
+        "fy25Volume":  7105,
+        "fy25Utilization":  0.867,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5027",
+        "optimusScore":  0.764,
+        "optimusTier":  "B",
+        "fy25Volume":  12825,
+        "fy25Utilization":  0.922,
+        "priority":  null,
+        "quickWins":  "Organize items on filing cabinets to reduce clutter.; Organize the reception desk to reduce visible clutter.; Ensure all signs are well-organized and not overlapping."
+    },
+    {
+        "siteId":  "5029",
+        "optimusScore":  0.706,
+        "optimusTier":  "B",
+        "fy25Volume":  8759,
+        "fy25Utilization":  0.945,
+        "priority":  null,
+        "quickWins":  "Organize and declutter the reception desk.; Remove visible clutter near the entrance to improve appearance.; Store cleaning tools out of sight to improve aesthetics.; Remove clutter such as water bottles."
+    },
+    {
+        "siteId":  "5032",
+        "optimusScore":  0.688,
+        "optimusTier":  "C",
+        "fy25Volume":  5877,
+        "fy25Utilization":  0.741,
+        "priority":  "N",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5037",
+        "optimusScore":  0.578,
+        "optimusTier":  "C",
+        "fy25Volume":  4332,
+        "fy25Utilization":  0.885,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5038",
+        "optimusScore":  0.573,
+        "optimusTier":  "C",
+        "fy25Volume":  1399,
+        "fy25Utilization":  0.606,
+        "priority":  "N",
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5039",
+        "optimusScore":  0.693,
+        "optimusTier":  "C",
+        "fy25Volume":  2712,
+        "fy25Utilization":  0.719,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5040",
+        "optimusScore":  0.388,
+        "optimusTier":  "C",
+        "fy25Volume":  640,
+        "fy25Utilization":  0.583,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5040",
+        "optimusScore":  0.662,
+        "optimusTier":  "C",
+        "fy25Volume":  640,
+        "fy25Utilization":  0.583,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5042",
+        "optimusScore":  0.544,
+        "optimusTier":  "C",
+        "fy25Volume":  15959,
+        "fy25Utilization":  0.777,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5042",
+        "optimusScore":  0.661,
+        "optimusTier":  "C",
+        "fy25Volume":  15959,
+        "fy25Utilization":  0.777,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5093",
+        "optimusScore":  0.695,
+        "optimusTier":  "C",
+        "fy25Volume":  2987,
+        "fy25Utilization":  0.797,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5097",
+        "optimusScore":  0.656,
+        "optimusTier":  "C",
+        "fy25Volume":  11724,
+        "fy25Utilization":  0.846,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5109",
+        "optimusScore":  0.744,
+        "optimusTier":  "B",
+        "fy25Volume":  8762,
+        "fy25Utilization":  0.706,
+        "priority":  null,
+        "quickWins":  "Remove clutter such as bags and water bottles.; Organize shelves to reduce visible clutter.; Remove clutter from workstations to improve cleanliness.; Organize and reduce clutter near signage to improve candidate focus."
+    },
+    {
+        "siteId":  "5118",
+        "optimusScore":  0.656,
+        "optimusTier":  "C",
+        "fy25Volume":  1693,
+        "fy25Utilization":  0.553,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5129",
+        "optimusScore":  0.286,
+        "optimusTier":  "C",
+        "fy25Volume":  6428,
+        "fy25Utilization":  0.882,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5131",
+        "optimusScore":  0.714,
+        "optimusTier":  "B",
+        "fy25Volume":  4713,
+        "fy25Utilization":  0.941,
+        "priority":  "Y",
+        "quickWins":  "Replace temporary signage with permanent fixtures.; Remove unnecessary items from the reception desk to reduce clutter.; Secure and organize exposed wires.; Remove or tidy up tape on the floor.; Address minor discoloration around the toilet base to enhance cleanliness.; Organize and reduce the numbe"
+    },
+    {
+        "siteId":  "5132",
+        "optimusScore":  0.717,
+        "optimusTier":  "B",
+        "fy25Volume":  3311,
+        "fy25Utilization":  0.859,
+        "priority":  null,
+        "quickWins":  "Reduce clutter on the reception desk for a cleaner appearance.; Organize visible wires to reduce clutter.; Remove or better position the fan to enhance room aesthetics.; Organize boxes and supplies to reduce clutter.; Clean and maintain door area."
+    },
+    {
+        "siteId":  "5134",
+        "optimusScore":  0.581,
+        "optimusTier":  "C",
+        "fy25Volume":  3087,
+        "fy25Utilization":  0.885,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5135",
+        "optimusScore":  0.544,
+        "optimusTier":  "C",
+        "fy25Volume":  6533,
+        "fy25Utilization":  0.802,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5135",
+        "optimusScore":  0.65,
+        "optimusTier":  "C",
+        "fy25Volume":  6533,
+        "fy25Utilization":  0.802,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5144",
+        "optimusScore":  0.667,
+        "optimusTier":  "C",
+        "fy25Volume":  5198,
+        "fy25Utilization":  0.919,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5584",
+        "optimusScore":  0.6,
+        "optimusTier":  "C",
+        "fy25Volume":  6161,
+        "fy25Utilization":  0.835,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5584",
+        "optimusScore":  0.589,
+        "optimusTier":  "C",
+        "fy25Volume":  6161,
+        "fy25Utilization":  0.835,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5617",
+        "optimusScore":  0.664,
+        "optimusTier":  "C",
+        "fy25Volume":  9516,
+        "fy25Utilization":  0.795,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5617",
+        "optimusScore":  0.671,
+        "optimusTier":  "C",
+        "fy25Volume":  9516,
+        "fy25Utilization":  0.795,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5643",
+        "optimusScore":  0.7,
+        "optimusTier":  "B",
+        "fy25Volume":  8984,
+        "fy25Utilization":  0.731,
+        "priority":  "Y",
+        "quickWins":  "Remove personal items to reduce clutter.; Improve organization and cleanliness of reception desk.; Remove clutter near the entrance to improve appearance.; Organize supplies to reduce clutter.; Repair or replace damaged furniture.; Fix ceiling tiles and clean stains."
+    },
+    {
+        "siteId":  "5654",
+        "optimusScore":  0.608,
+        "optimusTier":  "C",
+        "fy25Volume":  3553,
+        "fy25Utilization":  0.765,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "5695",
+        "optimusScore":  0.752,
+        "optimusTier":  "B",
+        "fy25Volume":  5579,
+        "fy25Utilization":  0.832,
+        "priority":  null,
+        "quickWins":  "Organize and secure visible cables to reduce clutter.; Organize cleaning supplies to reduce visible clutter.; Ensure all cleaning supplies are neatly organized.; Remove clutter near the proctor station to enhance clarity."
+    },
+    {
+        "siteId":  "5711",
+        "optimusScore":  0.766,
+        "optimusTier":  "B",
+        "fy25Volume":  18613,
+        "fy25Utilization":  0.93,
+        "priority":  null,
+        "quickWins":  "Remove clutter such as boxes and water bottles.; Remove clutter from desks to improve cleanliness.; Ensure regular maintenance to sustain cleanliness.; Remove any clutter near signage for better visibility."
+    },
+    {
+        "siteId":  "5713",
+        "optimusScore":  0.717,
+        "optimusTier":  "B",
+        "fy25Volume":  7685,
+        "fy25Utilization":  0.906,
+        "priority":  null,
+        "quickWins":  "Regularly clean parking area to remove debris.; Remove clutter near the entrance for a cleaner appearance.; Ensure regular checks to maintain cleanliness."
+    },
+    {
+        "siteId":  "5840",
+        "optimusScore":  0.753,
+        "optimusTier":  "B",
+        "fy25Volume":  7000,
+        "fy25Utilization":  0.872,
+        "priority":  null,
+        "quickWins":  "Organize items on proctor desk to reduce clutter."
+    },
+    {
+        "siteId":  "6011",
+        "optimusScore":  0.625,
+        "optimusTier":  "C",
+        "fy25Volume":  3134,
+        "fy25Utilization":  0.65,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "6115",
+        "optimusScore":  0.802,
+        "optimusTier":  "B",
+        "fy25Volume":  15194,
+        "fy25Utilization":  0.793,
+        "priority":  null,
+        "quickWins":  "Remove clutter from the reception desk.; Remove clutter from the proctor station to enhance cleanliness.; Ensure regular maintenance to sustain cleanliness.; Organize boxes on the floor to improve space utilization."
+    },
+    {
+        "siteId":  "6116",
+        "optimusScore":  0.786,
+        "optimusTier":  "B",
+        "fy25Volume":  9106,
+        "fy25Utilization":  0.927,
+        "priority":  null,
+        "quickWins":  "Organize small items on desks to reduce clutter.; Organize and reduce clutter on doors for better visibility.; Repair or replace damaged chairs.; Fix or replace broken blinds."
+    },
+    {
+        "siteId":  "6559",
+        "optimusScore":  0.738,
+        "optimusTier":  "B",
+        "fy25Volume":  4381,
+        "fy25Utilization":  0.605,
+        "priority":  null,
+        "quickWins":  "Ensure regular maintenance to sustain cleanliness.; Replace paper signs with more professional, permanent signage."
+    },
+    {
+        "siteId":  "6672",
+        "optimusScore":  0.562,
+        "optimusTier":  "C",
+        "fy25Volume":  8269,
+        "fy25Utilization":  0.651,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "6712",
+        "optimusScore":  0.734,
+        "optimusTier":  "B",
+        "fy25Volume":  14674,
+        "fy25Utilization":  0.904,
+        "priority":  null,
+        "quickWins":  "Organize the reception desk to reduce clutter."
+    },
+    {
+        "siteId":  "6723",
+        "optimusScore":  0.736,
+        "optimusTier":  "B",
+        "fy25Volume":  501,
+        "fy25Utilization":  0.404,
+        "priority":  null,
+        "quickWins":  "Organize PSI bags to reduce clutter.; Secure and organize exposed wires to improve safety."
+    },
+    {
+        "siteId":  "6751",
+        "optimusScore":  0.65,
+        "optimusTier":  "C",
+        "fy25Volume":  3744,
+        "fy25Utilization":  0.712,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "9001",
+        "optimusScore":  0.691,
+        "optimusTier":  "C",
+        "fy25Volume":  12867,
+        "fy25Utilization":  0.794,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "9001",
+        "optimusScore":  0.667,
+        "optimusTier":  "C",
+        "fy25Volume":  12867,
+        "fy25Utilization":  0.794,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "9201",
+        "optimusScore":  0.705,
+        "optimusTier":  "B",
+        "fy25Volume":  18354,
+        "fy25Utilization":  0.947,
+        "priority":  null,
+        "quickWins":  "Repair or replace damaged carpet.; Organize and reduce clutter in waiting area.; Organize cables and headphones to reduce clutter.; Regularly check and clean the restroom floors.; Organize storage items to clear pathways.; Ensure all signs are neatly organized and visible."
+    },
+    {
+        "siteId":  "9408",
+        "optimusScore":  0.629,
+        "optimusTier":  "C",
+        "fy25Volume":  3749,
+        "fy25Utilization":  0.702,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "9443",
+        "optimusScore":  0.748,
+        "optimusTier":  "B",
+        "fy25Volume":  3474,
+        "fy25Utilization":  0.743,
+        "priority":  null,
+        "quickWins":  "Organize cables to reduce clutter under desks.; Remove cleaning supplies from signage area to reduce clutter."
+    },
+    {
+        "siteId":  "9655",
+        "optimusScore":  0.58,
+        "optimusTier":  "C",
+        "fy25Volume":  4910,
+        "fy25Utilization":  0.707,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "9677",
+        "optimusScore":  0.713,
+        "optimusTier":  "B",
+        "fy25Volume":  12967,
+        "fy25Utilization":  0.759,
+        "priority":  null,
+        "quickWins":  "Organize or conceal paper clutter.; Organize or remove red bags to reduce clutter.; Remove excess items to enhance accessibility."
+    },
+    {
+        "siteId":  "9677",
+        "optimusScore":  0.738,
+        "optimusTier":  "B",
+        "fy25Volume":  12967,
+        "fy25Utilization":  0.759,
+        "priority":  null,
+        "quickWins":  "Organize and remove clutter from chairs.; Remove visible cleaning tools to reduce clutter.; Update or clean signage for better appearance.; Remove excess boxes to improve accessibility."
+    },
+    {
+        "siteId":  "9736",
+        "optimusScore":  0.732,
+        "optimusTier":  "B",
+        "fy25Volume":  14530,
+        "fy25Utilization":  0.843,
+        "priority":  null,
+        "quickWins":  "Remove any clutter near the water feature to maintain cleanliness.; Remove unnecessary items from the reception desk to reduce clutter.; Remove any clutter from desks to maintain cleanliness.; Organize loose items and boxes to improve space usability."
+    },
+    {
+        "siteId":  "9817",
+        "optimusScore":  0.712,
+        "optimusTier":  "B",
+        "fy25Volume":  10524,
+        "fy25Utilization":  0.675,
+        "priority":  null,
+        "quickWins":  ""
+    },
+    {
+        "siteId":  "10042",
+        "optimusScore":  0.634,
+        "optimusTier":  "C",
+        "fy25Volume":  8792,
+        "fy25Utilization":  0.68,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "10130",
+        "optimusScore":  0.752,
+        "optimusTier":  "B",
+        "fy25Volume":  7760,
+        "fy25Utilization":  0.861,
+        "priority":  null,
+        "quickWins":  "Ensure all items on the reception desk are organized."
+    },
+    {
+        "siteId":  "10137",
+        "optimusScore":  0.774,
+        "optimusTier":  "B",
+        "fy25Volume":  4723,
+        "fy25Utilization":  0.808,
+        "priority":  "N",
+        "quickWins":  ""
+    },
+    {
+        "siteId":  "10255",
+        "optimusScore":  0.741,
+        "optimusTier":  "B",
+        "fy25Volume":  10897,
+        "fy25Utilization":  0.903,
+        "priority":  null,
+        "quickWins":  "Remove clutter from storage areas.; Organize and secure visible wires to improve safety and aesthetics.; Organize loose items and boxes.; Organize clipboards to reduce clutter."
+    },
+    {
+        "siteId":  "10255",
+        "optimusScore":  0.75,
+        "optimusTier":  "B",
+        "fy25Volume":  10897,
+        "fy25Utilization":  0.903,
+        "priority":  null,
+        "quickWins":  "Secure and organize exposed wires to prevent tripping hazards.; Organize loose papers and boxes to reduce clutter."
+    },
+    {
+        "siteId":  "10329",
+        "optimusScore":  0.697,
+        "optimusTier":  "C",
+        "fy25Volume":  7439,
+        "fy25Utilization":  0.511,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "10471",
+        "optimusScore":  0.736,
+        "optimusTier":  "B",
+        "fy25Volume":  9269,
+        "fy25Utilization":  0.706,
+        "priority":  null,
+        "quickWins":  "Organize the proctor\u0027s desk to reduce visible clutter.; Remove or organize boxes and water bottles from the floor.; Reorganize signs to reduce overlap and clutter."
+    },
+    {
+        "siteId":  "10506",
+        "optimusScore":  0.712,
+        "optimusTier":  "B",
+        "fy25Volume":  22030,
+        "fy25Utilization":  0.921,
+        "priority":  null,
+        "quickWins":  "Remove unnecessary signs and papers to reduce clutter.; Remove excess boxes from the top of cabinets.; Reorganize storage to improve accessibility and space utilization."
+    },
+    {
+        "siteId":  "10571",
+        "optimusScore":  0.726,
+        "optimusTier":  "B",
+        "fy25Volume":  1882,
+        "fy25Utilization":  0.671,
+        "priority":  "Y",
+        "quickWins":  "Organize storage area to reduce clutter.; Organize the storage area to reduce clutter.; Organize cleaning supplies and wires to improve safety."
+    },
+    {
+        "siteId":  "10572",
+        "optimusScore":  0.505,
+        "optimusTier":  "C",
+        "fy25Volume":  3045,
+        "fy25Utilization":  0.711,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "10605",
+        "optimusScore":  0.706,
+        "optimusTier":  "B",
+        "fy25Volume":  12534,
+        "fy25Utilization":  0.915,
+        "priority":  null,
+        "quickWins":  "Remove clutter from proctor desks to enhance cleanliness.; Organize storage items to reduce clutter."
+    },
+    {
+        "siteId":  "10653",
+        "optimusScore":  0.634,
+        "optimusTier":  "C",
+        "fy25Volume":  4018,
+        "fy25Utilization":  0.755,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "10781",
+        "optimusScore":  0.75,
+        "optimusTier":  "B",
+        "fy25Volume":  5470,
+        "fy25Utilization":  0.932,
+        "priority":  "N",
+        "quickWins":  "Remove personal items from visible areas.; Remove excess items from the top of cabinets to reduce clutter.; Replace handwritten signs with printed versions to reduce clutter."
+    },
+    {
+        "siteId":  "11353",
+        "optimusScore":  0.768,
+        "optimusTier":  "B",
+        "fy25Volume":  6973,
+        "fy25Utilization":  0.824,
+        "priority":  null,
+        "quickWins":  "Organize cables and items under the desks to reduce clutter.; Organize and secure exposed wires to reduce clutter.; Organize cables and remove excess boxes."
+    },
+    {
+        "siteId":  "11553",
+        "optimusScore":  0.703,
+        "optimusTier":  "B",
+        "fy25Volume":  9705,
+        "fy25Utilization":  0.848,
+        "priority":  null,
+        "quickWins":  "Ensure regular cleaning of parking area to remove litter.; Organize and reduce clutter on desks to improve appearance.; Remove clutter from workstations to improve cleanliness.; Remove redundant signage to improve clarity."
+    },
+    {
+        "siteId":  "11553",
+        "optimusScore":  0.761,
+        "optimusTier":  "B",
+        "fy25Volume":  9705,
+        "fy25Utilization":  0.848,
+        "priority":  null,
+        "quickWins":  "Remove any visible clutter from the parking area.; Organize clipboards and pens to reduce clutter.; Remove unnecessary items from the reception desk.; Secure and organize exposed wires.; Reorganize scattered items to reduce clutter.; Remove any unnecessary items to reduce clutter."
+    },
+    {
+        "siteId":  "11555",
+        "optimusScore":  0.562,
+        "optimusTier":  "C",
+        "fy25Volume":  7058,
+        "fy25Utilization":  0.953,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "11555",
+        "optimusScore":  0.608,
+        "optimusTier":  "C",
+        "fy25Volume":  7058,
+        "fy25Utilization":  0.953,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "11985",
+        "optimusScore":  0.823,
+        "optimusTier":  "B",
+        "fy25Volume":  18286,
+        "fy25Utilization":  0.88,
+        "priority":  null,
+        "quickWins":  "Remove clutter from the proctor station to improve organization.; Ensure cleaning supplies are stored more neatly."
+    },
+    {
+        "siteId":  "12215",
+        "optimusScore":  0.756,
+        "optimusTier":  "B",
+        "fy25Volume":  3954,
+        "fy25Utilization":  0.631,
+        "priority":  null,
+        "quickWins":  "Reduce clutter on the reception desk for a cleaner appearance.; Remove any clutter from workstations to improve cleanliness.; Ensure regular maintenance to sustain cleanliness.; Remove clutter such as water bottles and papers from visible areas."
+    },
+    {
+        "siteId":  "12223",
+        "optimusScore":  0.672,
+        "optimusTier":  "C",
+        "fy25Volume":  9132,
+        "fy25Utilization":  0.923,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "12237",
+        "optimusScore":  0.72,
+        "optimusTier":  "B",
+        "fy25Volume":  6760,
+        "fy25Utilization":  0.73,
+        "priority":  null,
+        "quickWins":  "Remove personal items and office supplies from desks to reduce clutter."
+    },
+    {
+        "siteId":  "12237",
+        "optimusScore":  0.633,
+        "optimusTier":  "C",
+        "fy25Volume":  6760,
+        "fy25Utilization":  0.73,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "18073",
+        "optimusScore":  0.725,
+        "optimusTier":  "B",
+        "fy25Volume":  4081,
+        "fy25Utilization":  0.422,
+        "priority":  null,
+        "quickWins":  "Ensure cleaning supplies are stored out of sight."
+    },
+    {
+        "siteId":  "18648",
+        "optimusScore":  0.73,
+        "optimusTier":  "B",
+        "fy25Volume":  1946,
+        "fy25Utilization":  0.623,
+        "priority":  null,
+        "quickWins":  "Remove any disposable items from the waiting area to improve cleanliness.; Organize items at the proctor station to reduce clutter.; Organize visible cables to reduce clutter."
+    },
+    {
+        "siteId":  "18886",
+        "optimusScore":  0.716,
+        "optimusTier":  "B",
+        "fy25Volume":  2613,
+        "fy25Utilization":  0.763,
+        "priority":  null,
+        "quickWins":  "Regularly clean pathways to remove debris.; Remove any unnecessary items from the proctor desk.; Ensure regular cleaning to maintain high standards.; Remove any clutter near the sink area.; Organize and store water bottles and boxes properly.; Replace handwritten signs with printed versions."
+    },
+    {
+        "siteId":  "18969",
+        "optimusScore":  0.666,
+        "optimusTier":  "C",
+        "fy25Volume":  2194,
+        "fy25Utilization":  0.683,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "18969",
+        "optimusScore":  0.694,
+        "optimusTier":  "C",
+        "fy25Volume":  2194,
+        "fy25Utilization":  0.683,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "18969",
+        "optimusScore":  0.714,
+        "optimusTier":  "B",
+        "fy25Volume":  2194,
+        "fy25Utilization":  0.683,
+        "priority":  null,
+        "quickWins":  ""
+    },
+    {
+        "siteId":  "19030",
+        "optimusScore":  0.536,
+        "optimusTier":  "C",
+        "fy25Volume":  2553,
+        "fy25Utilization":  0.88,
+        "priority":  null,
+        "quickWins":  "Repair facade damage, repaint, replace broken doors, improve entrance appearance; Clean floors, repair walls, replace broken furniture, improve lighting; Remove personal items, organize desk, update signage, clear walkways; Replace broken furniture, organize cables, improve lighting, reduce noise; D"
+    },
+    {
+        "siteId":  "19114",
+        "optimusScore":  0.791,
+        "optimusTier":  "B",
+        "fy25Volume":  null,
+        "fy25Utilization":  0.701,
+        "priority":  null,
+        "quickWins":  "Organize desk items to reduce clutter.; Organize items on storage cart."
+    }
+]

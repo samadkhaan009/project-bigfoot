@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Map, { Layer, Source, NavigationControl, ScaleControl, Popup } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -292,11 +292,43 @@ const PSI_COUNTS = { oo:143, authorized:397, mg:33, td:20, amp:1 }
 const PSI_3P_TOTAL = PSI_3P_KEYS.reduce((s,k) => s + (PSI_COUNTS[k]||0), 0)
 
 // ── Performance Mode constants ────────────────────────
-const PERF_BUCKET_COLORS  = { 1:'#ef4444', 2:'#f97316', 3:'#eab308', 4:'#86efac', 5:'#22c55e' }
-const PERF_BUCKET_LABELS  = { 1:'Underperforming', 2:'Below Average', 3:'Average', 4:'Above Average', 5:'Top Performer' }
-const PERF_BUCKET_COUNTS  = { 1:13, 2:119, 3:169, 4:167, 5:56 }
-const PERF_COLOR_EXPR = ['match', ['coalesce', ['get','scoreBucket'], 0],
-  1,'#ef4444', 2,'#f97316', 3,'#eab308', 4,'#86efac', 5,'#22c55e', '#64748b']
+const PERF_TIER_LABELS = { 1:'At Risk', 2:'Watch List', 3:'Average', 4:'Strong', 5:'Top Performer' }
+const PERF_TIER_COUNTS = { 1:13, 2:119, 3:169, 4:167, 5:56 }
+
+// Dual color families — O&O stays amber, 3P stays blue even in perf mode
+const PERF_OO_COLORS = { 5:'#fbbf24', 4:'#f59e0b', 3:'#d97706', 2:'#b45309', 1:'#92400e', 0:'#78716c' }
+const PERF_3P_COLORS = { 5:'#22d3ee', 4:'#38bdf8', 3:'#60a5fa', 2:'#3b82f6', 1:'#1d4ed8', 0:'#64748b' }
+
+// MapLibre expression: O&O amber family, 3P blue family, keyed by scoreBucket
+const PERF_COLOR_EXPR = ['case',
+  ['==', ['get','category'], 'OO'],
+  ['match', ['coalesce',['get','scoreBucket'],0], 5,'#fbbf24', 4,'#f59e0b', 3,'#d97706', 2,'#b45309', 1,'#92400e', '#78716c'],
+  ['match', ['coalesce',['get','scoreBucket'],0], 5,'#22d3ee', 4,'#38bdf8', 3,'#60a5fa', 2,'#3b82f6', 1,'#1d4ed8', '#64748b']
+]
+const AT_RISK_FILTER = ['==', ['coalesce',['get','scoreBucket'],0], 1]
+
+// ── Optimus Mode constants ────────────────────────────
+const OPTIMUS_COLORS     = { A:'#22c55e', B:'#818cf8', C:'#fb923c' }  // green/indigo/orange spectrum
+const OPTIMUS_NO_DATA    = '#475569'
+const OPTIMUS_TIER_LABELS = { A:'Top Quality', B:'Good', C:'Needs Improvement' }
+const OPTIMUS_TIER_COUNTS = { A:0, B:49, C:77 }  // geocoded counts
+const OPTIMUS_OO_COLOR = ['match', ['coalesce',['get','optimusTier'],''],
+  'A','#22c55e', 'B','#818cf8', 'C','#fb923c', '#475569']
+// Score-based radius: 6 + (optimusScore * 10) → range 6–16px; no-score → 5px
+const OPTIMUS_RADIUS_EXPR = ['case',
+  ['==', ['coalesce',['get','optimusTier'],''], ''],
+  5,
+  ['+', 6, ['*', ['coalesce',['get','optimusScore'],0], 10]]
+]
+
+// ── Lease Intelligence constants ─────────────────────
+const LEASE_ACTION_COLORS = {
+  'Relocate':'#ef4444','Refurbish':'#f97316','Assess-Close':'#7f1d1d',
+  'Renew+Expand':'#22c55e','Renew':'#60a5fa','Review':'#a855f7',
+}
+const LEASE_RING_COLOR_EXPR = ['match', ['coalesce',['get','leaseAction'],''],
+  'Relocate','#ef4444','Refurbish','#f97316','Assess-Close','#7f1d1d',
+  'Renew+Expand','#22c55e','Renew','#60a5fa','Review','#a855f7','#475569']
 
 // Log-scale volume radius (p10=75 → ln=4.3175, p90=11947 → ln=9.3882, range=5.0707)
 // p90/p10 ratio = 159× — log scale required
@@ -442,11 +474,11 @@ function QualitySummaryBar({ layers }) {
 }
 
 // ── Legend ────────────────────────────────────────────────
-function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode }) {
+function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel }) {
   const [open, setOpen] = useState(true)
   const active    = Object.entries(layers).filter(([k,v]) => v)
   const psiActive = Object.entries(psiLayers||{}).filter(([k,v]) => v)
-  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode) return null
+  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel) return null
   const allInfo = {}
   LAYER_GROUPS.forEach(g => g.layers.forEach(l => { allInfo[l.key] = l }))
   return (
@@ -515,7 +547,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode }) 
                   <span style={{ fontSize:11, color:'#94a3b8', fontWeight:600 }}>Urban / Rural</span>
                   {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
                 </div>
-                {[['Urban Core','#818cf8'],['Rural Hub','#86efac']].map(([label, color]) => (
+                {[['Major Urban','#38bdf8'],['Urban','#4ade80'],['Rural Hub','#92400e']].map(([label, color]) => (
                   <div key={label} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
                     <div style={{ width:10, height:10, borderRadius:'50%', background:color }}/>
                     <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
@@ -560,24 +592,86 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode }) 
             </div>
           )}
 
-          {/* Performance bucket legend */}
-          {performanceMode && psiActive.length > 0 && (
-            <div style={{ padding:'6px 13px 4px', borderTop:'1px solid rgba(34,197,94,0.2)', marginTop:4 }}>
-              <div style={{ fontSize:9, fontWeight:700, color:'#14532d', letterSpacing:'0.08em', marginBottom:5 }}>PERFORMANCE SCORE</div>
-              {[5,4,3,2,1].map(b => (
-                <div key={b} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
-                  <div style={{ width:10, height:10, borderRadius:'50%', background:PERF_BUCKET_COLORS[b], flexShrink:0, boxShadow:`0 0 4px ${PERF_BUCKET_COLORS[b]}88` }}/>
-                  <span style={{ fontSize:10, color:'#64748b' }}>
-                    {PERF_BUCKET_LABELS[b]}
-                    <span style={{ color:'#334155', marginLeft:4 }}>({PERF_BUCKET_COUNTS[b]})</span>
+          {/* Lease Intelligence legend */}
+          {showLeaseIntel && psiActive.length > 0 && (
+            <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(249,115,22,0.25)', marginTop:4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#92400e', letterSpacing:'0.08em', marginBottom:6 }}>LEASE DECISIONS</div>
+              {[['Relocate','#ef4444',10],['Refurbish','#f97316',6],['Assess-Close','#7f1d1d',2],['Renew+Expand','#22c55e',3],['Renew','#60a5fa',35],['Review','#a855f7',1]].map(([label,color,count]) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
+                  <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2.5px solid ${color}`, flexShrink:0 }}/>
+                  <span style={{ fontSize:10, color:'#64748b' }}>{label} <span style={{ color:'#334155' }}>({count})</span></span>
+                </div>
+              ))}
+              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                <div style={{ width:11, height:11, borderRadius:'50%', background:'rgba(251,191,36,0.35)', flexShrink:0 }}/>
+                <span style={{ fontSize:10, color:'#64748b' }}>Contract Flag <span style={{ color:'#334155' }}>(7)</span></span>
+              </div>
+              <div style={{ marginTop:6, padding:'5px 8px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:4 }}>
+                <div style={{ fontSize:9, color:'#ef4444', lineHeight:1.7 }}>32 sites on expired leases<br/>$3.4M monthly revenue at risk</div>
+              </div>
+            </div>
+          )}
+
+          {/* Optimus legend */}
+          {optimusMode && psiActive.length > 0 && (
+            <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(168,85,247,0.2)', marginTop:4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#7e22ce', letterSpacing:'0.08em', marginBottom:6 }}>OPTIMUS SITE QUALITY — O&O ONLY</div>
+              {/* Tier rows with size-indicating dots (larger = higher score) */}
+              {[['A','#22c55e','Top Quality',0,14],['B','#818cf8','Good',49,11],['C','#fb923c','Needs Improvement',77,8]].map(([tier,color,label,count,dotR]) => (
+                <div key={tier} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:5 }}>
+                  <div style={{ width:dotR, height:dotR, borderRadius:'50%', background:color, flexShrink:0, opacity:count===0?0.3:1 }}/>
+                  <span style={{ fontSize:10, color:count===0?'#334155':'#64748b' }}>
+                    Tier {tier} — {label}
+                    <span style={{ color:'#334155', marginLeft:4 }}>({count})</span>
                   </span>
                 </div>
               ))}
-              <div style={{ display:'flex', alignItems:'center', gap:7, marginTop:5 }}>
-                <div style={{ display:'flex', gap:2 }}>
-                  {[5,8,11].map(r => <div key={r} style={{ width:r, height:r, borderRadius:'50%', background:'#64748b', flexShrink:0 }}/>)}
+              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                <div style={{ width:5, height:5, borderRadius:'50%', background:'#475569', flexShrink:0 }}/>
+                <span style={{ fontSize:10, color:'#334155' }}>Not yet audited</span>
+              </div>
+              <div style={{ fontSize:9, color:'#475569', marginTop:3, marginBottom:7 }}>Circle size = Optimus quality score</div>
+              <div style={{ padding:'5px 8px', background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.3)', borderRadius:4 }}>
+                <div style={{ fontSize:9, color:'#818cf8', lineHeight:1.7 }}>
+                  Average O&O quality score: 65.6%<br/>Target for Tier A: 85%+<br/>No O&O site currently achieves Tier A.
                 </div>
-                <span style={{ fontSize:9, color:'#475569' }}>circle size = exam volume delivered</span>
+              </div>
+            </div>
+          )}
+
+          {/* Performance legend — two-column grid */}
+          {performanceMode && psiActive.length > 0 && (
+            <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(34,197,94,0.2)', marginTop:4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#14532d', letterSpacing:'0.08em', marginBottom:6 }}>PERFORMANCE TIER</div>
+              {/* Column headers */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:4, marginBottom:5 }}>
+                <span style={{ fontSize:9, fontWeight:700, color:'#78350f', letterSpacing:'0.04em' }}>O&O SITES</span>
+                <span style={{ fontSize:9, fontWeight:700, color:'#0c4a6e', letterSpacing:'0.04em' }}>3P SITES</span>
+              </div>
+              {/* 5 tier rows */}
+              {[5,4,3,2,1].map(b => (
+                <div key={b} style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:4, marginBottom:4, alignItems:'center' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                    <div style={{ width:9, height:9, borderRadius:'50%', background:PERF_OO_COLORS[b], flexShrink:0 }}/>
+                    <span style={{ fontSize:9, color:'#64748b' }}>
+                      {PERF_TIER_LABELS[b]}
+                      {PERF_TIER_COUNTS[b] && <span style={{ color:'#334155', marginLeft:3 }}>({PERF_TIER_COUNTS[b]})</span>}
+                    </span>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                    <div style={{ width:9, height:9, borderRadius:'50%', background:PERF_3P_COLORS[b], flexShrink:0 }}/>
+                    <span style={{ fontSize:9, color:'#64748b' }}>{PERF_TIER_LABELS[b]}</span>
+                  </div>
+                </div>
+              ))}
+              {/* Notes */}
+              <div style={{ marginTop:7, paddingTop:6, borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize:9, color:'#475569', marginBottom:2 }}>Lighter shade = better performance</div>
+                <div style={{ fontSize:9, color:'#475569' }}>Circle size = exam volume delivered</div>
+              </div>
+              {/* At Risk callout */}
+              <div style={{ marginTop:7, padding:'5px 8px', background:'rgba(146,64,14,0.12)', border:'1px solid rgba(146,64,14,0.35)', borderRadius:5 }}>
+                <span style={{ fontSize:9, fontWeight:700, color:'#92400e' }}>⚠ 13 At Risk sites identified across the network</span>
               </div>
             </div>
           )}
@@ -600,7 +694,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode }) 
 }
 
 // ── Info Card ────────────────────────────────────────────
-function InfoCard({ info, onClose, qualityMode }) {
+function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel }) {
   if (!info) return null
 
   // PSI site card
@@ -635,18 +729,134 @@ function InfoCard({ info, onClose, qualityMode }) {
           {info.scoreBucket != null && (
             <div style={{ marginTop:10, borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:10 }}>
               <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>PERFORMANCE 2024–25</div>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:8, padding:'3px 9px', borderRadius:4, background:`${PERF_BUCKET_COLORS[info.scoreBucket]}18`, border:`1px solid ${PERF_BUCKET_COLORS[info.scoreBucket]}44` }}>
-                <div style={{ width:6, height:6, borderRadius:'50%', background:PERF_BUCKET_COLORS[info.scoreBucket], flexShrink:0 }}/>
-                <span style={{ fontSize:10, fontWeight:700, color:PERF_BUCKET_COLORS[info.scoreBucket] }}>
-                  Bucket {info.scoreBucket} — {PERF_BUCKET_LABELS[info.scoreBucket]}
-                </span>
-              </div>
+              {(() => {
+                const tierColors = info.psiCategory === 'OO' ? PERF_OO_COLORS : PERF_3P_COLORS
+                const tc = tierColors[info.scoreBucket] || tierColors[0]
+                return (<>
+                  <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:info.scoreBucket===1?4:8, padding:'3px 9px', borderRadius:4, background:`${tc}18`, border:`1px solid ${tc}44` }}>
+                    <div style={{ width:6, height:6, borderRadius:'50%', background:tc, flexShrink:0 }}/>
+                    <span style={{ fontSize:10, fontWeight:700, color:tc }}>
+                      Performance Tier: {PERF_TIER_LABELS[info.scoreBucket]}
+                    </span>
+                  </div>
+                  {info.scoreBucket === 1 && (
+                    <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:8, padding:'4px 8px', background:'rgba(239,68,68,0.1)', borderRadius:4, border:'1px solid rgba(239,68,68,0.3)' }}>
+                      <span style={{ fontSize:9, color:'#ef4444', fontWeight:700 }}>⚠ This site requires immediate attention</span>
+                    </div>
+                  )}
+                </>)
+              })()}
               {info.cdVolume    != null && <InfoRow label="CD Volume"      value={info.cdVolume.toLocaleString()} color="#94a3b8" />}
               {info.avgMonthlyVol != null && <InfoRow label="Monthly Avg"  value={Math.round(info.avgMonthlyVol).toLocaleString()} />}
               {info.seats       != null && <InfoRow label="Seats"          value={info.seats.toLocaleString()} />}
               {info.dispRate    != null && <InfoRow label="Displacement"   value={(info.dispRate*100).toFixed(1)+'%'}   color={info.dispRate>0.03?'#f97316':info.dispRate>0.01?'#eab308':'#94a3b8'} />}
               {info.reschdRate  != null && <InfoRow label="Reschedule"     value={(info.reschdRate*100).toFixed(1)+'%'} color={info.reschdRate>0.05?'#f97316':info.reschdRate>0.02?'#eab308':'#94a3b8'} />}
               {info.dmaRegion               && <InfoRow label="DMA Region" value={info.dmaRegion} />}
+            </div>
+          )}
+
+          {/* Optimus Quality Score — always shown for O&O sites */}
+          {info.psiCategory === 'OO' && (
+            <div style={{ marginTop:10, borderTop:'1px solid rgba(168,85,247,0.2)', paddingTop:10 }}>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#a855f7', marginBottom:7 }}>OPTIMUS QUALITY SCORE</div>
+              {!info.optimusTier ? (
+                <div style={{ fontSize:10, color:'#475569', fontStyle:'italic' }}>No Optimus audit on record</div>
+              ) : (() => {
+                const catColor = v => v == null ? '#334155' : v >= 0.85 ? '#22c55e' : v >= 0.70 ? '#818cf8' : '#fb923c'
+                const pct = (info.optimusScore||0)*100
+                const barCol = pct >= 85 ? '#22c55e' : pct >= 70 ? '#818cf8' : '#fb923c'
+                const tc = OPTIMUS_COLORS[info.optimusTier]||'#475569'
+                const CATS = [
+                  ['oc01','Site Exterior'],      ['oc02','Entrance & Lobby'],
+                  ['oc03','Reception'],           ['oc04','Testing Rooms'],
+                  ['oc05','Restrooms'],           ['oc06','Employee / Storage'],
+                  ['oc07','ADA Compliance'],      ['oc08','Signage & Branding'],
+                  ['oc09','Private Room'],
+                ]
+                return (<>
+                  {/* Score bar */}
+                  <div style={{ marginBottom:8 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', fontSize:9, color:'#64748b', marginBottom:3 }}>
+                      <span>Overall Score</span>
+                      <span style={{ color:barCol, fontWeight:700 }}>{pct.toFixed(1)}%</span>
+                    </div>
+                    <div style={{ height:5, background:'rgba(255,255,255,0.08)', borderRadius:3, overflow:'hidden' }}>
+                      <div style={{ width:`${pct}%`, height:'100%', borderRadius:3, background:barCol }}/>
+                    </div>
+                  </div>
+                  {/* Tier badge + date */}
+                  <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:7 }}>
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'2px 8px', borderRadius:4, background:`${tc}18`, border:`1px solid ${tc}44` }}>
+                      <span style={{ fontSize:9, fontWeight:700, color:tc }}>Tier {info.optimusTier} — {OPTIMUS_TIER_LABELS[info.optimusTier]}</span>
+                    </div>
+                    {info.osDate && <span style={{ fontSize:9, color:'#334155' }}>{info.osDate}</span>}
+                  </div>
+                  {/* Category grid */}
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'5px 10px', marginBottom:6 }}>
+                    {CATS.map(([key, label]) => {
+                      const v = info[key]
+                      const c = catColor(v)
+                      return (
+                        <div key={key}>
+                          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:2 }}>
+                            <span style={{ fontSize:8, color:'#475569' }}>{label}</span>
+                            <span style={{ fontSize:8, color:c, fontWeight:600 }}>{v != null ? (v*100).toFixed(0)+'%' : '—'}</span>
+                          </div>
+                          <div style={{ height:3, background:'rgba(255,255,255,0.06)', borderRadius:2, overflow:'hidden' }}>
+                            {v != null && <div style={{ width:`${v*100}%`, height:'100%', background:c, borderRadius:2 }}/>}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {/* Flags */}
+                  {info.adaFlag && (
+                    <div style={{ display:'flex', alignItems:'center', gap:5, padding:'3px 7px', background:'rgba(239,68,68,0.1)', borderRadius:4, border:'1px solid rgba(239,68,68,0.3)', marginBottom:4 }}>
+                      <span style={{ fontSize:9, color:'#ef4444', fontWeight:700 }}>⚠ ADA compliance issue flagged</span>
+                    </div>
+                  )}
+                  {info.brandingFlag && (
+                    <div style={{ display:'flex', alignItems:'center', gap:5, padding:'3px 7px', background:'rgba(245,158,11,0.1)', borderRadius:4, border:'1px solid rgba(245,158,11,0.3)', marginBottom:4 }}>
+                      <span style={{ fontSize:9, color:'#f59e0b', fontWeight:700 }}>⚠ Branding requires update</span>
+                    </div>
+                  )}
+                  {/* Quick Wins if present */}
+                  {info.quickWins && (
+                    <div style={{ padding:'5px 8px', background:'rgba(168,85,247,0.06)', borderRadius:5, borderLeft:'2px solid #a855f7', marginTop:4 }}>
+                      <div style={{ fontSize:9, color:'#a855f7', fontWeight:700, marginBottom:2 }}>QUICK WINS</div>
+                      <div style={{ fontSize:9, color:'#64748b', lineHeight:1.5, fontStyle:'italic' }}>{info.quickWins}</div>
+                    </div>
+                  )}
+                </>)
+              })()}
+            </div>
+          )}
+
+          {/* Lease Intelligence section */}
+          {showLeaseIntel && info.leaseAction && (
+            <div style={{ marginTop:10, borderTop:'1px solid rgba(249,115,22,0.2)', paddingTop:10 }}>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>LEASE INTELLIGENCE</div>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:7, padding:'3px 9px', borderRadius:4, background:`${LEASE_ACTION_COLORS[info.leaseAction]||'#475569'}18`, border:`1px solid ${LEASE_ACTION_COLORS[info.leaseAction]||'#475569'}44` }}>
+                <div style={{ width:6, height:6, borderRadius:'50%', background:LEASE_ACTION_COLORS[info.leaseAction]||'#475569', flexShrink:0 }}/>
+                <span style={{ fontSize:10, fontWeight:700, color:LEASE_ACTION_COLORS[info.leaseAction]||'#475569' }}>{info.leaseAction}</span>
+              </div>
+              {info.leaseStatus && <InfoRow label="Lease Status" value={info.leaseStatus} color={info.leaseStatus==='EXPIRED'?'#ef4444':info.leaseStatus.startsWith('<')?'#f97316':'#94a3b8'} />}
+              {info.daysRemaining != null && info.daysRemaining < 0 && <InfoRow label="Days Overdue" value={Math.abs(info.daysRemaining).toLocaleString()} color="#ef4444" />}
+              {info.leaseExpiry && <InfoRow label="Lease Expiry" value={info.leaseExpiry} />}
+              {info.leaseUtilization != null && <InfoRow label="FY25 Utilization" value={(info.leaseUtilization*100).toFixed(0)+'%'} color={info.leaseUtilization>=0.80?'#22c55e':info.leaseUtilization>=0.60?'#eab308':'#ef4444'} />}
+              {info.monthlyRevenue != null && <InfoRow label="Monthly Revenue" value={'$'+Math.round(info.monthlyRevenue).toLocaleString()} color="#94a3b8" />}
+              {info.licensureNote && <InfoRow label="Contract Note" value={info.licensureNote} />}
+              {info.recommendedAction && (
+                <div style={{ marginTop:6, padding:'5px 8px', background:'rgba(249,115,22,0.06)', borderRadius:4, borderLeft:'2px solid #f97316' }}>
+                  <div style={{ fontSize:9, color:'#f97316', fontWeight:700, marginBottom:2 }}>RECOMMENDED</div>
+                  <div style={{ fontSize:10, color:'#64748b', lineHeight:1.5, fontStyle:'italic' }}>{info.recommendedAction}</div>
+                </div>
+              )}
+              {info.contractFlag && (
+                <div style={{ marginTop:6, display:'flex', alignItems:'center', gap:5, padding:'4px 8px', background:'rgba(251,191,36,0.1)', borderRadius:4, border:'1px solid rgba(251,191,36,0.3)' }}>
+                  <span style={{ fontSize:9, color:'#fbbf24', fontWeight:700 }}>⚠ Contract alignment review required</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -723,6 +933,10 @@ export default function BigFootMap() {
   const [showRadii, setShowRadii]       = useState(false)
   const [psiCollapsed, setPsiCollapsed] = useState({group:false,thirdParty:true})
   const [performanceMode, setPerformanceMode] = useState(false)
+  const [optimusMode,     setOptimusMode]     = useState(false)
+  const [showLeaseIntel,  setShowLeaseIntel]  = useState(false)
+  const togglePerformanceMode = () => { setPerformanceMode(p => { if (!p) setOptimusMode(false); return !p; }) }
+  const toggleOptimusMode     = () => { setOptimusMode(o => { if (!o) setPerformanceMode(false); return !o; }) }
   const mapRef = useRef(null)
 
   const onMapLoad = useCallback(() => {
@@ -749,6 +963,8 @@ export default function BigFootMap() {
     setLayers(prev => ({...prev,...update}))
   }
 
+  const showNormalMode = !performanceMode && !optimusMode
+
   const activePsiPropTypes = [
     ...(psiLayers.oo         ? ['PSI Owned']      : []),
     ...(psiLayers.authorized ? ['PSI Authorized'] : []),
@@ -761,10 +977,44 @@ export default function BigFootMap() {
     ? ['in', ['get','propertyType'], ['literal', activePsiPropTypes]]
     : ['==', ['get','id'], '_none_']
 
+  // ── Filter state ──────────────────────────────────────
+  const [filterPanelOpen,  setFilterPanelOpen]  = useState(false)
+  const [availableStates,  setAvailableStates]  = useState([])
+  const [filterStates,     setFilterStates]     = useState(null)   // null = all
+  const [filterPerfTiers,  setFilterPerfTiers]  = useState(null)   // null = all; Set<string>
+  const [filterOptusTiers, setFilterOptusTiers] = useState(null)   // null = all; Set<string>
+  const [stateDropOpen,    setStateDropOpen]    = useState(false)
+
+  useEffect(() => {
+    fetch('/data/data_psi_sites.geojson').then(r => r.json())
+      .then(d => setAvailableStates([...new Set(d.features.map(f => f.properties.state).filter(Boolean))].sort()))
+      .catch(() => {})
+  }, [])
+
+  const hasActiveFilters = filterStates !== null ||
+    (performanceMode && filterPerfTiers !== null) ||
+    (optimusMode && filterOptusTiers !== null)
+
+  const addPsiFilters = (base) => {
+    const parts = [base]
+    if (filterStates) parts.push(['in',['get','state'],['literal',[...filterStates]]])
+    if (performanceMode && filterPerfTiers) {
+      const vals = [...filterPerfTiers].map(v => v==='no-data' ? 0 : Number(v))
+      parts.push(['in',['coalesce',['get','scoreBucket'],0],['literal',vals]])
+    }
+    if (optimusMode && filterOptusTiers) {
+      const vals = [...filterOptusTiers].map(v => v==='no-score' ? '' : v)
+      parts.push(['in',['coalesce',['get','optimusTier'],''],['literal',vals]])
+    }
+    return parts.length > 1 ? ['all',...parts] : parts[0]
+  }
+
   const interactiveIds = [
     ...POINT_LAYERS.map(k=>`${k}-symbol`),
     'urban-rural-circle','population-fill','metros-fill','states-fill',
-    ...(performanceMode ? ['psi-perf-circle'] : PSI_INTERACTIVE),
+    ...(performanceMode ? ['psi-perf-circle'] :
+        optimusMode     ? ['psi-optimus-oo-circle','psi-authorized-circle','psi-mg-circle','psi-td-circle','psi-amp-circle'] :
+        PSI_INTERACTIVE),
   ]
 
   const togglePsi    = (key) => setPsiLayers(prev => ({...prev, [key]:!prev[key]}))
@@ -779,7 +1029,7 @@ export default function BigFootMap() {
     const coords = f.geometry?.type==='Point' ? f.geometry.coordinates : null
     const lid    = f.layer.id
 
-    if (PSI_INTERACTIVE.includes(lid) || lid === 'psi-perf-circle') {
+    if (PSI_INTERACTIVE.includes(lid) || lid === 'psi-perf-circle' || lid === 'psi-optimus-oo-circle') {
       return {
         lon: coords?.[0]??null, lat: coords?.[1]??null,
         name: props.name||'Unknown Site',
@@ -790,7 +1040,7 @@ export default function BigFootMap() {
         address: props.address||'',
         city: props.city||'', state: props.state||'',
         zip: props.zip||'', country: props.country||'',
-        // Performance fields (null when site has no perf data)
+        // Performance fields
         scoreBucket:   props.scoreBucket   ?? null,
         scoreRaw:      props.scoreRaw      ?? null,
         seats:         props.seats         ?? null,
@@ -800,6 +1050,30 @@ export default function BigFootMap() {
         dispRate:      props.dispRate      ?? null,
         reschdRate:    props.reschdRate     ?? null,
         dmaRegion:     props.dmaRegion     || null,
+        // Lease fields
+        leaseAction:       props.leaseAction       || null,
+        leaseStatus:       props.leaseStatus        || null,
+        daysRemaining:     props.daysRemaining      ?? null,
+        leaseUtilization:  props.leaseUtilization   ?? null,
+        monthlyRevenue:    props.monthlyRevenue     ?? null,
+        contractFlag:      props.contractFlag       === true,
+        recommendedAction: props.recommendedAction  || null,
+        licensureNote:     props.licensureNote      || null,
+        leaseExpiry:       props.leaseExpiry        || null,
+        // Optimus summary
+        optimusScore:    props.optimusScore    ?? null,
+        optimusTier:     props.optimusTier     || null,
+        fy25Volume:      props.fy25Volume      ?? null,
+        fy25Utilization: props.fy25Utilization ?? null,
+        priority:        props.priority        || null,
+        quickWins:       props.quickWins       || null,
+        // Optimus categories + flags
+        osDate:      props.osDate      || null,
+        oc01: props.oc01 ?? null, oc02: props.oc02 ?? null, oc03: props.oc03 ?? null,
+        oc04: props.oc04 ?? null, oc05: props.oc05 ?? null, oc06: props.oc06 ?? null,
+        oc07: props.oc07 ?? null, oc08: props.oc08 ?? null, oc09: props.oc09 ?? null,
+        adaFlag:      props.adaFlag      === true,
+        brandingFlag: props.brandingFlag === true,
       }
     }
 
@@ -861,7 +1135,7 @@ export default function BigFootMap() {
           </Source>
         )}
         {layers.metros && (
-          <Source id="metros" type="geojson" data="/metros.geojson">
+          <Source id="metros" type="geojson" data="/data/metros.geojson">
             <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.07}}/>
             <Layer id="metros-line" type="line" paint={{'line-color':'#22d3ee','line-width':1.1,'line-opacity':0.65,'line-dasharray':[4,3]}}/>
           </Source>
@@ -874,21 +1148,21 @@ export default function BigFootMap() {
         )}
         {layers.urban_rural && (
           <Source id="urban_rural" type="geojson" data="/data/data_urban_rural.geojson">
-            <Layer id="urban-rural-circle" type="circle" paint={{'circle-radius':8,'circle-color':['match',['get','classification'],'Urban Core','#818cf8','#86efac'],'circle-opacity':0.75,'circle-stroke-color':'#020817','circle-stroke-width':1}}/>
+            <Layer id="urban-rural-circle" type="circle" paint={{'circle-radius':8,'circle-color':['match',['get','classification'],'Major Urban','#38bdf8','Urban','#4ade80','#92400e'],'circle-opacity':0.75,'circle-stroke-color':'#020817','circle-stroke-width':1}}/>
           </Source>
         )}
         {/* PSI 50-mile radii — type-filtered and color-coded, rendered below industry icons */}
         <Source id="psi-radii" type="geojson" data="/data/data_psi_radii.geojson">
           {/* O&O — amber, bolder line */}
-          {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={['==',['get','propertyType'],'PSI Owned']} paint={{'line-color':'#f59e0b','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
+          {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':'#f59e0b','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
           {/* PSI Authorized — sky */}
-          {psiLayers.authorized && showRadii && <Layer id="psi-radii-authorized-line" type="line" filter={['==',['get','propertyType'],'PSI Authorized']} paint={{'line-color':'#38bdf8','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.authorized && showRadii && <Layer id="psi-radii-authorized-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'line-color':'#38bdf8','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
           {/* MG Testing — purple */}
-          {psiLayers.mg && showRadii && <Layer id="psi-radii-mg-line" type="line" filter={['==',['get','propertyType'],'MG TESTING']} paint={{'line-color':'#a855f7','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.mg && showRadii && <Layer id="psi-radii-mg-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])} paint={{'line-color':'#a855f7','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
           {/* TD Testing — rose */}
-          {psiLayers.td && showRadii && <Layer id="psi-radii-td-line" type="line" filter={['==',['get','propertyType'],'TD TESTING']} paint={{'line-color':'#fb7185','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.td && showRadii && <Layer id="psi-radii-td-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])} paint={{'line-color':'#fb7185','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
           {/* AMP Authorized — teal */}
-          {psiLayers.amp && showRadii && <Layer id="psi-radii-amp-line" type="line" filter={['==',['get','propertyType'],'AMP Authorized']} paint={{'line-color':'#2dd4bf','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.amp && showRadii && <Layer id="psi-radii-amp-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])} paint={{'line-color':'#2dd4bf','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
         </Source>
 
         {iconsLoaded && POINT_LAYERS.map(key => layers[key] && (
@@ -900,15 +1174,41 @@ export default function BigFootMap() {
         {/* PSI sites — rendered on top of industry icons */}
         <Source id="psi-sites" type="geojson" data="/data/data_psi_sites.geojson">
           {/* Normal mode: property-type colors */}
-          {!performanceMode && psiLayers.oo && <Layer id="psi-oo-halo"   type="circle" filter={['==',['get','propertyType'],'PSI Owned']}    paint={{'circle-radius':13,'circle-color':PSI_COLORS.oo,'circle-opacity':0.18,'circle-blur':0.6}}/>}
-          {!performanceMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={['==',['get','propertyType'],'PSI Owned']}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
-          {!performanceMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={['==',['get','propertyType'],'PSI Authorized']} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {!performanceMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={['==',['get','propertyType'],'MG TESTING']}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {!performanceMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={['==',['get','propertyType'],'TD TESTING']}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {!performanceMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={['==',['get','propertyType'],'AMP Authorized']}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {/* Performance mode: score-bucket colors, volume-scaled radius */}
-          {performanceMode && anyPsiActive && <Layer id="psi-perf-halo" type="circle" filter={['all',['==',['get','category'],'OO'],perfLayerFilter]} paint={{'circle-radius':['case',['<=',['coalesce',['get','cdVolume'],0],0],11,['+',11,['*',_tExpr,10]]],'circle-color':PERF_COLOR_EXPR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
-          {performanceMode && anyPsiActive && <Layer id="psi-perf-circle" type="circle" filter={perfLayerFilter} paint={{'circle-radius':PERF_RADIUS_EXPR,'circle-color':PERF_COLOR_EXPR,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {showNormalMode && psiLayers.oo && <Layer id="psi-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':13,'circle-color':PSI_COLORS.oo,'circle-opacity':0.18,'circle-blur':0.6}}/>}
+          {showNormalMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {showNormalMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {/* Optimus mode: O&O colored by tier, 3P normal colors */}
+          {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':['+', OPTIMUS_RADIUS_EXPR, 5],'circle-color':OPTIMUS_OO_COLOR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
+          {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':OPTIMUS_RADIUS_EXPR,'circle-color':OPTIMUS_OO_COLOR,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {optimusMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {/* Performance mode: score-tier colors, volume-scaled radius */}
+          {performanceMode && anyPsiActive && <Layer id="psi-perf-halo" type="circle" filter={addPsiFilters(['all',['==',['get','category'],'OO'],perfLayerFilter])} paint={{'circle-radius':['case',['<=',['coalesce',['get','cdVolume'],0],0],11,['+',11,['*',_tExpr,10]]],'circle-color':PERF_COLOR_EXPR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
+          {/* At Risk static red ring (scoreBucket=1) */}
+          {performanceMode && anyPsiActive && <Layer id="psi-at-risk-pulse" type="circle" filter={addPsiFilters(['all', AT_RISK_FILTER, perfLayerFilter])} paint={{'circle-radius':['+', PERF_RADIUS_EXPR, 8],'circle-color':'#ef4444','circle-opacity':0.4,'circle-blur':0.5}}/>}
+          {performanceMode && anyPsiActive && <Layer id="psi-perf-circle" type="circle" filter={addPsiFilters(perfLayerFilter)} paint={{'circle-radius':PERF_RADIUS_EXPR,'circle-color':PERF_COLOR_EXPR,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {/* Critical Optimus indicator — pulsing red ring, always shown when site layer is active */}
+          {anyPsiActive && <Layer id="psi-critical-optimus" type="circle"
+            filter={['==', ['get','criticalOptimus'], true]}
+            paint={{'circle-radius':17,'circle-color':'#ef4444','circle-opacity':0.45,'circle-blur':0.5}}
+          />}
+          {/* Lease Intelligence rings — rendered on top of dots, transparent fill */}
+          {showLeaseIntel && <Layer id="psi-lease-contract-pulse" type="circle"
+            filter={addPsiFilters(['all',
+              ['!=', ['coalesce',['get','leaseAction'],''], ''],
+              ['==', ['get','contractFlag'], true]
+            ])}
+            paint={{'circle-radius':['case',['==',['get','category'],'OO'],19,17],'circle-color':'#fbbf24','circle-opacity':0.35,'circle-blur':0.3}}
+          />}
+          {showLeaseIntel && <Layer id="psi-lease-ring" type="circle"
+            filter={addPsiFilters(['!=', ['coalesce',['get','leaseAction'],''], ''])}
+            paint={{'circle-radius':['case',['==',['get','category'],'OO'],12,10],'circle-color':'rgba(0,0,0,0)','circle-stroke-color':LEASE_RING_COLOR_EXPR,'circle-stroke-width':3,'circle-opacity':0,'circle-stroke-opacity':0.85}}
+          />}
         </Source>
 
         {hoverInfo?.lon && (
@@ -947,8 +1247,10 @@ export default function BigFootMap() {
       {/* Quality mode banner */}
       {qualityMode && <QualitySummaryBar layers={layers} />}
 
+      {/* Left column: header + filter panel */}
+      <div style={{ position:'absolute', top:20, left:20, width:284, display:'flex', flexDirection:'column', gap:8, maxHeight:'calc(100vh - 40px)', overflowY:'auto' }}>
       {/* Header */}
-      <div style={{ position:'absolute', top:20, left:20, background:'rgba(2,8,23,0.9)', border:'1px solid rgba(96,165,250,0.25)', borderRadius:12, padding:'14px 20px', backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)' }}>
+      <div style={{ background:'rgba(2,8,23,0.9)', border:'1px solid rgba(96,165,250,0.25)', borderRadius:12, padding:'14px 20px', backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)', flexShrink:0 }}>
         <div style={{ fontSize:18, fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.02em' }}>Project Big Foot</div>
         <div style={{ fontSize:10, color:'#22d3ee', marginTop:4, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase' }}>PSI / ETS &nbsp;·&nbsp; Network Intelligence</div>
 
@@ -979,7 +1281,7 @@ export default function BigFootMap() {
         </div>
 
         {/* Performance Mode Toggle */}
-        <div onClick={() => setPerformanceMode(p => !p)} style={{
+        <div onClick={togglePerformanceMode} style={{
           marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
           padding:'6px 10px',
           background: performanceMode ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.04)',
@@ -994,10 +1296,141 @@ export default function BigFootMap() {
             <div style={{ fontSize:10, fontWeight:700, color:performanceMode?'#22c55e':'#475569', letterSpacing:'0.04em' }}>
               {performanceMode ? 'PERFORMANCE ON' : 'Performance Mode'}
             </div>
-            {performanceMode && <div style={{ fontSize:9, color:'#14532d', marginTop:1 }}>Score bucket colors · dot size = seats</div>}
+            {performanceMode && <div style={{ fontSize:9, color:'#14532d', marginTop:1 }}>Performance tier · dual color by network type · dot size = volume</div>}
+          </div>
+        </div>
+
+        {/* Optimus Mode Toggle */}
+        <div onClick={toggleOptimusMode} style={{
+          marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
+          padding:'6px 10px',
+          background: optimusMode ? 'rgba(168,85,247,0.1)' : 'rgba(255,255,255,0.04)',
+          borderRadius:6,
+          border: optimusMode ? '1px solid rgba(168,85,247,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          transition:'all 0.2s',
+        }}>
+          <div style={{ width:28, height:16, borderRadius:8, background:optimusMode?'#a855f7':'#1e293b', border:`1px solid ${optimusMode?'#a855f7':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:optimusMode?'0 0 8px rgba(168,85,247,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:optimusMode?13:2, width:10, height:10, borderRadius:'50%', background:optimusMode?'#020817':'#475569', transition:'left 0.25s' }}/>
+          </div>
+          <div>
+            <div style={{ fontSize:10, fontWeight:700, color:optimusMode?'#a855f7':'#475569', letterSpacing:'0.04em' }}>
+              {optimusMode ? 'OPTIMUS ON' : 'Optimus Mode'}
+            </div>
+            {optimusMode && <div style={{ fontSize:9, color:'#6b21a8', marginTop:1 }}>O&O sites colored by Optimus quality tier</div>}
           </div>
         </div>
       </div>
+
+      {/* Filter Panel */}
+      <div style={{ background:'rgba(2,8,23,0.92)', border:`1px solid ${hasActiveFilters?'rgba(245,158,11,0.45)':'rgba(96,165,250,0.18)'}`, borderRadius:12, backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)', overflow:'hidden', flexShrink:0 }}>
+        <div onClick={()=>setFilterPanelOpen(o=>!o)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px', cursor:'pointer', userSelect:'none' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <span style={{ fontSize:11 }}>⚡</span>
+            <span style={{ fontSize:10, fontWeight:700, color:'#94a3b8', letterSpacing:'0.1em' }}>FILTERS</span>
+            {hasActiveFilters && <div style={{ width:6, height:6, borderRadius:'50%', background:'#f59e0b', boxShadow:'0 0 5px #f59e0b', flexShrink:0 }}/>}
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            {hasActiveFilters && <span onClick={e=>{e.stopPropagation();setFilterStates(null);setFilterPerfTiers(null);setFilterOptusTiers(null)}} style={{ fontSize:9, color:'#f59e0b', cursor:'pointer', padding:'2px 6px', borderRadius:3, background:'rgba(245,158,11,0.12)' }}>Clear All</span>}
+            <span style={{ fontSize:9, color:'#475569' }}>{filterPanelOpen?'▼':'▶'}</span>
+          </div>
+        </div>
+
+        {filterPanelOpen && (
+          <div style={{ padding:'0 14px 14px', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+
+            {/* Filter 1: State */}
+            <div style={{ marginTop:12, marginBottom:14 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>STATE</div>
+              <div onClick={()=>setStateDropOpen(o=>!o)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 10px', background:'rgba(255,255,255,0.05)', borderRadius:6, border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer', userSelect:'none' }}>
+                <span style={{ fontSize:11, color:'#94a3b8' }}>{filterStates===null?'All states':`${filterStates.size} state${filterStates.size!==1?'s':''} selected`}</span>
+                <span style={{ fontSize:9, color:'#475569' }}>{stateDropOpen?'▲':'▼'}</span>
+              </div>
+              {stateDropOpen && (
+                <div style={{ maxHeight:150, overflowY:'auto', marginTop:4, background:'rgba(2,8,23,0.98)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:6 }}>
+                  <div onClick={()=>setFilterStates(null)} style={{ padding:'5px 10px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.06)', userSelect:'none' }}>
+                    <span style={{ fontSize:10, color:'#60a5fa' }}>Select all</span>
+                  </div>
+                  {availableStates.map(state => {
+                    const checked = filterStates===null || filterStates.has(state)
+                    return (
+                      <div key={state} onClick={()=>setFilterStates(prev=>{
+                        if(prev===null) return new Set(availableStates.filter(s=>s!==state))
+                        const ns=new Set(prev); checked?ns.delete(state):ns.add(state)
+                        return ns.size===availableStates.length?null:ns
+                      })} style={{ display:'flex', alignItems:'center', gap:7, padding:'4px 10px', cursor:'pointer', userSelect:'none', borderBottom:'1px solid rgba(255,255,255,0.03)' }}>
+                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#334155'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
+                        </div>
+                        <span style={{ fontSize:11, color:checked?'#94a3b8':'#475569' }}>{state}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Filter 2: Performance Tier */}
+            <div style={{ marginBottom:14, opacity:performanceMode?1:0.4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>PERFORMANCE TIER</div>
+              {!performanceMode ? (
+                <div style={{ fontSize:9, color:'#334155', fontStyle:'italic' }}>Enable Performance Mode to filter by tier</div>
+              ) : (
+                <div>
+                  {[[5,'Top Performer',56],[4,'Strong',167],[3,'Average',169],[2,'Watch List',119],[1,'At Risk',13],['no-data','No Data',null]].map(([val,label,count]) => {
+                    const k=String(val), checked=filterPerfTiers===null||filterPerfTiers.has(k)
+                    return (
+                      <div key={k} onClick={()=>setFilterPerfTiers(prev=>{
+                        const ALL=['5','4','3','2','1','no-data']
+                        if(prev===null) return new Set(ALL.filter(x=>x!==k))
+                        const ns=new Set(prev); checked?ns.delete(k):ns.add(k)
+                        return ns.size===ALL.length?null:ns
+                      })} style={{ display:'flex', alignItems:'center', gap:7, padding:'3px 0', cursor:'pointer', userSelect:'none' }}>
+                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#334155'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
+                        </div>
+                        <span style={{ fontSize:11, color:checked?'#94a3b8':'#475569' }}>
+                          {label}{count!==null&&<span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>({count})</span>}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Filter 3: Optimus Tier */}
+            <div style={{ opacity:optimusMode?1:0.4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>OPTIMUS QUALITY TIER</div>
+              {!optimusMode ? (
+                <div style={{ fontSize:9, color:'#334155', fontStyle:'italic' }}>Enable Optimus Mode to filter by quality tier</div>
+              ) : (
+                <div>
+                  {[['A','Top Quality',0],['B','Good',49],['C','Needs Improvement',77],['no-score','No Score',null]].map(([val,label,count]) => {
+                    const checked=filterOptusTiers===null||filterOptusTiers.has(val)
+                    return (
+                      <div key={val} onClick={()=>setFilterOptusTiers(prev=>{
+                        const ALL=['A','B','C','no-score']
+                        if(prev===null) return new Set(ALL.filter(x=>x!==val))
+                        const ns=new Set(prev); checked?ns.delete(val):ns.add(val)
+                        return ns.size===ALL.length?null:ns
+                      })} style={{ display:'flex', alignItems:'center', gap:7, padding:'3px 0', cursor:'pointer', userSelect:'none' }}>
+                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#a855f7':'#334155'}`, background:checked?'#a855f7':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
+                        </div>
+                        <span style={{ fontSize:11, color:checked?'#94a3b8':'#475569' }}>
+                          {label}{count!==null&&<span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>({count})</span>}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+      </div>
+      </div>{/* closes left column */}
 
       {/* Layer Panel */}
       <div style={{ position:'absolute', top:20, right:20, background:'rgba(2,8,23,0.92)', border:'1px solid rgba(96,165,250,0.18)', borderRadius:12, padding:'14px 0', width:230, backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)', maxHeight:'calc(100vh - 80px)', overflowY:'auto' }}>
@@ -1100,15 +1533,28 @@ export default function BigFootMap() {
                 <span style={{ fontSize:9, color:'#334155', marginLeft:6 }}>all sites</span>
               </div>
             </div>
+
+            {/* Lease Intelligence toggle */}
+            <div onClick={()=>setShowLeaseIntel(l=>!l)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', userSelect:'none' }}>
+              <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showLeaseIntel?'#f97316':'#334155'}`, background:showLeaseIntel?'rgba(249,115,22,0.2)':'transparent', transition:'all 0.2s' }}/>
+              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showLeaseIntel?'#f97316':'#1e293b', border:`1px solid ${showLeaseIntel?'#f97316':'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:showLeaseIntel?'0 0 5px rgba(249,115,22,0.4)':'none' }}>
+                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showLeaseIntel?13:2, background:showLeaseIntel?'#020817':'#475569', transition:'left 0.2s' }}/>
+              </div>
+              <div>
+                <span style={{ fontSize:12, fontWeight:500, color:showLeaseIntel?'#e2e8f0':'#475569', transition:'color 0.2s' }}>Lease Intelligence</span>
+                <span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>(57 sites)</span>
+                {showLeaseIntel && <div style={{ fontSize:9, color:'#92400e', marginTop:1 }}>32 expired · 7 contract flags</div>}
+              </div>
+            </div>
           </>)}
         </div>
       </div>
 
       {/* Legend */}
-      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} />
+      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} />
 
       {/* Info Card */}
-      <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} />
+      <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} />
 
       {/* Status Bar */}
       <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', background:'rgba(2,8,23,0.9)', border:'1px solid rgba(96,165,250,0.2)', borderRadius:8, padding:'8px 20px', backdropFilter:'blur(8px)', fontFamily:FONT, display:'flex', gap:20, alignItems:'center', boxShadow:'0 4px 16px rgba(0,0,0,0.4)' }}>

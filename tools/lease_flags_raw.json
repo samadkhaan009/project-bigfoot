@@ -1,0 +1,37 @@
+﻿[
+    {
+        "testCenter":  "WEST HARTFORD - FARMINGTON AVE",
+        "city":  "West Hartford",
+        "state":  "CT"
+    },
+    {
+        "testCenter":  "MYRTLE BEACH",
+        "city":  "Myrtle Beach",
+        "state":  "SC"
+    },
+    {
+        "testCenter":  "ROSWELL",
+        "city":  "Roswell",
+        "state":  "NM"
+    },
+    {
+        "testCenter":  "CHARLESTON",
+        "city":  "North Charleston",
+        "state":  "SC"
+    },
+    {
+        "testCenter":  "COLUMBIA",
+        "city":  "Columbia",
+        "state":  "SC"
+    },
+    {
+        "testCenter":  "OLYMPIA",
+        "city":  "Olympia",
+        "state":  "WA"
+    },
+    {
+        "testCenter":  "BEAUFORT",
+        "city":  "Beaufort",
+        "state":  "SC"
+    }
+]
