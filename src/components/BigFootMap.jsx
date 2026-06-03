@@ -836,10 +836,15 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel }) {
           {showLeaseIntel && info.leaseAction && (
             <div style={{ marginTop:10, borderTop:'1px solid rgba(249,115,22,0.2)', paddingTop:10 }}>
               <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>LEASE INTELLIGENCE</div>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:7, padding:'3px 9px', borderRadius:4, background:`${LEASE_ACTION_COLORS[info.leaseAction]||'#475569'}18`, border:`1px solid ${LEASE_ACTION_COLORS[info.leaseAction]||'#475569'}44` }}>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:info.leaseOnThirdParty?4:7, padding:'3px 9px', borderRadius:4, background:`${LEASE_ACTION_COLORS[info.leaseAction]||'#475569'}18`, border:`1px solid ${LEASE_ACTION_COLORS[info.leaseAction]||'#475569'}44` }}>
                 <div style={{ width:6, height:6, borderRadius:'50%', background:LEASE_ACTION_COLORS[info.leaseAction]||'#475569', flexShrink:0 }}/>
                 <span style={{ fontSize:10, fontWeight:700, color:LEASE_ACTION_COLORS[info.leaseAction]||'#475569' }}>{info.leaseAction}</span>
               </div>
+              {info.leaseOnThirdParty && (
+                <div style={{ fontSize:9, color:'#f59e0b', marginBottom:6, fontStyle:'italic' }}>
+                  ⚠ Partner (3P) site — lease ownership pending confirmation
+                </div>
+              )}
               {info.leaseStatus && <InfoRow label="Lease Status" value={info.leaseStatus} color={info.leaseStatus==='EXPIRED'?'#ef4444':info.leaseStatus.startsWith('<')?'#f97316':'#94a3b8'} />}
               {info.daysRemaining != null && info.daysRemaining < 0 && <InfoRow label="Days Overdue" value={Math.abs(info.daysRemaining).toLocaleString()} color="#ef4444" />}
               {info.leaseExpiry && <InfoRow label="Lease Expiry" value={info.leaseExpiry} />}
@@ -1051,15 +1056,16 @@ export default function BigFootMap() {
         reschdRate:    props.reschdRate     ?? null,
         dmaRegion:     props.dmaRegion     || null,
         // Lease fields
-        leaseAction:       props.leaseAction       || null,
-        leaseStatus:       props.leaseStatus        || null,
-        daysRemaining:     props.daysRemaining      ?? null,
-        leaseUtilization:  props.leaseUtilization   ?? null,
-        monthlyRevenue:    props.monthlyRevenue     ?? null,
-        contractFlag:      props.contractFlag       === true,
-        recommendedAction: props.recommendedAction  || null,
-        licensureNote:     props.licensureNote      || null,
-        leaseExpiry:       props.leaseExpiry        || null,
+        leaseAction:        props.leaseAction        || null,
+        leaseStatus:        props.leaseStatus         || null,
+        daysRemaining:      props.daysRemaining       ?? null,
+        leaseUtilization:   props.leaseUtilization    ?? null,
+        monthlyRevenue:     props.monthlyRevenue      ?? null,
+        contractFlag:       props.contractFlag        === true,
+        recommendedAction:  props.recommendedAction   || null,
+        licensureNote:      props.licensureNote       || null,
+        leaseExpiry:        props.leaseExpiry         || null,
+        leaseOnThirdParty:  props.leaseOnThirdParty   === true,
         // Optimus summary
         optimusScore:    props.optimusScore    ?? null,
         optimusTier:     props.optimusTier     || null,

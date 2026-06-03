@@ -1,35 +1,42 @@
 ﻿[
     {
+        "siteCode":  "10130",
         "testCenter":  "WEST HARTFORD - FARMINGTON AVE",
         "city":  "West Hartford",
         "state":  "CT"
     },
     {
+        "siteCode":  "72",
         "testCenter":  "MYRTLE BEACH",
         "city":  "Myrtle Beach",
         "state":  "SC"
     },
     {
+        "siteCode":  "5004",
         "testCenter":  "ROSWELL",
         "city":  "Roswell",
         "state":  "NM"
     },
     {
+        "siteCode":  "73",
         "testCenter":  "CHARLESTON",
         "city":  "North Charleston",
         "state":  "SC"
     },
     {
+        "siteCode":  "71",
         "testCenter":  "COLUMBIA",
         "city":  "Columbia",
         "state":  "SC"
     },
     {
+        "siteCode":  "5093",
         "testCenter":  "OLYMPIA",
         "city":  "Olympia",
         "state":  "WA"
     },
     {
+        "siteCode":  "74",
         "testCenter":  "BEAUFORT",
         "city":  "Beaufort",
         "state":  "SC"
