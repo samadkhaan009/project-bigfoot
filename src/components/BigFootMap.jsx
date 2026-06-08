@@ -127,10 +127,10 @@ const DATA_QUALITY = {
     classification: 'REAL',
     confidence: 'HIGH',
     lastUpdated: '2021',
-    features: '3,579 industrial energy facilities (Gas, Coal, Oil, Biomass, Waste, Nuclear)',
-    suitable: 'Identifying heavy industrial facility locations as a proxy for manufacturing workforce concentration. All use cases.',
-    notSuitable: 'Light manufacturing, food processing, textiles. This layer covers energy-intensive industrial sites only.',
-    note: 'Real facility names, owner, fuel type, capacity (MW), and verified coordinates from the WRI Global Power Plant Database. Industrial energy plants are a reliable proxy for heavy manufacturing workforce presence.',
+    features: '3,579 energy facilities (Gas, Coal, Oil, Biomass, Waste, Nuclear)',
+    suitable: 'Identifying energy-intensive industrial site locations as a proxy for heavy-industry workforce concentration.',
+    notSuitable: 'Light manufacturing, food processing, textiles. This layer shows power plants and energy facilities, not factories.',
+    note: 'Data source: WRI Global Power Plant Database (2021). Contains real facility names, fuel type, capacity (MW), and verified coordinates. Used as a proxy for heavy-industry workforce presence. This is energy infrastructure data — the layer is labeled "Energy / Industrial Infrastructure" in the UI.',
   },
   railway: {
     source: 'City population model — Amtrak station logic',
@@ -217,7 +217,7 @@ const HUB_LABELS = {
   universities:'Universities & Colleges',airports:'Airports',
   healthcare:'Healthcare',financial:'Financial',
   government:'Government',technology:'Technology',
-  manufacturing:'Manufacturing',railway:'Railway & Transit',
+  manufacturing:'Energy / Industrial Infrastructure',railway:'Railway & Transit',
   cultural:'Cultural',agriculture:'Agriculture',
 }
 const HUB_EMOJI = {
@@ -282,7 +282,7 @@ const LAYER_GROUPS = [
     {key:'financial',label:'Financial',color:'#4ade80',count:8557},
     {key:'government',label:'Government',color:'#60a5fa',count:2698},
     {key:'technology',label:'Technology',color:'#818cf8',count:2737},
-    {key:'manufacturing',label:'Manufacturing',color:'#fb923c',count:3579},
+    {key:'manufacturing',label:'Energy / Industrial Infrastructure',color:'#fb923c',count:3579},
     {key:'railway',label:'Railway & Transit',color:'#e2e8f0',count:1545},
     {key:'cultural',label:'Cultural',color:'#c084fc',count:1916},
     {key:'agriculture',label:'Agriculture',color:'#86efac',count:1439},
@@ -322,6 +322,14 @@ const OPTIMUS_RADIUS_EXPR = ['case',
 ]
 
 // ── Lease Intelligence constants ─────────────────────
+// ── IRS Clearance constants ───────────────────────────
+const IRS_ACTIVATED_COLOR   = '#22c55e'   // green  — ≥1 TCA cleared
+const IRS_IN_PROCESS_COLOR  = '#f59e0b'   // amber  — TCAs in process, none cleared
+const IRS_RING_RADIUS_EXPR  = ['case', ['==',['get','category'],'OO'], 17, 15]
+
+// ── Priority Cities constants ─────────────────────────
+const PC_ICON_SIZE = ['match', ['coalesce',['get','cityLevel'],99], 1,0.9, 2,0.75, 3,0.6, 0.48]
+
 const LEASE_ACTION_COLORS = {
   'Relocate':'#ef4444','Refurbish':'#f97316','Assess-Close':'#7f1d1d',
   'Renew+Expand':'#22c55e','Renew':'#60a5fa','Review':'#a855f7',
@@ -474,11 +482,11 @@ function QualitySummaryBar({ layers }) {
 }
 
 // ── Legend ────────────────────────────────────────────────
-function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel }) {
+function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel, irsMode }) {
   const [open, setOpen] = useState(true)
   const active    = Object.entries(layers).filter(([k,v]) => v)
   const psiActive = Object.entries(psiLayers||{}).filter(([k,v]) => v)
-  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel) return null
+  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel && !irsMode) return null
   const allInfo = {}
   LAYER_GROUPS.forEach(g => g.layers.forEach(l => { allInfo[l.key] = l }))
   return (
@@ -592,6 +600,34 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
             </div>
           )}
 
+          {/* IRS Clearance legend */}
+          {irsMode && (
+            <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(34,211,238,0.2)', marginTop:4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#164e63', letterSpacing:'0.08em', marginBottom:6 }}>IRS CLEARANCE STATUS</div>
+              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2.5px solid ${IRS_ACTIVATED_COLOR}`, flexShrink:0 }}/>
+                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(115 in Bigfoot)</span></span>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2px dashed ${IRS_IN_PROCESS_COLOR}`, flexShrink:0 }}/>
+                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(145 in Bigfoot)</span></span>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
+                <div style={{ width:11, height:6, borderRadius:1, background:'rgba(34,197,94,0.4)', flexShrink:0, border:'1px solid #22c55e' }}/>
+                <span style={{ fontSize:10, color:'#64748b' }}>States with activation (green fill)</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:6 }}>
+                <div style={{ width:11, height:6, borderRadius:1, background:'rgba(239,68,68,0.2)', flexShrink:0, border:'1px solid #ef4444' }}/>
+                <span style={{ fontSize:10, color:'#64748b' }}>No activated sites yet (red fill)</span>
+              </div>
+              <div style={{ padding:'4px 8px', background:'rgba(34,211,238,0.08)', borderRadius:4 }}>
+                <div style={{ fontSize:9, color:'#22d3ee', lineHeight:1.6 }}>
+                  Network: 118 activated · 678 in process<br/>159 Final Clearances granted<br/>Enable State Boundaries to see choropleth
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Lease Intelligence legend */}
           {showLeaseIntel && psiActive.length > 0 && (
             <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(249,115,22,0.25)', marginTop:4 }}>
@@ -642,7 +678,8 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
           {/* Performance legend — two-column grid */}
           {performanceMode && psiActive.length > 0 && (
             <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(34,197,94,0.2)', marginTop:4 }}>
-              <div style={{ fontSize:9, fontWeight:700, color:'#14532d', letterSpacing:'0.08em', marginBottom:6 }}>PERFORMANCE TIER</div>
+              <div style={{ fontSize:9, fontWeight:700, color:'#14532d', letterSpacing:'0.08em', marginBottom:2 }}>VOLUME TIER</div>
+              <div style={{ fontSize:8, color:'#334155', marginBottom:6, fontStyle:'italic' }}>Tiers reflect candidate exam volume</div>
               {/* Column headers */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:4, marginBottom:5 }}>
                 <span style={{ fontSize:9, fontWeight:700, color:'#78350f', letterSpacing:'0.04em' }}>O&O SITES</span>
@@ -694,7 +731,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
 }
 
 // ── Info Card ────────────────────────────────────────────
-function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel }) {
+function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irsMode }) {
   if (!info) return null
 
   // PSI site card
@@ -728,7 +765,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel }) {
           {/* Performance section */}
           {info.scoreBucket != null && (
             <div style={{ marginTop:10, borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:10 }}>
-              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>PERFORMANCE 2024–25</div>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>VOLUME METRICS 2024–25</div>
               {(() => {
                 const tierColors = info.psiCategory === 'OO' ? PERF_OO_COLORS : PERF_3P_COLORS
                 const tc = tierColors[info.scoreBucket] || tierColors[0]
@@ -736,7 +773,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel }) {
                   <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:info.scoreBucket===1?4:8, padding:'3px 9px', borderRadius:4, background:`${tc}18`, border:`1px solid ${tc}44` }}>
                     <div style={{ width:6, height:6, borderRadius:'50%', background:tc, flexShrink:0 }}/>
                     <span style={{ fontSize:10, fontWeight:700, color:tc }}>
-                      Performance Tier: {PERF_TIER_LABELS[info.scoreBucket]}
+                      Volume Tier: {PERF_TIER_LABELS[info.scoreBucket]}
                     </span>
                   </div>
                   {info.scoreBucket === 1 && (
@@ -827,6 +864,27 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel }) {
                       <div style={{ fontSize:9, color:'#64748b', lineHeight:1.5, fontStyle:'italic' }}>{info.quickWins}</div>
                     </div>
                   )}
+                </>)
+              })()}
+            </div>
+          )}
+
+          {/* IRS Clearance section */}
+          {irsMode && (
+            <div style={{ marginTop:10, borderTop:'1px solid rgba(34,211,238,0.2)', paddingTop:10 }}>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#22d3ee', marginBottom:7 }}>IRS CLEARANCE STATUS</div>
+              {(() => {
+                const status    = info.irsActivated ? 'Activated' : info.irsInProcess > 0 ? 'In Process' : 'Not Started'
+                const statusClr = info.irsActivated ? '#22c55e'   : info.irsInProcess > 0 ? '#f59e0b'    : '#475569'
+                return (<>
+                  <div style={{ display:'inline-flex', alignItems:'center', gap:5, marginBottom:8, padding:'3px 9px', borderRadius:4, background:`${statusClr}18`, border:`1px solid ${statusClr}44` }}>
+                    <div style={{ width:6, height:6, borderRadius:'50%', background:statusClr, flexShrink:0 }}/>
+                    <span style={{ fontSize:10, fontWeight:700, color:statusClr }}>{status}</span>
+                  </div>
+                  <InfoRow label="TCAs Cleared"    value={String(info.irsCleared)}   color={info.irsCleared > 0 ? '#22c55e' : '#475569'} />
+                  <InfoRow label="TCAs In Process" value={String(info.irsInProcess)} color={info.irsInProcess > 0 ? '#f59e0b' : '#475569'} />
+                  <InfoRow label="Total TCAs"      value={String(info.irsTotalTCAs)} />
+                  {info.irsSegment && <InfoRow label="Segment" value={info.irsSegment} />}
                 </>)
               })()}
             </div>
@@ -940,8 +998,42 @@ export default function BigFootMap() {
   const [performanceMode, setPerformanceMode] = useState(false)
   const [optimusMode,     setOptimusMode]     = useState(false)
   const [showLeaseIntel,  setShowLeaseIntel]  = useState(false)
+  const [irsMode,         setIrsMode]         = useState(false)
+  const [irsStatePaint,      setIrsStatePaint]      = useState(null)
+  const [showPriorityCities, setShowPriorityCities] = useState(false)
+  const [irsFilterPriority,  setIrsFilterPriority]  = useState(false)
+  const [pcIconsLoaded,      setPcIconsLoaded]      = useState(false)
+  const [priorityCityKeys,   setPriorityCityKeys]   = useState(new Set())
+
+  // Load IRS state paint + priority city lookup
+  useEffect(() => {
+    fetch('/data/data_irs_states.json').then(r => r.json()).then(data => {
+      const colorPairs = [], opacityPairs = [];
+      for (const [name, info] of Object.entries(data)) {
+        colorPairs.push(name, info.stateActivated > 0 ? '#22c55e' : '#ef4444');
+        opacityPairs.push(name, info.stateActivated > 0
+          ? Math.round((0.25 + info.statePctActivated * 0.30) * 100) / 100
+          : 0.20);
+      }
+      setIrsStatePaint({
+        color:   ['match', ['coalesce',['get','name'],['get','NAME']], ...colorPairs, '#1e40af'],
+        opacity: ['match', ['coalesce',['get','name'],['get','NAME']], ...opacityPairs, 0.12],
+      });
+    }).catch(() => {});
+  }, [])
+
+  // Load priority cities lookup for IRS filter
+  useEffect(() => {
+    fetch('/data/priority_cities.geojson').then(r => r.json()).then(d => {
+      setPriorityCityKeys(new Set(
+        d.features.filter(f => f.properties.isPriority).map(f => f.properties.cityStateKey)
+      ));
+    }).catch(() => {});
+  }, [])
+
   const togglePerformanceMode = () => { setPerformanceMode(p => { if (!p) setOptimusMode(false); return !p; }) }
   const toggleOptimusMode     = () => { setOptimusMode(o => { if (!o) setPerformanceMode(false); return !o; }) }
+  const toggleIrsMode         = () => { setIrsMode(m => { if (m) setIrsFilterPriority(false); return !m; }) }
   const mapRef = useRef(null)
 
   const onMapLoad = useCallback(() => {
@@ -955,7 +1047,25 @@ export default function BigFootMap() {
       img.onload = () => { if (!map.hasImage(`icon-${key}`)) map.addImage(`icon-${key}`, img, {pixelRatio:2}); URL.revokeObjectURL(url); resolve() }
       img.onerror = () => { URL.revokeObjectURL(url); resolve() }
       img.src = url
-    }))).then(() => setIconsLoaded(true))
+    }))).then(() => {
+      setIconsLoaded(true)
+      // Generate priority-city diamond icons (4 color variants)
+      const pcVariants = [
+        ['pc-green-gold', '#22c55e', '#f59e0b'],
+        ['pc-green-plain','#22c55e', '#22c55e'],
+        ['pc-red-gold',   '#ef4444', '#f59e0b'],
+        ['pc-red-plain',  '#ef4444', '#ef4444'],
+      ]
+      Promise.all(pcVariants.map(([id, fill, stroke]) => new Promise(res => {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="3.5"/></svg>`
+        const blob = new Blob([svg], { type:'image/svg+xml;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        const img = new Image(40, 40)
+        img.onload = () => { if (!map.hasImage(id)) map.addImage(id, img, {pixelRatio:2}); URL.revokeObjectURL(url); res() }
+        img.onerror = () => { URL.revokeObjectURL(url); res() }
+        img.src = url
+      }))).then(() => setPcIconsLoaded(true))
+    })
   }, [])
 
   const toggle = (key) => setLayers(prev => ({...prev, [key]:!prev[key]}))
@@ -1017,6 +1127,7 @@ export default function BigFootMap() {
   const interactiveIds = [
     ...POINT_LAYERS.map(k=>`${k}-symbol`),
     'urban-rural-circle','population-fill','metros-fill','states-fill',
+    ...(showPriorityCities ? ['priority-cities-diamond'] : []),
     ...(performanceMode ? ['psi-perf-circle'] :
         optimusMode     ? ['psi-optimus-oo-circle','psi-authorized-circle','psi-mg-circle','psi-td-circle','psi-amp-circle'] :
         PSI_INTERACTIVE),
@@ -1033,6 +1144,20 @@ export default function BigFootMap() {
     const props  = f.properties
     const coords = f.geometry?.type==='Point' ? f.geometry.coordinates : null
     const lid    = f.layer.id
+
+    if (lid === 'priority-cities-diamond') {
+      return {
+        lon: coords?.[0]??null, lat: coords?.[1]??null,
+        layerId: 'priority-cities', isPriorityCity: true,
+        name: `${props.city}, ${props.state}`,
+        city: props.city, state: props.state,
+        cityLevel: props.cityLevel, isPriority: props.isPriority,
+        ooCount: props.ooCount, partnerCount: props.partnerCount,
+        totalSites: props.totalSites, totalTCAs: props.totalTCAs,
+        inProcess: props.inProcess, cleared: props.cleared,
+        siteActivated: props.siteActivated,
+      }
+    }
 
     if (PSI_INTERACTIVE.includes(lid) || lid === 'psi-perf-circle' || lid === 'psi-optimus-oo-circle') {
       return {
@@ -1056,6 +1181,13 @@ export default function BigFootMap() {
         reschdRate:    props.reschdRate     ?? null,
         dmaRegion:     props.dmaRegion     || null,
         // Lease fields
+        // IRS fields
+        irsActivated:   props.irsActivated  === true,
+        irsCleared:     props.irsCleared    ?? 0,
+        irsInProcess:   props.irsInProcess  ?? 0,
+        irsTotalTCAs:   props.irsTotalTCAs  ?? 0,
+        irsNotStarted:  props.irsNotStarted ?? 0,
+        irsSegment:     props.irsSegment    || null,
         leaseAction:        props.leaseAction        || null,
         leaseStatus:        props.leaseStatus         || null,
         daysRemaining:      props.daysRemaining       ?? null,
@@ -1136,7 +1268,10 @@ export default function BigFootMap() {
       >
         {layers.states && (
           <Source id="states" type="geojson" data={STATES_URL}>
-            <Layer id="states-fill" type="fill" paint={{'fill-color':'#1e40af','fill-opacity':0.12}}/>
+            <Layer id="states-fill" type="fill" paint={irsMode && irsStatePaint
+              ? {'fill-color': irsStatePaint.color, 'fill-opacity': irsStatePaint.opacity}
+              : {'fill-color':'#1e40af','fill-opacity':0.12}
+            }/>
             <Layer id="states-line" type="line" paint={{'line-color':'#60a5fa','line-width':0.9,'line-opacity':0.7}}/>
           </Source>
         )}
@@ -1215,11 +1350,75 @@ export default function BigFootMap() {
             filter={addPsiFilters(['!=', ['coalesce',['get','leaseAction'],''], ''])}
             paint={{'circle-radius':['case',['==',['get','category'],'OO'],12,10],'circle-color':'rgba(0,0,0,0)','circle-stroke-color':LEASE_RING_COLOR_EXPR,'circle-stroke-width':3,'circle-opacity':0,'circle-stroke-opacity':0.85}}
           />}
+          {/* IRS Clearance rings — independent overlay, works in any mode */}
+          {irsMode && <Layer id="psi-irs-activated" type="circle"
+            filter={addPsiFilters(['all',
+              ['==',['get','irsActivated'],true],
+              perfLayerFilter,
+              ...(irsFilterPriority ? [['==',['get','inPriorityCity'],true]] : [])
+            ])}
+            paint={{
+              'circle-radius': IRS_RING_RADIUS_EXPR,
+              'circle-color': 'rgba(0,0,0,0)',
+              'circle-stroke-color': ['interpolate', ['linear'],
+                ['/', ['get','irsCleared'], ['max', ['get','irsTotalTCAs'], 1]],
+                0, '#f59e0b', 0.5, '#84cc16', 1, '#22c55e'
+              ],
+              'circle-stroke-width': 2.5,
+              'circle-opacity': 0,
+              'circle-stroke-opacity': 0.9,
+            }}
+          />}
+          {irsMode && <Layer id="psi-irs-in-process" type="circle"
+            filter={addPsiFilters(['all',
+              ['>', ['get','irsInProcess'],0],
+              ['==',['get','irsActivated'],false],
+              perfLayerFilter,
+              ...(irsFilterPriority ? [['==',['get','inPriorityCity'],true]] : [])
+            ])}
+            paint={{'circle-radius':IRS_RING_RADIUS_EXPR,'circle-color':'rgba(0,0,0,0)','circle-stroke-color':IRS_IN_PROCESS_COLOR,'circle-stroke-width':2,'circle-opacity':0,'circle-stroke-opacity':0.75,'circle-stroke-dasharray':[3,2]}}
+          />}
         </Source>
+
+        {/* Priority Cities layer — diamond markers */}
+        {showPriorityCities && pcIconsLoaded && (
+          <Source id="priority-cities" type="geojson" data="/data/priority_cities.geojson">
+            <Layer id="priority-cities-diamond" type="symbol"
+              layout={{
+                'icon-image': ['case',
+                  ['all', ['>', ['get','totalSites'],0], ['>', ['get','cleared'],0]], 'pc-green-gold',
+                  ['all', ['>', ['get','totalSites'],0], ['==', ['get','cleared'],0]], 'pc-green-plain',
+                  ['all', ['==', ['get','totalSites'],0], ['>', ['get','cleared'],0]], 'pc-red-gold',
+                  'pc-red-plain'
+                ],
+                'icon-size': PC_ICON_SIZE,
+                'icon-rotate': 45,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true,
+                'icon-anchor': 'center',
+              }}
+            />
+          </Source>
+        )}
 
         {hoverInfo?.lon && (
           <Popup longitude={hoverInfo.lon} latitude={hoverInfo.lat} closeButton={false} closeOnClick={false} anchor="bottom" offset={16}>
-            {hoverInfo.isPsi ? (
+            {hoverInfo.isPriorityCity ? (
+              <div style={{ fontFamily:FONT, background:'rgba(2,8,23,0.97)', border:'1px solid rgba(251,191,36,0.4)', borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
+                <div style={{ fontSize:9, fontWeight:700, color:'#f59e0b', letterSpacing:'0.1em', marginBottom:3 }}>
+                  ◆ PRIORITY CITY — Level {hoverInfo.cityLevel || '?'}
+                </div>
+                <div style={{ fontSize:13, fontWeight:600, color:'#f1f5f9' }}>{hoverInfo.city}, {hoverInfo.state}</div>
+                <div style={{ fontSize:11, color:'#64748b', marginTop:4 }}>
+                  Sites: {hoverInfo.totalSites} (O&O: {hoverInfo.ooCount} · 3P: {hoverInfo.partnerCount})
+                </div>
+                <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>
+                  TCAs: {hoverInfo.cleared} cleared · {hoverInfo.inProcess} in process
+                </div>
+                {hoverInfo.siteActivated && <div style={{ fontSize:10, color:'#22c55e', marginTop:3, fontWeight:600 }}>✅ IRS Activated</div>}
+                <div style={{ fontSize:9, color:'#334155', marginTop:4 }}>Click for details</div>
+              </div>
+            ) : hoverInfo.isPsi ? (
               <div style={{ fontFamily:FONT, background:'rgba(2,8,23,0.97)', border:`1px solid ${PSI_COLORS[PSI_TYPE_MAP[hoverInfo.propertyType]||'authorized']}44`, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
                 <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:PSI_COLORS[PSI_TYPE_MAP[hoverInfo.propertyType]||'authorized'], marginBottom:3 }}>
                   📍 {hoverInfo.psiCategory==='OO'?'O&O':'3P'} · {hoverInfo.propertyType}
@@ -1300,9 +1499,9 @@ export default function BigFootMap() {
           </div>
           <div>
             <div style={{ fontSize:10, fontWeight:700, color:performanceMode?'#22c55e':'#475569', letterSpacing:'0.04em' }}>
-              {performanceMode ? 'PERFORMANCE ON' : 'Performance Mode'}
+              {performanceMode ? 'VOLUME MODE ON' : 'Volume Mode'}
             </div>
-            {performanceMode && <div style={{ fontSize:9, color:'#14532d', marginTop:1 }}>Performance tier · dual color by network type · dot size = volume</div>}
+            {performanceMode && <div style={{ fontSize:9, color:'#14532d', marginTop:1 }}>Volume tier · dual color by network type · dot size = exam volume</div>}
           </div>
         </div>
 
@@ -1323,6 +1522,55 @@ export default function BigFootMap() {
               {optimusMode ? 'OPTIMUS ON' : 'Optimus Mode'}
             </div>
             {optimusMode && <div style={{ fontSize:9, color:'#6b21a8', marginTop:1 }}>O&O sites colored by Optimus quality tier</div>}
+          </div>
+        </div>
+
+        {/* IRS Clearance Toggle */}
+        <div onClick={toggleIrsMode} style={{
+          marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
+          padding:'6px 10px',
+          background: irsMode ? 'rgba(34,211,238,0.1)' : 'rgba(255,255,255,0.04)',
+          borderRadius:6,
+          border: irsMode ? '1px solid rgba(34,211,238,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          transition:'all 0.2s',
+        }}>
+          <div style={{ width:28, height:16, borderRadius:8, background:irsMode?'#22d3ee':'#1e293b', border:`1px solid ${irsMode?'#22d3ee':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:irsMode?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:irsMode?13:2, width:10, height:10, borderRadius:'50%', background:irsMode?'#020817':'#475569', transition:'left 0.25s' }}/>
+          </div>
+          <div>
+            <div style={{ fontSize:10, fontWeight:700, color:irsMode?'#22d3ee':'#475569', letterSpacing:'0.04em' }}>
+              {irsMode ? 'IRS OVERLAY ON' : 'IRS Clearance'}
+            </div>
+            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>118 activated · 678 in process</div>}
+          </div>
+        </div>
+        {/* Priority Cities filter — shown under IRS toggle when irsMode is on */}
+        {irsMode && (
+          <div onClick={()=>setIrsFilterPriority(f=>!f)} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', padding:'5px 10px', marginTop:4, background:irsFilterPriority?'rgba(251,191,36,0.08)':'rgba(255,255,255,0.03)', borderRadius:5, border:`1px solid ${irsFilterPriority?'rgba(251,191,36,0.3)':'rgba(255,255,255,0.06)'}`, userSelect:'none' }}>
+            <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${irsFilterPriority?'#f59e0b':'#334155'}`, background:irsFilterPriority?'#f59e0b':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              {irsFilterPriority && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
+            </div>
+            <span style={{ fontSize:10, color:irsFilterPriority?'#f59e0b':'#475569' }}>Priority Cities only</span>
+          </div>
+        )}
+
+        {/* Priority Cities Toggle */}
+        <div onClick={()=>setShowPriorityCities(s=>!s)} style={{
+          marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
+          padding:'6px 10px',
+          background: showPriorityCities ? 'rgba(251,191,36,0.1)' : 'rgba(255,255,255,0.04)',
+          borderRadius:6,
+          border: showPriorityCities ? '1px solid rgba(251,191,36,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          transition:'all 0.2s',
+        }}>
+          <div style={{ width:28, height:16, borderRadius:8, background:showPriorityCities?'#f59e0b':'#1e293b', border:`1px solid ${showPriorityCities?'#f59e0b':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:showPriorityCities?'0 0 8px rgba(251,191,36,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:showPriorityCities?13:2, width:10, height:10, borderRadius:'50%', background:showPriorityCities?'#020817':'#475569', transition:'left 0.25s' }}/>
+          </div>
+          <div>
+            <div style={{ fontSize:10, fontWeight:700, color:showPriorityCities?'#f59e0b':'#475569', letterSpacing:'0.04em' }}>
+              {showPriorityCities ? 'PRIORITY CITIES ON' : 'Priority Cities'}
+            </div>
+            {showPriorityCities && <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>158 priority markets · diamond markers</div>}
           </div>
         </div>
       </div>
@@ -1375,11 +1623,11 @@ export default function BigFootMap() {
               )}
             </div>
 
-            {/* Filter 2: Performance Tier */}
+            {/* Filter 2: Volume Tier */}
             <div style={{ marginBottom:14, opacity:performanceMode?1:0.4 }}>
-              <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>PERFORMANCE TIER</div>
+              <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>VOLUME TIER</div>
               {!performanceMode ? (
-                <div style={{ fontSize:9, color:'#334155', fontStyle:'italic' }}>Enable Performance Mode to filter by tier</div>
+                <div style={{ fontSize:9, color:'#334155', fontStyle:'italic' }}>Enable Volume Mode to filter by tier</div>
               ) : (
                 <div>
                   {[[5,'Top Performer',56],[4,'Strong',167],[3,'Average',169],[2,'Watch List',119],[1,'At Risk',13],['no-data','No Data',null]].map(([val,label,count]) => {
@@ -1557,10 +1805,10 @@ export default function BigFootMap() {
       </div>
 
       {/* Legend */}
-      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} />
+      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} />
 
       {/* Info Card */}
-      <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} />
+      <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} />
 
       {/* Status Bar */}
       <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', background:'rgba(2,8,23,0.9)', border:'1px solid rgba(96,165,250,0.2)', borderRadius:8, padding:'8px 20px', backdropFilter:'blur(8px)', fontFamily:FONT, display:'flex', gap:20, alignItems:'center', boxShadow:'0 4px 16px rgba(0,0,0,0.4)' }}>
