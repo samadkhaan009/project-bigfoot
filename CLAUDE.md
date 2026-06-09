@@ -144,6 +144,50 @@ Source Excel files live outside the repo at:
 
 ---
 
+## IRS Clearance Overlay
+
+### Pipeline paths
+
+**Pipeline root:**
+```
+C:\Users\Samad.Khan\OneDrive - Educational Testing Service\Documents\PSI Documents - ASK\Channel PSI\4. Work Documents\IRS\IRS_Map_Pipeline\
+```
+
+**Export script:**
+```
+IRS_Map_Pipeline\scripts\export_irs_for_bigfoot.js
+```
+
+**Source data:**
+```
+IRS_Map_Pipeline\data\Status Query - Partner.xlsx
+IRS_Map_Pipeline\data\Active Test Center List With Address 20 May 2026.xlsx
+```
+
+**Output files:**
+```
+IRS_Map_Pipeline\output\irs_clearance_data.json
+IRS_Map_Pipeline\output\irs_city_summary.json
+IRS_Map_Pipeline\output\irs_state_summary.json
+IRS_Map_Pipeline\output\irs_pipeline_log.txt
+```
+
+### Bigfoot GeoJSON (read in place — do not copy or move)
+
+```
+C:\Users\Samad.Khan\OneDrive - Educational Testing Service\Documents\PSI Documents - ASK\Channel PSI\4. Work Documents\Big Foot - US Network Gap Analysis\Development\project-bigfoot\public\data\data_psi_sites.geojson
+```
+
+### To refresh the map data
+
+1. Security team updates Status Query on SharePoint
+2. OneDrive syncs automatically (or download manually)
+3. Run: `node scripts/export_irs_for_bigfoot.js` from `IRS_Map_Pipeline\` folder
+4. Run: `node tools/join_irs.js` from Bigfoot project folder
+5. Map reflects latest IRS clearance data
+
+---
+
 ## Visual Modes
 
 The map has three mutually exclusive O&O coloring modes plus independent overlays:

@@ -606,11 +606,11 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               <div style={{ fontSize:9, fontWeight:700, color:'#164e63', letterSpacing:'0.08em', marginBottom:6 }}>IRS CLEARANCE STATUS</div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2.5px solid ${IRS_ACTIVATED_COLOR}`, flexShrink:0 }}/>
-                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(115 in Bigfoot)</span></span>
+                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(102 in Bigfoot)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2px dashed ${IRS_IN_PROCESS_COLOR}`, flexShrink:0 }}/>
-                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(145 in Bigfoot)</span></span>
+                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(105 in Bigfoot)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:6, borderRadius:1, background:'rgba(34,197,94,0.4)', flexShrink:0, border:'1px solid #22c55e' }}/>
@@ -622,7 +622,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               </div>
               <div style={{ padding:'4px 8px', background:'rgba(34,211,238,0.08)', borderRadius:4 }}>
                 <div style={{ fontSize:9, color:'#22d3ee', lineHeight:1.6 }}>
-                  Network: 118 activated · 678 in process<br/>159 Final Clearances granted<br/>Enable State Boundaries to see choropleth
+                  Network: 104 activated · 202 in process<br/>163 Final Clearances granted<br/>Enable State Boundaries to see choropleth
                 </div>
               </div>
             </div>
@@ -1541,7 +1541,7 @@ export default function BigFootMap() {
             <div style={{ fontSize:10, fontWeight:700, color:irsMode?'#22d3ee':'#475569', letterSpacing:'0.04em' }}>
               {irsMode ? 'IRS OVERLAY ON' : 'IRS Clearance'}
             </div>
-            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>118 activated · 678 in process</div>}
+            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>104 activated · 202 in process</div>}
           </div>
         </div>
         {/* Priority Cities filter — shown under IRS toggle when irsMode is on */}
