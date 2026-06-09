@@ -61,7 +61,15 @@ sites.features.forEach(f => {
     p.irsSubmitted  = rec.submitted  ?? 0;
     // notStarted = TCAs not yet submitted to IRS
     p.irsNotStarted = Math.max(0, (rec.totalTCAs ?? 0) - (rec.submitted ?? 0));
-    p.irsSegment    = rec.segment    || null;
+    p.irsSegment     = rec.segment    || null;
+    p.irsIslaGranted = rec.islaGranted ?? 0;
+    // Synthetic features lack category/propertyType — patch them so perfLayerFilter passes
+    if (p.irsSyntheticFeature) {
+      const isOwned   = rec.segment === 'PSI Owned';
+      p.category      = isOwned ? 'OO' : '3P';
+      p.propertyType  = isOwned ? 'PSI Owned' : 'PSI Authorized';
+      p.irsIslaGranted = rec.islaGranted ?? 0;
+    }
     joined++;
   } else {
     p.irsActivated  = false;
@@ -69,14 +77,55 @@ sites.features.forEach(f => {
     p.irsInProcess  = 0;
     p.irsTotalTCAs  = 0;
     p.irsSubmitted  = 0;
-    p.irsNotStarted = 0;
-    p.irsSegment    = null;
+    p.irsNotStarted  = 0;
+    p.irsSegment     = null;
+    p.irsIslaGranted = 0;
     defaulted++;
   }
 
   // Priority city flag — uses city+state key matching priority_cities.geojson
   const cityKey = `${(p.city||'').trim()}|${(p.state||'').trim()}`;
   p.inPriorityCity = priorityCityKeys.size > 0 ? priorityCityKeys.has(cityKey) : false;
+});
+
+// ── Second pass: create synthetic features for pipeline records absent from GeoJSON ──
+const unmatchedIds    = Object.keys(lookup).filter(id => !bigfootIds.has(id));
+const syntheticSkipped = [];
+let syntheticCreated  = 0;
+
+unmatchedIds.sort((a, b) => Number(a) - Number(b)).forEach(id => {
+  const rec = lookup[id];
+  if (rec.lat == null || rec.long == null) {
+    syntheticSkipped.push({ id, name: rec.name });
+    return;
+  }
+  const cityKey      = `${(rec.city || '').trim()}|${(rec.state || '').trim()}`;
+  const isOwned      = rec.segment === 'PSI Owned';
+  sites.features.push({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [rec.long, rec.lat] },
+    properties: {
+      id:                  String(rec.id),
+      name:                rec.name    || '',
+      city:                rec.city    || '',
+      state:               rec.state   || '',
+      segment:             rec.segment || null,
+      // Required by perfLayerFilter and ring-radius expression in BigFootMap.jsx
+      category:            isOwned ? 'OO' : '3P',
+      propertyType:        isOwned ? 'PSI Owned' : 'PSI Authorized',
+      irsActivated:        rec.irsActivated === true,
+      irsCleared:          rec.cleared    ?? 0,
+      irsInProcess:        rec.inProcess  ?? 0,
+      irsTotalTCAs:        rec.totalTCAs  ?? 0,
+      irsSubmitted:        rec.submitted  ?? 0,
+      irsNotStarted:       Math.max(0, (rec.totalTCAs ?? 0) - (rec.submitted ?? 0)),
+      irsSegment:          rec.segment    || null,
+      irsIslaGranted:      rec.islaGranted ?? 0,
+      inPriorityCity:      priorityCityKeys.size > 0 ? priorityCityKeys.has(cityKey) : false,
+      irsSyntheticFeature: true,
+    },
+  });
+  syntheticCreated++;
 });
 
 fs.writeFileSync(sitesPath, JSON.stringify(sites));
@@ -99,34 +148,28 @@ for (const r of stateArr) {
 const statesOutPath = path.join(ROOT, 'public', 'data', 'data_irs_states.json');
 fs.writeFileSync(statesOutPath, JSON.stringify(statesOut, null, 2));
 
-// ── Unmatched IRS site ids (pipeline sites absent from GeoJSON) ───────────────
-const unmatchedIrs = Object.keys(lookup).filter(id => !bigfootIds.has(id));
-const unmatchedByType = {};
-unmatchedIrs.forEach(id => {
-  const seg = lookup[id].segment || 'unknown';
-  unmatchedByType[seg] = (unmatchedByType[seg] || 0) + 1;
-});
-
 // ── Verify activated count ────────────────────────────────────────────────────
 const activatedInGeo = sites.features.filter(f => f.properties.irsActivated).length;
 const inProcInGeo    = sites.features.filter(f => f.properties.irsInProcess > 0 && !f.properties.irsActivated).length;
 const notStartedGeo  = sites.features.filter(f => f.properties.irsTotalTCAs === 0).length;
 
 console.log('\n── IRS join complete ─────────────────────────────────');
-console.log(`  Bigfoot sites:           ${sites.features.length}`);
+console.log(`  Native Bigfoot sites:    ${sites.features.length - syntheticCreated}`);
 console.log(`  Joined (IRS data):       ${joined}`);
 console.log(`  Defaulted (no IRS):      ${defaulted}`);
-console.log(`\n  Activated (≥1 cleared):  ${activatedInGeo}  (expected: 104)`);
+console.log(`  Synthetic features added:${syntheticCreated}`);
+if (syntheticSkipped.length > 0) {
+  console.log(`  Skipped (missing coords):${syntheticSkipped.length}`);
+  syntheticSkipped.forEach(s => console.log(`    id=${s.id}  name="${s.name}"`));
+}
+console.log(`  Total features written:  ${sites.features.length}`);
+console.log(`\n  Activated (ISLA or cleared):  ${activatedInGeo}`);
 console.log(`  In-process only:         ${inProcInGeo}`);
 console.log(`  Not in IRS yet:          ${notStartedGeo}`);
-console.log(`\n  Unmatched IRS site ids:  ${unmatchedIrs.length} (pipeline sites absent from GeoJSON)`);
-Object.entries(unmatchedByType).sort((a, b) => b[1] - a[1])
-  .forEach(([k, v]) => console.log(`    ${v.toString().padStart(4)}  ${k}`));
-if (unmatchedIrs.length > 0) {
-  const sorted = unmatchedIrs.sort((a, b) => Number(a) - Number(b));
-  sorted.forEach(id => {
-    const r = lookup[id];
-    console.log(`    id=${id}  name="${r.name}"  segment="${r.segment}"`);
-  });
-}
+console.log(`\n  Synthetic feature ids/names:`);
+unmatchedIds.sort((a, b) => Number(a) - Number(b)).forEach(id => {
+  const r = lookup[id];
+  const created = r.lat != null && r.long != null;
+  console.log(`    id=${id}  activated=${r.irsActivated}  created=${created}  name="${r.name}"`);
+});
 console.log(`\n  data_irs_states.json:    ${Object.keys(statesOut).length} states written`);

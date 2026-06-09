@@ -8,45 +8,45 @@
   },
   "Alaska": {
     "stateSites": 3,
-    "stateActivated": 0,
+    "stateActivated": 2,
     "stateCleared": 0,
     "stateInProcess": 6,
-    "statePctActivated": 0
+    "statePctActivated": 0.6667
   },
   "Arizona": {
     "stateSites": 4,
-    "stateActivated": 0,
+    "stateActivated": 2,
     "stateCleared": 0,
-    "stateInProcess": 9,
-    "statePctActivated": 0
+    "stateInProcess": 8,
+    "statePctActivated": 0.5
   },
   "Arkansas": {
     "stateSites": 4,
-    "stateActivated": 0,
+    "stateActivated": 1,
     "stateCleared": 0,
-    "stateInProcess": 10,
-    "statePctActivated": 0
+    "stateInProcess": 6,
+    "statePctActivated": 0.25
   },
   "California": {
     "stateSites": 20,
-    "stateActivated": 16,
+    "stateActivated": 18,
     "stateCleared": 36,
-    "stateInProcess": 106,
-    "statePctActivated": 0.8
+    "stateInProcess": 89,
+    "statePctActivated": 0.9
   },
   "Colorado": {
     "stateSites": 6,
     "stateActivated": 4,
     "stateCleared": 6,
-    "stateInProcess": 10,
+    "stateInProcess": 9,
     "statePctActivated": 0.6667
   },
   "Connecticut": {
     "stateSites": 2,
-    "stateActivated": 0,
+    "stateActivated": 2,
     "stateCleared": 0,
     "stateInProcess": 6,
-    "statePctActivated": 0
+    "statePctActivated": 1
   },
   "Delaware": {
     "stateSites": 1,
@@ -59,15 +59,15 @@
     "stateSites": 11,
     "stateActivated": 3,
     "stateCleared": 3,
-    "stateInProcess": 18,
+    "stateInProcess": 17,
     "statePctActivated": 0.2727
   },
   "Georgia": {
     "stateSites": 6,
-    "stateActivated": 4,
+    "stateActivated": 5,
     "stateCleared": 7,
     "stateInProcess": 9,
-    "statePctActivated": 0.6667
+    "statePctActivated": 0.8333
   },
   "Hawaii": {
     "stateSites": 1,
@@ -80,49 +80,49 @@
     "stateSites": 2,
     "stateActivated": 1,
     "stateCleared": 2,
-    "stateInProcess": 4,
+    "stateInProcess": 2,
     "statePctActivated": 0.5
   },
   "Illinois": {
     "stateSites": 4,
-    "stateActivated": 2,
+    "stateActivated": 3,
     "stateCleared": 3,
-    "stateInProcess": 8,
-    "statePctActivated": 0.5
+    "stateInProcess": 6,
+    "statePctActivated": 0.75
   },
   "Indiana": {
     "stateSites": 2,
     "stateActivated": 2,
     "stateCleared": 3,
-    "stateInProcess": 7,
+    "stateInProcess": 0,
     "statePctActivated": 1
   },
   "Iowa": {
     "stateSites": 3,
-    "stateActivated": 2,
+    "stateActivated": 3,
     "stateCleared": 2,
-    "stateInProcess": 6,
-    "statePctActivated": 0.6667
+    "stateInProcess": 5,
+    "statePctActivated": 1
   },
   "Kansas": {
     "stateSites": 1,
-    "stateActivated": 0,
+    "stateActivated": 1,
     "stateCleared": 0,
     "stateInProcess": 3,
-    "statePctActivated": 0
+    "statePctActivated": 1
   },
   "Kentucky": {
     "stateSites": 3,
     "stateActivated": 2,
     "stateCleared": 3,
-    "stateInProcess": 6,
+    "stateInProcess": 5,
     "statePctActivated": 0.6667
   },
   "Louisiana": {
     "stateSites": 3,
     "stateActivated": 1,
     "stateCleared": 1,
-    "stateInProcess": 4,
+    "stateInProcess": 2,
     "statePctActivated": 0.3333
   },
   "Maine": {
@@ -134,38 +134,38 @@
   },
   "Maryland": {
     "stateSites": 5,
-    "stateActivated": 1,
+    "stateActivated": 2,
     "stateCleared": 1,
     "stateInProcess": 7,
-    "statePctActivated": 0.2
+    "statePctActivated": 0.4
   },
   "Massachusetts": {
     "stateSites": 4,
     "stateActivated": 1,
     "stateCleared": 1,
-    "stateInProcess": 5,
+    "stateInProcess": 3,
     "statePctActivated": 0.25
   },
   "Michigan": {
     "stateSites": 7,
-    "stateActivated": 3,
+    "stateActivated": 6,
     "stateCleared": 4,
     "stateInProcess": 16,
-    "statePctActivated": 0.4286
+    "statePctActivated": 0.8571
   },
   "Minnesota": {
     "stateSites": 5,
     "stateActivated": 1,
     "stateCleared": 1,
-    "stateInProcess": 4,
+    "stateInProcess": 2,
     "statePctActivated": 0.2
   },
   "Mississippi": {
     "stateSites": 3,
-    "stateActivated": 1,
+    "stateActivated": 2,
     "stateCleared": 1,
     "stateInProcess": 3,
-    "statePctActivated": 0.3333
+    "statePctActivated": 0.6667
   },
   "Missouri": {
     "stateSites": 4,
@@ -178,91 +178,91 @@
     "stateSites": 3,
     "stateActivated": 2,
     "stateCleared": 2,
-    "stateInProcess": 1,
+    "stateInProcess": 0,
     "statePctActivated": 0.6667
   },
   "Nebraska": {
     "stateSites": 3,
-    "stateActivated": 1,
+    "stateActivated": 2,
     "stateCleared": 1,
     "stateInProcess": 6,
-    "statePctActivated": 0.3333
+    "statePctActivated": 0.6667
   },
   "Nevada": {
     "stateSites": 3,
     "stateActivated": 0,
     "stateCleared": 0,
-    "stateInProcess": 2,
+    "stateInProcess": 1,
     "statePctActivated": 0
   },
   "New Hampshire": {
     "stateSites": 4,
     "stateActivated": 2,
     "stateCleared": 2,
-    "stateInProcess": 6,
+    "stateInProcess": 3,
     "statePctActivated": 0.5
   },
   "New Jersey": {
     "stateSites": 11,
-    "stateActivated": 4,
+    "stateActivated": 8,
     "stateCleared": 6,
-    "stateInProcess": 30,
-    "statePctActivated": 0.3636
+    "stateInProcess": 23,
+    "statePctActivated": 0.7273
   },
   "New Mexico": {
     "stateSites": 4,
-    "stateActivated": 2,
+    "stateActivated": 4,
     "stateCleared": 3,
-    "stateInProcess": 7,
-    "statePctActivated": 0.5
+    "stateInProcess": 5,
+    "statePctActivated": 1
   },
   "New York": {
     "stateSites": 12,
-    "stateActivated": 1,
+    "stateActivated": 5,
     "stateCleared": 1,
-    "stateInProcess": 20,
-    "statePctActivated": 0.0833
+    "stateInProcess": 16,
+    "statePctActivated": 0.4167
   },
   "North Carolina": {
     "stateSites": 8,
-    "stateActivated": 6,
+    "stateActivated": 7,
     "stateCleared": 9,
-    "stateInProcess": 14,
-    "statePctActivated": 0.75
+    "stateInProcess": 13,
+    "statePctActivated": 0.875
   },
   "North Dakota": {
     "stateSites": 2,
-    "stateActivated": 0,
+    "stateActivated": 1,
     "stateCleared": 0,
     "stateInProcess": 4,
-    "statePctActivated": 0
+    "statePctActivated": 0.5
   },
   "Ohio": {
     "stateSites": 5,
-    "stateActivated": 2,
+    "stateActivated": 5,
     "stateCleared": 3,
-    "stateInProcess": 13,
-    "statePctActivated": 0.4
+    "stateInProcess": 12,
+    "statePctActivated": 1
   },
   "Oklahoma": {
     "stateSites": 5,
-    "stateActivated": 1,
+    "stateActivated": 3,
     "stateCleared": 2,
     "stateInProcess": 10,
-    "statePctActivated": 0.2
+    "statePctActivated": 0.6
   },
   "Oregon": {
     "stateSites": 6,
-    "stateActivated": 3,
+    "stateActivated": 4,
     "stateCleared": 3,
-    "stateInProcess": 14,
-    "statePctActivated": 0.5
+    "stateInProcess": 11,
+    "statePctActivated": 0.6667
   },
   "Pennsylvania": {
     "stateSites": 9,
     "stateActivated": 6,
     "stateCleared": 8,
-    "stateInProcess": 11,
+    "stateInProcess": 10,
     "statePctActivated": 0.6667
   },
   "Rhode Island": {
@@ -274,38 +274,38 @@
   },
   "South Carolina": {
     "stateSites": 7,
-    "stateActivated": 3,
+    "stateActivated": 5,
     "stateCleared": 6,
-    "stateInProcess": 9,
-    "statePctActivated": 0.4286
+    "stateInProcess": 8,
+    "statePctActivated": 0.7143
   },
   "South Dakota": {
     "stateSites": 3,
-    "stateActivated": 1,
+    "stateActivated": 2,
     "stateCleared": 1,
     "stateInProcess": 8,
-    "statePctActivated": 0.3333
+    "statePctActivated": 0.6667
   },
   "Tennessee": {
     "stateSites": 6,
-    "stateActivated": 2,
+    "stateActivated": 5,
     "stateCleared": 2,
-    "stateInProcess": 19,
-    "statePctActivated": 0.3333
+    "stateInProcess": 16,
+    "statePctActivated": 0.8333
   },
   "Texas": {
     "stateSites": 23,
-    "stateActivated": 9,
+    "stateActivated": 17,
     "stateCleared": 19,
-    "stateInProcess": 47,
-    "statePctActivated": 0.3913
+    "stateInProcess": 46,
+    "statePctActivated": 0.7391
   },
   "Utah": {
     "stateSites": 2,
-    "stateActivated": 0,
+    "stateActivated": 1,
     "stateCleared": 0,
     "stateInProcess": 3,
-    "statePctActivated": 0
+    "statePctActivated": 0.5
   },
   "Virginia": {
     "stateSites": 4,
@@ -316,30 +316,30 @@
   },
   "Washington": {
     "stateSites": 7,
-    "stateActivated": 2,
+    "stateActivated": 4,
     "stateCleared": 4,
-    "stateInProcess": 8,
-    "statePctActivated": 0.2857
+    "stateInProcess": 6,
+    "statePctActivated": 0.5714
   },
   "West Virginia": {
     "stateSites": 2,
-    "stateActivated": 0,
+    "stateActivated": 2,
     "stateCleared": 0,
     "stateInProcess": 3,
-    "statePctActivated": 0
+    "statePctActivated": 1
   },
   "Wisconsin": {
     "stateSites": 3,
     "stateActivated": 0,
     "stateCleared": 0,
-    "stateInProcess": 5,
+    "stateInProcess": 4,
     "statePctActivated": 0
   },
   "Wyoming": {
     "stateSites": 3,
-    "stateActivated": 1,
+    "stateActivated": 2,
     "stateCleared": 2,
     "stateInProcess": 2,
-    "statePctActivated": 0.3333
+    "statePctActivated": 0.6667
   }
 }

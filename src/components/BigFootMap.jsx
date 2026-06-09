@@ -606,11 +606,11 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               <div style={{ fontSize:9, fontWeight:700, color:'#164e63', letterSpacing:'0.08em', marginBottom:6 }}>IRS CLEARANCE STATUS</div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2.5px solid ${IRS_ACTIVATED_COLOR}`, flexShrink:0 }}/>
-                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(102 in Bigfoot)</span></span>
+                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(161 mapped)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2px dashed ${IRS_IN_PROCESS_COLOR}`, flexShrink:0 }}/>
-                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(105 in Bigfoot)</span></span>
+                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(47 mapped)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:6, borderRadius:1, background:'rgba(34,197,94,0.4)', flexShrink:0, border:'1px solid #22c55e' }}/>
@@ -622,7 +622,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               </div>
               <div style={{ padding:'4px 8px', background:'rgba(34,211,238,0.08)', borderRadius:4 }}>
                 <div style={{ fontSize:9, color:'#22d3ee', lineHeight:1.6 }}>
-                  Network: 104 activated · 202 in process<br/>163 Final Clearances granted<br/>Enable State Boundaries to see choropleth
+                  Network: 161 activated · 188 in process (network)<br/>163 Final Clearances granted<br/>Enable State Boundaries to see choropleth
                 </div>
               </div>
             </div>
@@ -881,8 +881,9 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
                     <div style={{ width:6, height:6, borderRadius:'50%', background:statusClr, flexShrink:0 }}/>
                     <span style={{ fontSize:10, fontWeight:700, color:statusClr }}>{status}</span>
                   </div>
-                  <InfoRow label="TCAs Cleared"    value={String(info.irsCleared)}   color={info.irsCleared > 0 ? '#22c55e' : '#475569'} />
-                  <InfoRow label="TCAs In Process" value={String(info.irsInProcess)} color={info.irsInProcess > 0 ? '#f59e0b' : '#475569'} />
+                  <InfoRow label="TCAs at ISLA"        value={String(info.irsIslaGranted)} color={info.irsIslaGranted > 0 ? '#22c55e' : '#475569'} />
+                  <InfoRow label="Final Clearances"    value={String(info.irsCleared)}     color={info.irsCleared > 0 ? '#22c55e' : '#475569'} />
+                  <InfoRow label="TCAs In Process"     value={String(info.irsInProcess)}   color={info.irsInProcess > 0 ? '#f59e0b' : '#475569'} />
                   <InfoRow label="Total TCAs"      value={String(info.irsTotalTCAs)} />
                   {info.irsSegment && <InfoRow label="Segment" value={info.irsSegment} />}
                 </>)
@@ -1186,8 +1187,9 @@ export default function BigFootMap() {
         irsCleared:     props.irsCleared    ?? 0,
         irsInProcess:   props.irsInProcess  ?? 0,
         irsTotalTCAs:   props.irsTotalTCAs  ?? 0,
-        irsNotStarted:  props.irsNotStarted ?? 0,
-        irsSegment:     props.irsSegment    || null,
+        irsNotStarted:   props.irsNotStarted  ?? 0,
+        irsIslaGranted:  props.irsIslaGranted ?? 0,
+        irsSegment:      props.irsSegment    || null,
         leaseAction:        props.leaseAction        || null,
         leaseStatus:        props.leaseStatus         || null,
         daysRemaining:      props.daysRemaining       ?? null,
@@ -1360,10 +1362,7 @@ export default function BigFootMap() {
             paint={{
               'circle-radius': IRS_RING_RADIUS_EXPR,
               'circle-color': 'rgba(0,0,0,0)',
-              'circle-stroke-color': ['interpolate', ['linear'],
-                ['/', ['get','irsCleared'], ['max', ['get','irsTotalTCAs'], 1]],
-                0, '#f59e0b', 0.5, '#84cc16', 1, '#22c55e'
-              ],
+              'circle-stroke-color': IRS_ACTIVATED_COLOR,
               'circle-stroke-width': 2.5,
               'circle-opacity': 0,
               'circle-stroke-opacity': 0.9,
@@ -1541,7 +1540,7 @@ export default function BigFootMap() {
             <div style={{ fontSize:10, fontWeight:700, color:irsMode?'#22d3ee':'#475569', letterSpacing:'0.04em' }}>
               {irsMode ? 'IRS OVERLAY ON' : 'IRS Clearance'}
             </div>
-            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>104 activated · 202 in process</div>}
+            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>161 activated · 188 in process</div>}
           </div>
         </div>
         {/* Priority Cities filter — shown under IRS toggle when irsMode is on */}

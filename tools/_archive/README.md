@@ -1,0 +1,1 @@
+Archived 2026-06-09. These are the OLD keyed-object-format IRS export and its output, superseded by the IRS_Map_Pipeline (IRS_Map_Pipeline\scripts\export_irs_for_bigfoot.js → flat-array output consumed by tools\join_irs.js). Kept for rollback reference only. Do not run — output format is incompatible with the current join_irs.js.
