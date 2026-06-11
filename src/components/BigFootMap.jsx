@@ -5,6 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 const INITIAL_VIEW = { longitude: -96, latitude: 39, zoom: 4, pitch: 0, bearing: 0 }
 const STATES_URL = 'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json'
+const BASE = import.meta.env.BASE_URL
 
 // ── Data Quality Registry ────────────────────────────────
 // Single source of truth for every layer's data provenance.
@@ -1005,10 +1006,15 @@ export default function BigFootMap() {
   const [irsFilterPriority,  setIrsFilterPriority]  = useState(false)
   const [pcIconsLoaded,      setPcIconsLoaded]      = useState(false)
   const [priorityCityKeys,   setPriorityCityKeys]   = useState(new Set())
+  const [leaseFiltersOpen,   setLeaseFiltersOpen]   = useState(true)
+  const [leaseActionFilters, setLeaseActionFilters] = useState({
+    relocate: true, refurbish: true, assessClose: true,
+    renewExpand: true, renew: true, review: true, contractFlag: true,
+  })
 
   // Load IRS state paint + priority city lookup
   useEffect(() => {
-    fetch('/data/data_irs_states.json').then(r => r.json()).then(data => {
+    fetch(`${BASE}data/data_irs_states.json`).then(r => r.json()).then(data => {
       const colorPairs = [], opacityPairs = [];
       for (const [name, info] of Object.entries(data)) {
         colorPairs.push(name, info.stateActivated > 0 ? '#22c55e' : '#ef4444');
@@ -1025,7 +1031,7 @@ export default function BigFootMap() {
 
   // Load priority cities lookup for IRS filter
   useEffect(() => {
-    fetch('/data/priority_cities.geojson').then(r => r.json()).then(d => {
+    fetch(`${BASE}data/priority_cities.geojson`).then(r => r.json()).then(d => {
       setPriorityCityKeys(new Set(
         d.features.filter(f => f.properties.isPriority).map(f => f.properties.cityStateKey)
       ));
@@ -1093,6 +1099,25 @@ export default function BigFootMap() {
     ? ['in', ['get','propertyType'], ['literal', activePsiPropTypes]]
     : ['==', ['get','id'], '_none_']
 
+  const activeLeaseActions = [
+    ...(leaseActionFilters.relocate    ? ['Relocate']     : []),
+    ...(leaseActionFilters.refurbish   ? ['Refurbish']    : []),
+    ...(leaseActionFilters.assessClose ? ['Assess-Close'] : []),
+    ...(leaseActionFilters.renewExpand ? ['Renew+Expand'] : []),
+    ...(leaseActionFilters.renew       ? ['Renew']        : []),
+    ...(leaseActionFilters.review      ? ['Review']       : []),
+  ]
+  const leaseVisibilityFilter = (() => {
+    const parts = []
+    if (activeLeaseActions.length > 0)
+      parts.push(['in', ['coalesce',['get','leaseAction'],''], ['literal', activeLeaseActions]])
+    if (leaseActionFilters.contractFlag)
+      parts.push(['==', ['get','contractFlag'], true])
+    if (parts.length === 0) return ['==', ['get','id'], '_none_']
+    if (parts.length === 1) return parts[0]
+    return ['any', ...parts]
+  })()
+
   // ── Filter state ──────────────────────────────────────
   const [filterPanelOpen,  setFilterPanelOpen]  = useState(false)
   const [availableStates,  setAvailableStates]  = useState([])
@@ -1102,7 +1127,7 @@ export default function BigFootMap() {
   const [stateDropOpen,    setStateDropOpen]    = useState(false)
 
   useEffect(() => {
-    fetch('/data/data_psi_sites.geojson').then(r => r.json())
+    fetch(`${BASE}data/data_psi_sites.geojson`).then(r => r.json())
       .then(d => setAvailableStates([...new Set(d.features.map(f => f.properties.state).filter(Boolean))].sort()))
       .catch(() => {})
   }, [])
@@ -1278,24 +1303,24 @@ export default function BigFootMap() {
           </Source>
         )}
         {layers.metros && (
-          <Source id="metros" type="geojson" data="/data/metros.geojson">
+          <Source id="metros" type="geojson" data={`${BASE}data/metros.geojson`}>
             <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.07}}/>
             <Layer id="metros-line" type="line" paint={{'line-color':'#22d3ee','line-width':1.1,'line-opacity':0.65,'line-dasharray':[4,3]}}/>
           </Source>
         )}
         {layers.population && (
-          <Source id="population" type="geojson" data="/data/data_population.geojson">
+          <Source id="population" type="geojson" data={`${BASE}data/data_population.geojson`}>
             <Layer id="population-fill" type="fill" paint={{'fill-color':['match',['get','density'],'Very High','#ec4899','High','#a855f7','Medium','#6366f1','#334155'],'fill-opacity':0.25}}/>
             <Layer id="population-line" type="line" paint={{'line-color':'#f472b6','line-width':0.5,'line-opacity':0.4}}/>
           </Source>
         )}
         {layers.urban_rural && (
-          <Source id="urban_rural" type="geojson" data="/data/data_urban_rural.geojson">
+          <Source id="urban_rural" type="geojson" data={`${BASE}data/data_urban_rural.geojson`}>
             <Layer id="urban-rural-circle" type="circle" paint={{'circle-radius':8,'circle-color':['match',['get','classification'],'Major Urban','#38bdf8','Urban','#4ade80','#92400e'],'circle-opacity':0.75,'circle-stroke-color':'#020817','circle-stroke-width':1}}/>
           </Source>
         )}
         {/* PSI 50-mile radii — type-filtered and color-coded, rendered below industry icons */}
-        <Source id="psi-radii" type="geojson" data="/data/data_psi_radii.geojson">
+        <Source id="psi-radii" type="geojson" data={`${BASE}data/data_psi_radii.geojson`}>
           {/* O&O — amber, bolder line */}
           {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':'#f59e0b','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
           {/* PSI Authorized — sky */}
@@ -1309,13 +1334,13 @@ export default function BigFootMap() {
         </Source>
 
         {iconsLoaded && POINT_LAYERS.map(key => layers[key] && (
-          <Source key={key} id={key} type="geojson" data={`/data/data_${key}.geojson`}>
+          <Source key={key} id={key} type="geojson" data={`${BASE}data/data_${key}.geojson`}>
             <Layer id={`${key}-symbol`} type="symbol" layout={{'icon-image':`icon-${key}`,'icon-size':['interpolate',['linear'],['zoom'],3,0.35,6,0.55,10,0.8,14,1.1],'icon-allow-overlap':true,'icon-ignore-placement':true,'icon-anchor':'center'}}/>
           </Source>
         ))}
 
         {/* PSI sites — rendered on top of industry icons */}
-        <Source id="psi-sites" type="geojson" data="/data/data_psi_sites.geojson">
+        <Source id="psi-sites" type="geojson" data={`${BASE}data/data_psi_sites.geojson`}>
           {/* Normal mode: property-type colors */}
           {showNormalMode && psiLayers.oo && <Layer id="psi-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':13,'circle-color':PSI_COLORS.oo,'circle-opacity':0.18,'circle-blur':0.6}}/>}
           {showNormalMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
@@ -1342,14 +1367,11 @@ export default function BigFootMap() {
           />}
           {/* Lease Intelligence rings — rendered on top of dots, transparent fill */}
           {showLeaseIntel && <Layer id="psi-lease-contract-pulse" type="circle"
-            filter={addPsiFilters(['all',
-              ['!=', ['coalesce',['get','leaseAction'],''], ''],
-              ['==', ['get','contractFlag'], true]
-            ])}
+            filter={addPsiFilters(['all', leaseVisibilityFilter, ['==', ['get','contractFlag'], true]])}
             paint={{'circle-radius':['case',['==',['get','category'],'OO'],19,17],'circle-color':'#fbbf24','circle-opacity':0.35,'circle-blur':0.3}}
           />}
           {showLeaseIntel && <Layer id="psi-lease-ring" type="circle"
-            filter={addPsiFilters(['!=', ['coalesce',['get','leaseAction'],''], ''])}
+            filter={addPsiFilters(leaseVisibilityFilter)}
             paint={{'circle-radius':['case',['==',['get','category'],'OO'],12,10],'circle-color':'rgba(0,0,0,0)','circle-stroke-color':LEASE_RING_COLOR_EXPR,'circle-stroke-width':3,'circle-opacity':0,'circle-stroke-opacity':0.85}}
           />}
           {/* IRS Clearance rings — independent overlay, works in any mode */}
@@ -1381,7 +1403,7 @@ export default function BigFootMap() {
 
         {/* Priority Cities layer — diamond markers */}
         {showPriorityCities && pcIconsLoaded && (
-          <Source id="priority-cities" type="geojson" data="/data/priority_cities.geojson">
+          <Source id="priority-cities" type="geojson" data={`${BASE}data/priority_cities.geojson`}>
             <Layer id="priority-cities-diamond" type="symbol"
               layout={{
                 'icon-image': ['case',
@@ -1787,17 +1809,50 @@ export default function BigFootMap() {
               </div>
             </div>
 
-            {/* Lease Intelligence toggle */}
-            <div onClick={()=>setShowLeaseIntel(l=>!l)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', userSelect:'none' }}>
-              <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showLeaseIntel?'#f97316':'#334155'}`, background:showLeaseIntel?'rgba(249,115,22,0.2)':'transparent', transition:'all 0.2s' }}/>
-              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showLeaseIntel?'#f97316':'#1e293b', border:`1px solid ${showLeaseIntel?'#f97316':'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:showLeaseIntel?'0 0 5px rgba(249,115,22,0.4)':'none' }}>
-                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showLeaseIntel?13:2, background:showLeaseIntel?'#020817':'#475569', transition:'left 0.2s' }}/>
+            {/* Lease Intelligence toggle + sub-toggles */}
+            <div>
+              <div style={{ display:'flex', alignItems:'center', padding:'7px 16px', userSelect:'none' }}>
+                <div onClick={()=>setShowLeaseIntel(l=>!l)} style={{ display:'flex', alignItems:'center', gap:8, flex:1, cursor:'pointer' }}>
+                  <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showLeaseIntel?'#f97316':'#334155'}`, background:showLeaseIntel?'rgba(249,115,22,0.2)':'transparent', transition:'all 0.2s' }}/>
+                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showLeaseIntel?'#f97316':'#1e293b', border:`1px solid ${showLeaseIntel?'#f97316':'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:showLeaseIntel?'0 0 5px rgba(249,115,22,0.4)':'none' }}>
+                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showLeaseIntel?13:2, background:showLeaseIntel?'#020817':'#475569', transition:'left 0.2s' }}/>
+                  </div>
+                  <div>
+                    <span style={{ fontSize:12, fontWeight:500, color:showLeaseIntel?'#e2e8f0':'#475569', transition:'color 0.2s' }}>Lease Intelligence</span>
+                    <span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>(57 sites)</span>
+                    {showLeaseIntel && <div style={{ fontSize:9, color:'#92400e', marginTop:1 }}>32 expired · 7 contract flags</div>}
+                  </div>
+                </div>
+                {showLeaseIntel && (
+                  <span onClick={e=>{e.stopPropagation();setLeaseFiltersOpen(o=>!o)}} style={{ cursor:'pointer', color:'#475569', fontSize:10, padding:'2px 6px' }}>
+                    {leaseFiltersOpen ? '▼' : '▶'}
+                  </span>
+                )}
               </div>
-              <div>
-                <span style={{ fontSize:12, fontWeight:500, color:showLeaseIntel?'#e2e8f0':'#475569', transition:'color 0.2s' }}>Lease Intelligence</span>
-                <span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>(57 sites)</span>
-                {showLeaseIntel && <div style={{ fontSize:9, color:'#92400e', marginTop:1 }}>32 expired · 7 contract flags</div>}
-              </div>
+              {showLeaseIntel && leaseFiltersOpen && (
+                <div style={{ paddingBottom:4, background:'rgba(255,255,255,0.01)', borderTop:'1px solid rgba(255,255,255,0.03)' }}>
+                  {[
+                    ['relocate',    'Relocate',     '#ef4444', 10],
+                    ['refurbish',   'Refurbish',    '#f97316',  6],
+                    ['assessClose', 'Assess-Close', '#7f1d1d',  2],
+                    ['renewExpand', 'Renew+Expand', '#22c55e',  3],
+                    ['renew',       'Renew',        '#60a5fa', 35],
+                    ['review',      'Review',       '#a855f7',  1],
+                    ['contractFlag','Contract Flag','#fbbf24',  7],
+                  ].map(([key, label, color, cnt]) => {
+                    const on = leaseActionFilters[key]
+                    return (
+                      <div key={key} onClick={()=>setLeaseActionFilters(f=>({...f,[key]:!f[key]}))} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.02)', userSelect:'none' }}>
+                        <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:on?color:'#1e293b', border:`1.5px solid ${on?color:'#334155'}`, boxShadow:on?`0 0 4px ${color}88`:'none', transition:'all 0.2s' }}/>
+                        <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:on?color:'#1e293b', border:`1px solid ${on?color:'#334155'}`, position:'relative', transition:'all 0.2s' }}>
+                          <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:on?11:2, background:on?'#020817':'#475569', transition:'left 0.2s' }}/>
+                        </div>
+                        <span style={{ fontSize:11, fontWeight:500, color:on?'#94a3b8':'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </>)}
         </div>
