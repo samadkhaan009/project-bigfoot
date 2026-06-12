@@ -1011,6 +1011,16 @@ export default function BigFootMap() {
     relocate: true, refurbish: true, assessClose: true,
     renewExpand: true, renew: true, review: true, contractFlag: true,
   })
+  const [isChatOpen,          setIsChatOpen]          = useState(false)
+  const [chatMessages,        setChatMessages]        = useState([
+    { role:'assistant', content:'Loading network data...', time:'' }
+  ])
+  const [chatInput,           setChatInput]           = useState('')
+  const [chatLoading,         setChatLoading]         = useState(false)
+  const [conversationHistory, setConversationHistory] = useState([])
+  const contextRef      = useRef(null)
+  const hasBuiltContext = useRef(false)
+  const messagesEndRef  = useRef(null)
 
   // Load IRS state paint + priority city lookup
   useEffect(() => {
@@ -1038,10 +1048,115 @@ export default function BigFootMap() {
     }).catch(() => {});
   }, [])
 
+  // Build chat context once when panel first opens
+  useEffect(() => {
+    if (!isChatOpen || hasBuiltContext.current) return
+    hasBuiltContext.current = true
+    const ts = () => new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false })
+    Promise.all([
+      fetch(`${BASE}data/data_psi_sites.geojson`).then(r => r.json()),
+      fetch(`${BASE}data/data_irs_states.json`).then(r => r.json()),
+    ]).then(([geo, stateData]) => {
+      const feats = geo.features.map(f => f.properties)
+      const ns = {
+        totalSites:      feats.length,
+        ooSites:         feats.filter(f => f.category === 'OO').length,
+        threePSites:     feats.filter(f => f.category === '3P').length,
+        irsActivated:    feats.filter(f => f.irsActivated === true).length,
+        irsInProcess:    feats.filter(f => f.irsInProcess > 0 && !f.irsActivated).length,
+        irsNotStarted:   feats.filter(f => f.irsTotalTCAs === 0).length,
+        leaseSites:      feats.filter(f => f.leaseAction).length,
+        expiredLeases:   feats.filter(f => f.leaseStatus === 'EXPIRED').length,
+        contractFlagged: feats.filter(f => f.contractFlag === true).length,
+        optimusSites:    feats.filter(f => f.optimusScore != null).length,
+        perfSites:       feats.filter(f => f.scoreBucket != null).length,
+        priorityCities:  feats.filter(f => f.inPriorityCity === true).length,
+      }
+      const stateEntries = Object.entries(stateData)
+      const irsState = {
+        activatedStates: stateEntries.filter(([,v]) => v.stateActivated > 0).length,
+        gapStates: stateEntries.filter(([,v]) => v.stateSites > 0 && v.stateActivated === 0).map(([k]) => k),
+        topStatesByActivation: stateEntries
+          .filter(([,v]) => v.stateActivated > 0)
+          .sort((a,b) => b[1].stateActivated - a[1].stateActivated)
+          .slice(0,5)
+          .map(([state,v]) => ({ state, activated:v.stateActivated, pct:Math.round(v.statePctActivated*100) })),
+      }
+      const lf = feats.filter(f => f.leaseAction)
+      const byAction = {}, byStatus = {}
+      lf.forEach(f => { byAction[f.leaseAction] = (byAction[f.leaseAction]||0)+1 })
+      lf.forEach(f => { if (f.leaseStatus) byStatus[f.leaseStatus] = (byStatus[f.leaseStatus]||0)+1 })
+      const lease = {
+        byAction, byStatus,
+        totalMonthlyRevenue: Math.round(lf.reduce((s,f) => s+(f.monthlyRevenue||0), 0)),
+        expiredRevenue: Math.round(lf.filter(f => f.leaseStatus==='EXPIRED').reduce((s,f) => s+(f.monthlyRevenue||0), 0)),
+        atRiskRevenue: Math.round(lf.filter(f => f.leaseStatus==='EXPIRED'||(f.daysRemaining!=null&&f.daysRemaining<365)).reduce((s,f) => s+(f.monthlyRevenue||0), 0)),
+      }
+      const activated = feats.filter(f => f.irsActivated === true)
+      const leaseOnly = feats.filter(f => !f.irsActivated && f.leaseAction)
+      const others    = feats.filter(f => !f.irsActivated && !f.leaseAction)
+      const sites = [...activated, ...leaseOnly, ...others].slice(0,300).map(f => ({
+        id:f.id, name:f.name, city:f.city, state:f.state,
+        propertyType:f.propertyType, category:f.category,
+        irsActivated:f.irsActivated, irsIslaGranted:f.irsIslaGranted,
+        irsCleared:f.irsCleared, irsInProcess:f.irsInProcess, irsTotalTCAs:f.irsTotalTCAs,
+        leaseAction:f.leaseAction, leaseStatus:f.leaseStatus,
+        daysRemaining:f.daysRemaining, monthlyRevenue:f.monthlyRevenue,
+        contractFlag:f.contractFlag, optimusScore:f.optimusScore,
+        optimusTier:f.optimusTier, scoreBucket:f.scoreBucket, inPriorityCity:f.inPriorityCity,
+      }))
+      contextRef.current = { networkSummary:ns, irsStateSummary:irsState, leaseSummary:lease, sites }
+      setChatMessages([{ role:'assistant', content:"Hi, I'm the Big Foot Assistant. I have live data on all PSI test centers — including IRS clearance status, lease intelligence, facility quality, and performance tiers. What would you like to know about the network?", time:ts() }])
+    }).catch(() => {
+      setChatMessages([{ role:'assistant', content:'Failed to load network data. Please refresh and try again.', time:'' }])
+    })
+  }, [isChatOpen])
+
+  // Auto-scroll chat to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior:'smooth' })
+  }, [chatMessages])
+
   const togglePerformanceMode = () => { setPerformanceMode(p => { if (!p) setOptimusMode(false); return !p; }) }
   const toggleOptimusMode     = () => { setOptimusMode(o => { if (!o) setPerformanceMode(false); return !o; }) }
   const toggleIrsMode         = () => { setIrsMode(m => { if (m) setIrsFilterPriority(false); return !m; }) }
   const mapRef = useRef(null)
+
+  const sendMessage = async () => {
+    const text = chatInput.trim()
+    if (!text || chatLoading || !contextRef.current) return
+    const ts = () => new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false })
+    setChatMessages(prev => [...prev, { role:'user', content:text, time:ts() }])
+    setChatInput('')
+    setChatLoading(true)
+    const history = [...conversationHistory, { role:'user', content:text }]
+    setConversationHistory(history)
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY || '',
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1024,
+          system: `You are the Big Foot Assistant, embedded in the PSI/ETS US Network Intelligence Platform. Answer questions about the PSI test center network using only the data provided. Be concise and direct. Use specific numbers from the data. Format for readability — short paragraphs or brief lists. If something is not in the data, say so. Never invent numbers.\n\nNetwork data:\n${JSON.stringify(contextRef.current)}`,
+          messages: history,
+        }),
+      })
+      const data = await res.json()
+      const reply = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || 'No response received.'
+      setChatMessages(prev => [...prev, { role:'assistant', content:reply, time:ts() }])
+      setConversationHistory(prev => [...prev, { role:'assistant', content:reply }])
+    } catch {
+      setChatMessages(prev => [...prev, { role:'assistant', content:'Something went wrong — please try again.', time:ts() }])
+    } finally {
+      setChatLoading(false)
+    }
+  }
 
   const onMapLoad = useCallback(() => {
     const map = mapRef.current?.getMap()
@@ -1594,6 +1709,31 @@ export default function BigFootMap() {
             {showPriorityCities && <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>158 priority markets · diamond markers</div>}
           </div>
         </div>
+
+        {/* Ask Big Foot */}
+        <div onClick={()=>setIsChatOpen(o=>!o)} style={{
+          marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
+          padding:'6px 10px',
+          background: isChatOpen ? 'rgba(34,211,238,0.1)' : 'rgba(255,255,255,0.04)',
+          borderRadius:6,
+          border: isChatOpen ? '1px solid rgba(34,211,238,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          transition:'all 0.2s',
+        }}>
+          <div style={{ width:28, height:16, borderRadius:8, background:isChatOpen?'#22d3ee':'#1e293b', border:`1px solid ${isChatOpen?'#22d3ee':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:isChatOpen?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:isChatOpen?13:2, width:10, height:10, borderRadius:'50%', background:isChatOpen?'#020817':'#475569', transition:'left 0.25s' }}/>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isChatOpen?'#22d3ee':'#475569'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <div>
+              <div style={{ fontSize:10, fontWeight:700, color:isChatOpen?'#22d3ee':'#475569', letterSpacing:'0.04em' }}>
+                {isChatOpen ? 'CLOSE ASSISTANT' : 'Ask Big Foot'}
+              </div>
+              {isChatOpen && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>Chat panel open</div>}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filter Panel */}
@@ -1876,6 +2016,82 @@ export default function BigFootMap() {
           <span style={{ fontSize:11, color:'#eab308', fontWeight:600 }}>⬤ Data Quality Mode</span>
         </>}
       </div>
+
+      {/* ── AI Chat Panel ──────────────────────────────────── */}
+      <div style={{
+        position:'fixed', top:0, right:0, width:380, height:'100vh',
+        background:'#0f172a', borderLeft:'1px solid #1e293b',
+        boxShadow:'-8px 0 32px rgba(0,0,0,0.5)',
+        zIndex:500, display:'flex', flexDirection:'column',
+        transform: isChatOpen ? 'translateX(0)' : 'translateX(100%)',
+        transition:'transform 0.25s ease',
+        fontFamily:FONT,
+      }}>
+        {/* Header */}
+        <div style={{ height:64, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 16px', borderBottom:'1px solid #1e293b', flexShrink:0 }}>
+          <div>
+            <div style={{ fontSize:14, fontWeight:700, color:'#22d3ee' }}>Big Foot Assistant</div>
+            <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>Powered by Claude</div>
+          </div>
+          <div onClick={()=>setIsChatOpen(false)} style={{ cursor:'pointer', color:'#475569', fontSize:20, lineHeight:1, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:'rgba(255,255,255,0.05)', userSelect:'none' }}>×</div>
+        </div>
+
+        {/* Messages */}
+        <div style={{ flex:1, overflowY:'auto', padding:16, display:'flex', flexDirection:'column', gap:12 }}>
+          {chatMessages.map((msg, i) => (
+            <div key={i} style={{ display:'flex', flexDirection:'column', alignItems:msg.role==='user'?'flex-end':'flex-start' }}>
+              <div style={{
+                maxWidth: msg.role==='user' ? '80%' : '85%',
+                background: msg.role==='user' ? '#1e40af' : '#1e293b',
+                color: msg.role==='user' ? 'white' : '#e2e8f0',
+                borderRadius: msg.role==='user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                padding: msg.role==='user' ? '8px 12px' : '10px 14px',
+                fontSize:13,
+                lineHeight: msg.role==='user' ? 1.4 : 1.6,
+                whiteSpace:'pre-wrap', wordBreak:'break-word',
+              }}>
+                {msg.content}
+              </div>
+              {msg.time && <div style={{ fontSize:10, color:'#334155', marginTop:3 }}>{msg.time}</div>}
+            </div>
+          ))}
+          {chatLoading && (
+            <div style={{ display:'flex', alignItems:'flex-start' }}>
+              <div style={{ background:'#1e293b', borderRadius:'12px 12px 12px 2px', padding:'10px 14px', display:'flex', gap:5, alignItems:'center' }}>
+                {[0,1,2].map(i => (
+                  <div key={i} style={{
+                    width:6, height:6, borderRadius:'50%', background:'#475569',
+                    animation:`bf-pulse 1.2s ease-in-out ${i*0.2}s infinite`,
+                  }}/>
+                ))}
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef}/>
+        </div>
+
+        {/* Input bar */}
+        <div style={{ height:64, borderTop:'1px solid #1e293b', padding:12, display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
+          <input
+            value={chatInput}
+            onChange={e => setChatInput(e.target.value)}
+            onKeyDown={e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+            placeholder="Ask about the network..."
+            style={{ flex:1, background:'#1e293b', border:'1px solid #334155', borderRadius:8, padding:'8px 12px', color:'#e2e8f0', fontSize:13, outline:'none', fontFamily:FONT }}
+          />
+          <div
+            onClick={sendMessage}
+            style={{
+              background: chatLoading || !chatInput.trim() ? '#1e293b' : '#1e40af',
+              color: chatLoading || !chatInput.trim() ? '#475569' : 'white',
+              borderRadius:8, padding:'8px 14px',
+              cursor: chatLoading || !chatInput.trim() ? 'default' : 'pointer',
+              fontSize:13, fontWeight:600, flexShrink:0, transition:'all 0.2s', userSelect:'none',
+            }}
+          >Send</div>
+        </div>
+      </div>
+      <style>{`@keyframes bf-pulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}`}</style>
     </div>
   )
 }
