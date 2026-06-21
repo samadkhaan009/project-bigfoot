@@ -188,6 +188,27 @@ C:\Users\Samad.Khan\OneDrive - Educational Testing Service\Documents\PSI Documen
 
 ---
 
+## Priority Cities
+
+Source: US Census population data (Plotly top-1000 cities CSV).
+Top 2 most populous cities per state selected automatically.
+101 cities total (2 per state × 50 states + Washington DC).
+No Master Tracker dependency. Refresh by running:
+`node tools/export_priority_cities.js` from the Bigfoot project root.
+
+Output file: `public/data/priority_cities.geojson` (101 features, all `isPriority: true`).
+
+Diamond icon encoding on the map (`'icon-rotate': 45` applied to square SVG):
+- **Green + gold border** — PSI site present AND IRS clearance in city
+- **Green + green border** — PSI site present, no clearance yet
+- **Red + gold border** — No PSI site, but IRS clearance exists in city
+- **Red + red border** — Coverage gap, no PSI presence
+
+`cityStateKey` format: `City|StateName` (pipe-separated, exact case from Census data).
+Used by `join_irs.js` to set `inPriorityCity` on PSI site features.
+
+---
+
 ## Visual Modes
 
 The map has three mutually exclusive O&O coloring modes plus independent overlays:

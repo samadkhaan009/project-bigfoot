@@ -483,11 +483,11 @@ function QualitySummaryBar({ layers }) {
 }
 
 // ── Legend ────────────────────────────────────────────────
-function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel, irsMode }) {
+function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel, irsMode, showPriorityCities }) {
   const [open, setOpen] = useState(true)
   const active    = Object.entries(layers).filter(([k,v]) => v)
   const psiActive = Object.entries(psiLayers||{}).filter(([k,v]) => v)
-  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel && !irsMode) return null
+  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel && !irsMode && !showPriorityCities) return null
   const allInfo = {}
   LAYER_GROUPS.forEach(g => g.layers.forEach(l => { allInfo[l.key] = l }))
   return (
@@ -626,6 +626,25 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                   Network: 161 activated · 188 in process (network)<br/>163 Final Clearances granted<br/>Enable State Boundaries to see choropleth
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Priority Cities legend */}
+          {showPriorityCities && (
+            <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(251,191,36,0.2)', marginTop:4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#78350f', letterSpacing:'0.08em', marginBottom:6 }}>PRIORITY CITIES</div>
+              {[
+                ['rgba(34,197,94,0.8)','#f59e0b','PSI present · IRS clearance within 50 mi'],
+                ['rgba(59,130,246,0.8)','#3b82f6','PSI present · no clearance within 50 mi'],
+                ['rgba(239,68,68,0.8)', '#f59e0b','No PSI center · IRS clearance within 50 mi'],
+                ['rgba(239,68,68,0.8)', '#ef4444','No PSI center · no IRS activity within 50 mi'],
+              ].map(([fill, border, label]) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:9, marginBottom:5 }}>
+                  <div style={{ width:10, height:10, transform:'rotate(45deg)', background:fill, border:`2px solid ${border}`, flexShrink:0 }}/>
+                  <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
+                </div>
+              ))}
+              <div style={{ fontSize:9, color:'#475569', marginTop:5 }}>101 priority cities · 2 per state · 50-mile radius logic</div>
             </div>
           )}
 
@@ -1174,7 +1193,7 @@ export default function BigFootMap() {
       // Generate priority-city diamond icons (4 color variants)
       const pcVariants = [
         ['pc-green-gold', '#22c55e', '#f59e0b'],
-        ['pc-green-plain','#22c55e', '#22c55e'],
+        ['pc-green-plain','#3b82f6', '#3b82f6'],
         ['pc-red-gold',   '#ef4444', '#f59e0b'],
         ['pc-red-plain',  '#ef4444', '#ef4444'],
       ]
@@ -1287,6 +1306,10 @@ export default function BigFootMap() {
     const lid    = f.layer.id
 
     if (lid === 'priority-cities-diamond') {
+      const rawNa = props.nearestActivated
+      const nearestActivated = rawNa
+        ? (typeof rawNa === 'string' ? (() => { try { return JSON.parse(rawNa) } catch { return null } })() : rawNa)
+        : null
       return {
         lon: coords?.[0]??null, lat: coords?.[1]??null,
         layerId: 'priority-cities', isPriorityCity: true,
@@ -1294,9 +1317,18 @@ export default function BigFootMap() {
         city: props.city, state: props.state,
         cityLevel: props.cityLevel, isPriority: props.isPriority,
         ooCount: props.ooCount, partnerCount: props.partnerCount,
-        totalSites: props.totalSites, totalTCAs: props.totalTCAs,
-        inProcess: props.inProcess, cleared: props.cleared,
-        siteActivated: props.siteActivated,
+        totalSites:       props.totalSites       ?? 0,
+        totalTCAs:        props.totalTCAs        ?? 0,
+        inProcess:        props.inProcess        ?? 0,
+        cleared:          props.cleared          ?? 0,
+        siteActivated:    props.siteActivated,
+        nearbyTotal:      props.nearbyTotal      ?? 0,
+        nearbyActivated:  props.nearbyActivated  ?? 0,
+        nearbyInProcess:  props.nearbyInProcess  ?? 0,
+        nearbyOO:         props.nearbyOO         ?? 0,
+        nearby3P:         props.nearby3P         ?? 0,
+        radiusActivated:  props.radiusActivated  === true,
+        nearestActivated,
       }
     }
 
@@ -1522,9 +1554,18 @@ export default function BigFootMap() {
             <Layer id="priority-cities-diamond" type="symbol"
               layout={{
                 'icon-image': ['case',
-                  ['all', ['>', ['get','totalSites'],0], ['>', ['get','cleared'],0]], 'pc-green-gold',
-                  ['all', ['>', ['get','totalSites'],0], ['==', ['get','cleared'],0]], 'pc-green-plain',
-                  ['all', ['==', ['get','totalSites'],0], ['>', ['get','cleared'],0]], 'pc-red-gold',
+                  ['all',
+                    ['any', ['>', ['get','totalSites'], 0], ['>', ['get','nearbyTotal'], 0]],
+                    ['any', ['>', ['get','cleared'], 0], ['==', ['get','radiusActivated'], true]]],
+                  'pc-green-gold',
+                  ['all',
+                    ['any', ['>', ['get','totalSites'], 0], ['>', ['get','nearbyTotal'], 0]],
+                    ['all', ['==', ['get','cleared'], 0], ['!=', ['get','radiusActivated'], true]]],
+                  'pc-green-plain',
+                  ['all',
+                    ['all', ['==', ['get','totalSites'], 0], ['==', ['get','nearbyTotal'], 0]],
+                    ['any', ['>', ['get','cleared'], 0], ['==', ['get','radiusActivated'], true]]],
+                  'pc-red-gold',
                   'pc-red-plain'
                 ],
                 'icon-size': PC_ICON_SIZE,
@@ -1551,6 +1592,26 @@ export default function BigFootMap() {
                 <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>
                   TCAs: {hoverInfo.cleared} cleared · {hoverInfo.inProcess} in process
                 </div>
+                {hoverInfo.nearbyTotal > 0 && (
+                  <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>
+                    Sites within 50 mi: {hoverInfo.nearbyTotal} (O&O: {hoverInfo.nearbyOO} · 3P: {hoverInfo.nearby3P})
+                  </div>
+                )}
+                {hoverInfo.nearestActivated && (
+                  <div style={{ fontSize:11, color:'#22c55e', marginTop:2 }}>
+                    Nearest cleared: {hoverInfo.nearestActivated.name} ({hoverInfo.nearestActivated.distanceMiles} mi)
+                  </div>
+                )}
+                {hoverInfo.nearbyTotal > 0 && hoverInfo.nearbyActivated === 0 && (
+                  <div style={{ fontSize:11, color:'#f59e0b', marginTop:2 }}>
+                    No activated sites within 50 mi
+                  </div>
+                )}
+                {hoverInfo.nearbyTotal === 0 && hoverInfo.totalSites === 0 && (
+                  <div style={{ fontSize:11, color:'#ef4444', marginTop:2, fontWeight:700 }}>
+                    No PSI presence within 50 mi
+                  </div>
+                )}
                 {hoverInfo.siteActivated && <div style={{ fontSize:10, color:'#22c55e', marginTop:3, fontWeight:600 }}>✅ IRS Activated</div>}
                 <div style={{ fontSize:9, color:'#334155', marginTop:4 }}>Click for details</div>
               </div>
@@ -1706,7 +1767,7 @@ export default function BigFootMap() {
             <div style={{ fontSize:10, fontWeight:700, color:showPriorityCities?'#f59e0b':'#475569', letterSpacing:'0.04em' }}>
               {showPriorityCities ? 'PRIORITY CITIES ON' : 'Priority Cities'}
             </div>
-            {showPriorityCities && <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>158 priority markets · diamond markers</div>}
+            {showPriorityCities && <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>101 priority cities · diamond markers</div>}
           </div>
         </div>
 
@@ -1999,7 +2060,7 @@ export default function BigFootMap() {
       </div>
 
       {/* Legend */}
-      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} />
+      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} showPriorityCities={showPriorityCities} />
 
       {/* Info Card */}
       <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} />

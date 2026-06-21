@@ -1,10 +1,10 @@
 {
   "Alabama": {
-    "stateSites": 4,
+    "stateSites": 5,
     "stateActivated": 3,
     "stateCleared": 3,
     "stateInProcess": 4,
-    "statePctActivated": 0.75
+    "statePctActivated": 0.6
   },
   "Alaska": {
     "stateSites": 3,
@@ -30,8 +30,8 @@
   "California": {
     "stateSites": 20,
     "stateActivated": 18,
-    "stateCleared": 36,
-    "stateInProcess": 89,
+    "stateCleared": 39,
+    "stateInProcess": 86,
     "statePctActivated": 0.9
   },
   "Colorado": {
@@ -44,8 +44,8 @@
   "Connecticut": {
     "stateSites": 2,
     "stateActivated": 2,
-    "stateCleared": 0,
-    "stateInProcess": 6,
+    "stateCleared": 1,
+    "stateInProcess": 5,
     "statePctActivated": 1
   },
   "Delaware": {
@@ -57,16 +57,16 @@
   },
   "Florida": {
     "stateSites": 11,
-    "stateActivated": 3,
+    "stateActivated": 4,
     "stateCleared": 3,
     "stateInProcess": 17,
-    "statePctActivated": 0.2727
+    "statePctActivated": 0.3636
   },
   "Georgia": {
     "stateSites": 6,
     "stateActivated": 5,
-    "stateCleared": 7,
-    "stateInProcess": 9,
+    "stateCleared": 10,
+    "stateInProcess": 5,
     "statePctActivated": 0.8333
   },
   "Hawaii": {
@@ -92,10 +92,10 @@
   },
   "Indiana": {
     "stateSites": 2,
-    "stateActivated": 2,
-    "stateCleared": 3,
-    "stateInProcess": 0,
-    "statePctActivated": 1
+    "stateActivated": 1,
+    "stateCleared": 2,
+    "stateInProcess": 1,
+    "statePctActivated": 0.5
   },
   "Iowa": {
     "stateSites": 3,
@@ -140,17 +140,17 @@
     "statePctActivated": 0.4
   },
   "Massachusetts": {
-    "stateSites": 4,
+    "stateSites": 5,
     "stateActivated": 1,
     "stateCleared": 1,
     "stateInProcess": 3,
-    "statePctActivated": 0.25
+    "statePctActivated": 0.2
   },
   "Michigan": {
     "stateSites": 7,
     "stateActivated": 6,
-    "stateCleared": 4,
-    "stateInProcess": 16,
+    "stateCleared": 5,
+    "stateInProcess": 15,
     "statePctActivated": 0.8571
   },
   "Minnesota": {
@@ -170,8 +170,8 @@
   "Missouri": {
     "stateSites": 4,
     "stateActivated": 3,
-    "stateCleared": 4,
-    "stateInProcess": 5,
+    "stateCleared": 5,
+    "stateInProcess": 4,
     "statePctActivated": 0.75
   },
   "Montana": {
@@ -192,7 +192,7 @@
     "stateSites": 3,
     "stateActivated": 0,
     "stateCleared": 0,
-    "stateInProcess": 1,
+    "stateInProcess": 2,
     "statePctActivated": 0
   },
   "New Hampshire": {
@@ -212,8 +212,8 @@
   "New Mexico": {
     "stateSites": 4,
     "stateActivated": 4,
-    "stateCleared": 3,
-    "stateInProcess": 5,
+    "stateCleared": 5,
+    "stateInProcess": 3,
     "statePctActivated": 1
   },
   "New York": {
@@ -226,8 +226,8 @@
   "North Carolina": {
     "stateSites": 8,
     "stateActivated": 7,
-    "stateCleared": 9,
-    "stateInProcess": 13,
+    "stateCleared": 10,
+    "stateInProcess": 12,
     "statePctActivated": 0.875
   },
   "North Dakota": {
@@ -240,15 +240,15 @@
   "Ohio": {
     "stateSites": 5,
     "stateActivated": 5,
-    "stateCleared": 3,
-    "stateInProcess": 12,
+    "stateCleared": 5,
+    "stateInProcess": 10,
     "statePctActivated": 1
   },
   "Oklahoma": {
     "stateSites": 5,
     "stateActivated": 3,
-    "stateCleared": 2,
-    "stateInProcess": 10,
+    "stateCleared": 3,
+    "stateInProcess": 9,
     "statePctActivated": 0.6
   },
   "Oregon": {
@@ -261,8 +261,8 @@
   "Pennsylvania": {
     "stateSites": 9,
     "stateActivated": 6,
-    "stateCleared": 8,
-    "stateInProcess": 10,
+    "stateCleared": 9,
+    "stateInProcess": 9,
     "statePctActivated": 0.6667
   },
   "Rhode Island": {
@@ -290,15 +290,15 @@
     "stateSites": 6,
     "stateActivated": 5,
     "stateCleared": 2,
-    "stateInProcess": 16,
+    "stateInProcess": 17,
     "statePctActivated": 0.8333
   },
   "Texas": {
-    "stateSites": 23,
+    "stateSites": 24,
     "stateActivated": 17,
-    "stateCleared": 19,
-    "stateInProcess": 46,
-    "statePctActivated": 0.7391
+    "stateCleared": 24,
+    "stateInProcess": 42,
+    "statePctActivated": 0.7083
   },
   "Utah": {
     "stateSites": 2,
