@@ -11,6 +11,7 @@ const THEME = {
   inputBorder:  '#CBD5E1',
   textPrimary:  '#0F172A',
   textSecondary:'#64748B',
+  textInactive: '#94A3B8',
   divider:      'rgba(15,23,42,0.08)',
   inset:        'rgba(15,23,42,0.04)',
   shadow:       '0 4px 16px rgba(15,23,42,0.12)',
@@ -635,7 +636,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                 <span style={{ fontSize:10, color:'#64748b' }}>No activated sites yet (red fill)</span>
               </div>
               <div style={{ padding:'4px 8px', background:'rgba(34,211,238,0.08)', borderRadius:4 }}>
-                <div style={{ fontSize:9, color:'#22d3ee', lineHeight:1.6 }}>
+                <div style={{ fontSize:9, color:'#0891B2', lineHeight:1.6 }}>
                   Network: 161 activated · 188 in process (network)<br/>163 Final Clearances granted<br/>Enable State Boundaries to see choropleth
                 </div>
               </div>
@@ -773,7 +774,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
     const accentColor = PSI_COLORS[typeKey]
     const catLabel    = info.psiCategory === 'OO' ? 'Owned & Operated' : '3rd Party'
     return (
-      <div style={{ position:'absolute', bottom:70, right:12, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:12, padding:0, width:270, fontFamily:FONT, boxShadow:THEME.shadowLg, backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto' }}>
+      <div style={{ position:'absolute', bottom:70, right:12, background:THEME.panelBg, border:`1px solid ${accentColor}55`, borderRadius:12, padding:0, width:270, fontFamily:FONT, boxShadow:THEME.shadowLg, backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
           <div>
             <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:accentColor, marginBottom:3 }}>
@@ -905,7 +906,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
           {/* IRS Clearance section */}
           {irsMode && (
             <div style={{ marginTop:10, borderTop:'1px solid rgba(34,211,238,0.2)', paddingTop:10 }}>
-              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#22d3ee', marginBottom:7 }}>IRS CLEARANCE STATUS</div>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#0891B2', marginBottom:7 }}>IRS CLEARANCE STATUS</div>
               {(() => {
                 const status    = info.irsActivated ? 'Activated' : info.irsInProcess > 0 ? 'In Process' : 'Not Started'
                 const statusClr = info.irsActivated ? '#22c55e'   : info.irsInProcess > 0 ? '#f59e0b'    : '#475569'
@@ -968,7 +969,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
   return (
     <div style={{
       position:'absolute', bottom:70, right:12,
-      background:THEME.panelBg, border:THEME.panelBorder,
+      background:THEME.panelBg, border:`1px solid ${accentColor}55`,
       borderRadius:12, padding:0, width:270,
       fontFamily:FONT, boxShadow:THEME.shadowLg,
       backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto',
@@ -1594,7 +1595,7 @@ export default function BigFootMap() {
         {hoverInfo?.lon && (
           <Popup longitude={hoverInfo.lon} latitude={hoverInfo.lat} closeButton={false} closeOnClick={false} anchor="bottom" offset={16}>
             {hoverInfo.isPriorityCity ? (
-              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
+              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:`1px solid rgba(217,119,6,0.5)`, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
                 <div style={{ fontSize:9, fontWeight:700, color:'#f59e0b', letterSpacing:'0.1em', marginBottom:3 }}>
                   ◆ PRIORITY CITY — Level {hoverInfo.cityLevel || '?'}
                 </div>
@@ -1629,7 +1630,7 @@ export default function BigFootMap() {
                 <div style={{ fontSize:9, color:'#334155', marginTop:4 }}>Click for details</div>
               </div>
             ) : hoverInfo.isPsi ? (
-              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
+              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:`1px solid ${PSI_COLORS[PSI_TYPE_MAP[hoverInfo.propertyType]||'authorized']}55`, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
                 <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:PSI_COLORS[PSI_TYPE_MAP[hoverInfo.propertyType]||'authorized'], marginBottom:3 }}>
                   📍 {hoverInfo.psiCategory==='OO'?'O&O':'3P'} · {hoverInfo.propertyType}
                 </div>
@@ -1638,7 +1639,7 @@ export default function BigFootMap() {
                 <div style={{ fontSize:9, color:'#334155', marginTop:4 }}>Click for details</div>
               </div>
             ) : (
-              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:7, padding:'8px 12px', maxWidth:230 }}>
+              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:`1px solid ${LAYER_COLORS[hoverInfo.layerId]||'#60a5fa'}55`, borderRadius:7, padding:'8px 12px', maxWidth:230 }}>
                 {qualityMode && <div style={{ marginBottom:5 }}><QualityBadge layerKey={hoverInfo.layerId} /></div>}
                 <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:LAYER_COLORS[hoverInfo.layerId]||'#60a5fa', marginBottom:3 }}>
                   {HUB_EMOJI[hoverInfo.layerId]||''} {hoverInfo.type}
@@ -1667,7 +1668,7 @@ export default function BigFootMap() {
       {/* Header */}
       <div style={{ background:THEME.panelBg, border:THEME.panelBorder, borderRadius:12, padding:'14px 20px', backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:THEME.shadow, flexShrink:0 }}>
         <div style={{ fontSize:18, fontWeight:800, color:THEME.textPrimary, letterSpacing:'-0.02em' }}>Project Big Foot</div>
-        <div style={{ fontSize:10, color:'#22d3ee', marginTop:4, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase' }}>PSI / ETS &nbsp;·&nbsp; Network Intelligence</div>
+        <div style={{ fontSize:10, color:'#0891B2', marginTop:4, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase' }}>PSI / ETS &nbsp;·&nbsp; Network Intelligence</div>
 
         {/* Quality Mode Toggle */}
         <div onClick={() => setQualityMode(q => !q)} style={{
@@ -1680,12 +1681,12 @@ export default function BigFootMap() {
         }}>
           <div style={{
             width:28, height:16, borderRadius:8,
-            background: qualityMode ? '#eab308' : '#1e293b',
-            border:`1px solid ${qualityMode ? '#eab308' : '#334155'}`,
+            background: qualityMode ? '#eab308' : '#E2E8F0',
+            border:`1px solid ${qualityMode ? '#eab308' : '#CBD5E1'}`,
             position:'relative', transition:'all 0.25s',
             boxShadow: qualityMode ? '0 0 8px rgba(234,179,8,0.5)' : 'none',
           }}>
-            <div style={{ position:'absolute', top:2, left: qualityMode ? 13 : 2, width:10, height:10, borderRadius:'50%', background: qualityMode ? '#020817' : '#475569', transition:'left 0.25s' }}/>
+            <div style={{ position:'absolute', top:2, left: qualityMode ? 13 : 2, width:10, height:10, borderRadius:'50%', background: qualityMode ? '#020817' : '#94A3B8', transition:'left 0.25s' }}/>
           </div>
           <div>
             <div style={{ fontSize:10, fontWeight:700, color: qualityMode ? '#eab308' : '#475569', letterSpacing:'0.04em' }}>
@@ -1704,8 +1705,8 @@ export default function BigFootMap() {
           border: performanceMode ? '1px solid rgba(34,197,94,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
-          <div style={{ width:28, height:16, borderRadius:8, background:performanceMode?'#22c55e':'#1e293b', border:`1px solid ${performanceMode?'#22c55e':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:performanceMode?'0 0 8px rgba(34,197,94,0.45)':'none', flexShrink:0 }}>
-            <div style={{ position:'absolute', top:2, left:performanceMode?13:2, width:10, height:10, borderRadius:'50%', background:performanceMode?'#020817':'#475569', transition:'left 0.25s' }}/>
+          <div style={{ width:28, height:16, borderRadius:8, background:performanceMode?'#22c55e':'#E2E8F0', border:`1px solid ${performanceMode?'#22c55e':'#CBD5E1'}`, position:'relative', transition:'all 0.25s', boxShadow:performanceMode?'0 0 8px rgba(34,197,94,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:performanceMode?13:2, width:10, height:10, borderRadius:'50%', background:performanceMode?'#020817':'#94A3B8', transition:'left 0.25s' }}/>
           </div>
           <div>
             <div style={{ fontSize:10, fontWeight:700, color:performanceMode?'#22c55e':'#475569', letterSpacing:'0.04em' }}>
@@ -1724,8 +1725,8 @@ export default function BigFootMap() {
           border: optimusMode ? '1px solid rgba(168,85,247,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
-          <div style={{ width:28, height:16, borderRadius:8, background:optimusMode?'#a855f7':'#1e293b', border:`1px solid ${optimusMode?'#a855f7':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:optimusMode?'0 0 8px rgba(168,85,247,0.45)':'none', flexShrink:0 }}>
-            <div style={{ position:'absolute', top:2, left:optimusMode?13:2, width:10, height:10, borderRadius:'50%', background:optimusMode?'#020817':'#475569', transition:'left 0.25s' }}/>
+          <div style={{ width:28, height:16, borderRadius:8, background:optimusMode?'#a855f7':'#E2E8F0', border:`1px solid ${optimusMode?'#a855f7':'#CBD5E1'}`, position:'relative', transition:'all 0.25s', boxShadow:optimusMode?'0 0 8px rgba(168,85,247,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:optimusMode?13:2, width:10, height:10, borderRadius:'50%', background:optimusMode?'#020817':'#94A3B8', transition:'left 0.25s' }}/>
           </div>
           <div>
             <div style={{ fontSize:10, fontWeight:700, color:optimusMode?'#a855f7':'#475569', letterSpacing:'0.04em' }}>
@@ -1744,11 +1745,11 @@ export default function BigFootMap() {
           border: irsMode ? '1px solid rgba(34,211,238,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
-          <div style={{ width:28, height:16, borderRadius:8, background:irsMode?'#22d3ee':'#1e293b', border:`1px solid ${irsMode?'#22d3ee':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:irsMode?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
-            <div style={{ position:'absolute', top:2, left:irsMode?13:2, width:10, height:10, borderRadius:'50%', background:irsMode?'#020817':'#475569', transition:'left 0.25s' }}/>
+          <div style={{ width:28, height:16, borderRadius:8, background:irsMode?'#22d3ee':'#E2E8F0', border:`1px solid ${irsMode?'#22d3ee':'#CBD5E1'}`, position:'relative', transition:'all 0.25s', boxShadow:irsMode?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:irsMode?13:2, width:10, height:10, borderRadius:'50%', background:irsMode?'#020817':'#94A3B8', transition:'left 0.25s' }}/>
           </div>
           <div>
-            <div style={{ fontSize:10, fontWeight:700, color:irsMode?'#22d3ee':'#475569', letterSpacing:'0.04em' }}>
+            <div style={{ fontSize:10, fontWeight:700, color:irsMode?'#0891B2':'#475569', letterSpacing:'0.04em' }}>
               {irsMode ? 'IRS OVERLAY ON' : 'IRS Clearance'}
             </div>
             {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>161 activated · 188 in process</div>}
@@ -1757,7 +1758,7 @@ export default function BigFootMap() {
         {/* Priority Cities filter — shown under IRS toggle when irsMode is on */}
         {irsMode && (
           <div onClick={()=>setIrsFilterPriority(f=>!f)} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', padding:'5px 10px', marginTop:4, background:irsFilterPriority?'rgba(251,191,36,0.08)':THEME.inset, borderRadius:5, border:`1px solid ${irsFilterPriority?'rgba(251,191,36,0.3)':THEME.divider}`, userSelect:'none' }}>
-            <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${irsFilterPriority?'#f59e0b':'#334155'}`, background:irsFilterPriority?'#f59e0b':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${irsFilterPriority?'#f59e0b':'#CBD5E1'}`, background:irsFilterPriority?'#f59e0b':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
               {irsFilterPriority && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
             </div>
             <span style={{ fontSize:10, color:irsFilterPriority?'#f59e0b':'#475569' }}>Priority Cities only</span>
@@ -1773,8 +1774,8 @@ export default function BigFootMap() {
           border: showPriorityCities ? '1px solid rgba(251,191,36,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
-          <div style={{ width:28, height:16, borderRadius:8, background:showPriorityCities?'#f59e0b':'#1e293b', border:`1px solid ${showPriorityCities?'#f59e0b':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:showPriorityCities?'0 0 8px rgba(251,191,36,0.45)':'none', flexShrink:0 }}>
-            <div style={{ position:'absolute', top:2, left:showPriorityCities?13:2, width:10, height:10, borderRadius:'50%', background:showPriorityCities?'#020817':'#475569', transition:'left 0.25s' }}/>
+          <div style={{ width:28, height:16, borderRadius:8, background:showPriorityCities?'#f59e0b':'#E2E8F0', border:`1px solid ${showPriorityCities?'#f59e0b':'#CBD5E1'}`, position:'relative', transition:'all 0.25s', boxShadow:showPriorityCities?'0 0 8px rgba(251,191,36,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:showPriorityCities?13:2, width:10, height:10, borderRadius:'50%', background:showPriorityCities?'#020817':'#94A3B8', transition:'left 0.25s' }}/>
           </div>
           <div>
             <div style={{ fontSize:10, fontWeight:700, color:showPriorityCities?'#f59e0b':'#475569', letterSpacing:'0.04em' }}>
@@ -1793,15 +1794,15 @@ export default function BigFootMap() {
           border: isChatOpen ? '1px solid rgba(34,211,238,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
-          <div style={{ width:28, height:16, borderRadius:8, background:isChatOpen?'#22d3ee':'#1e293b', border:`1px solid ${isChatOpen?'#22d3ee':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:isChatOpen?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
-            <div style={{ position:'absolute', top:2, left:isChatOpen?13:2, width:10, height:10, borderRadius:'50%', background:isChatOpen?'#020817':'#475569', transition:'left 0.25s' }}/>
+          <div style={{ width:28, height:16, borderRadius:8, background:isChatOpen?'#22d3ee':'#E2E8F0', border:`1px solid ${isChatOpen?'#22d3ee':'#CBD5E1'}`, position:'relative', transition:'all 0.25s', boxShadow:isChatOpen?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
+            <div style={{ position:'absolute', top:2, left:isChatOpen?13:2, width:10, height:10, borderRadius:'50%', background:isChatOpen?'#020817':'#94A3B8', transition:'left 0.25s' }}/>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:6 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isChatOpen?'#22d3ee':'#475569'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
             <div>
-              <div style={{ fontSize:10, fontWeight:700, color:isChatOpen?'#22d3ee':'#475569', letterSpacing:'0.04em' }}>
+              <div style={{ fontSize:10, fontWeight:700, color:isChatOpen?'#0891B2':'#475569', letterSpacing:'0.04em' }}>
                 {isChatOpen ? 'CLOSE ASSISTANT' : 'Ask Big Foot'}
               </div>
               {isChatOpen && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>Chat panel open</div>}
@@ -1830,7 +1831,7 @@ export default function BigFootMap() {
             {/* Filter 1: State */}
             <div style={{ marginTop:12, marginBottom:14 }}>
               <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>STATE</div>
-              <div onClick={()=>setStateDropOpen(o=>!o)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 10px', background:THEME.inset, borderRadius:6, border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer', userSelect:'none' }}>
+              <div onClick={()=>setStateDropOpen(o=>!o)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 10px', background:THEME.inset, borderRadius:6, border:`1px solid ${THEME.divider}`, cursor:'pointer', userSelect:'none' }}>
                 <span style={{ fontSize:11, color:THEME.textSecondary }}>{filterStates===null?'All states':`${filterStates.size} state${filterStates.size!==1?'s':''} selected`}</span>
                 <span style={{ fontSize:9, color:'#475569' }}>{stateDropOpen?'▲':'▼'}</span>
               </div>
@@ -1847,10 +1848,10 @@ export default function BigFootMap() {
                         const ns=new Set(prev); checked?ns.delete(state):ns.add(state)
                         return ns.size===availableStates.length?null:ns
                       })} style={{ display:'flex', alignItems:'center', gap:7, padding:'4px 10px', cursor:'pointer', userSelect:'none', borderBottom:`1px solid ${THEME.divider}` }}>
-                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#334155'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#CBD5E1'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                           {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize:11, color:checked?THEME.textSecondary:'#475569' }}>{state}</span>
+                        <span style={{ fontSize:11, color:checked?THEME.textPrimary:THEME.textInactive }}>{state}</span>
                       </div>
                     )
                   })}
@@ -1874,10 +1875,10 @@ export default function BigFootMap() {
                         const ns=new Set(prev); checked?ns.delete(k):ns.add(k)
                         return ns.size===ALL.length?null:ns
                       })} style={{ display:'flex', alignItems:'center', gap:7, padding:'3px 0', cursor:'pointer', userSelect:'none' }}>
-                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#334155'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#CBD5E1'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                           {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize:11, color:checked?THEME.textSecondary:'#475569' }}>
+                        <span style={{ fontSize:11, color:checked?THEME.textPrimary:THEME.textInactive }}>
                           {label}{count!==null&&<span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>({count})</span>}
                         </span>
                       </div>
@@ -1903,10 +1904,10 @@ export default function BigFootMap() {
                         const ns=new Set(prev); checked?ns.delete(val):ns.add(val)
                         return ns.size===ALL.length?null:ns
                       })} style={{ display:'flex', alignItems:'center', gap:7, padding:'3px 0', cursor:'pointer', userSelect:'none' }}>
-                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#a855f7':'#334155'}`, background:checked?'#a855f7':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#a855f7':'#CBD5E1'}`, background:checked?'#a855f7':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                           {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize:11, color:checked?THEME.textSecondary:'#475569' }}>
+                        <span style={{ fontSize:11, color:checked?THEME.textPrimary:THEME.textInactive }}>
                           {label}{count!==null&&<span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>({count})</span>}
                         </span>
                       </div>
@@ -1941,9 +1942,9 @@ export default function BigFootMap() {
               const qColor = q ? QUALITY_COLORS[q.classification] : '#475569'
               return (
                 <div key={key} onClick={() => toggle(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-                  <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:layers[key]?color:'#1e293b', border:`1.5px solid ${layers[key]?color:'#334155'}`, boxShadow:layers[key]?`0 0 5px ${color}88`:'none', transition:'all 0.2s' }}/>
-                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:layers[key]?color:'#1e293b', border:`1px solid ${layers[key]?color:'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:layers[key]?`0 0 5px ${color}55`:'none' }}>
-                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:layers[key]?13:2, background:layers[key]?'#020817':'#475569', transition:'left 0.2s' }}/>
+                  <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:layers[key]?color:'#E2E8F0', border:`1.5px solid ${layers[key]?color:'#CBD5E1'}`, boxShadow:layers[key]?`0 0 5px ${color}88`:'none', transition:'all 0.2s' }}/>
+                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:layers[key]?color:'#E2E8F0', border:`1px solid ${layers[key]?color:'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:layers[key]?`0 0 5px ${color}55`:'none' }}>
+                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:layers[key]?13:2, background:layers[key]?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                   </div>
                   <span style={{ fontSize:12, fontWeight:500, color:layers[key]?'#e2e8f0':'#475569', transition:'color 0.2s', flex:1 }}>
                     {label}{count ? <span style={{ fontSize:9, fontWeight:400, color:'#334155', marginLeft:4 }}>({count.toLocaleString()})</span> : null}
@@ -1972,12 +1973,12 @@ export default function BigFootMap() {
           {!psiCollapsed.group && (<>
             {/* O&O toggle */}
             <div onClick={()=>togglePsi('oo')} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-              <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#1e293b', border:`1.5px solid ${psiLayers.oo?PSI_COLORS.oo:'#334155'}`, boxShadow:psiLayers.oo?`0 0 6px ${PSI_COLORS.oo}99`:'none', transition:'all 0.2s' }}/>
-              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#1e293b', border:`1px solid ${psiLayers.oo?PSI_COLORS.oo:'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:psiLayers.oo?`0 0 5px ${PSI_COLORS.oo}55`:'none' }}>
-                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:psiLayers.oo?13:2, background:psiLayers.oo?'#020817':'#475569', transition:'left 0.2s' }}/>
+              <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#E2E8F0', border:`1.5px solid ${psiLayers.oo?PSI_COLORS.oo:'#CBD5E1'}`, boxShadow:psiLayers.oo?`0 0 6px ${PSI_COLORS.oo}99`:'none', transition:'all 0.2s' }}/>
+              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#E2E8F0', border:`1px solid ${psiLayers.oo?PSI_COLORS.oo:'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:psiLayers.oo?`0 0 5px ${PSI_COLORS.oo}55`:'none' }}>
+                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:psiLayers.oo?13:2, background:psiLayers.oo?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
               </div>
               <div style={{ flex:1 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:psiLayers.oo?THEME.textPrimary:'#475569', transition:'color 0.2s' }}>O&O Sites <span style={{ fontWeight:400, color:'#78350f' }}>({PSI_COUNTS.oo})</span></span>
+                <span style={{ fontSize:12, fontWeight:700, color:psiLayers.oo?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>O&O Sites <span style={{ fontWeight:400, color:'#78350f' }}>({PSI_COUNTS.oo})</span></span>
               </div>
             </div>
 
@@ -1985,9 +1986,9 @@ export default function BigFootMap() {
             <div style={{ borderBottom:`1px solid ${THEME.divider}` }}>
               <div style={{ display:'flex', alignItems:'center', padding:'7px 16px', userSelect:'none' }}>
                 <div onClick={toggle3pAll} style={{ display:'flex', alignItems:'center', gap:8, flex:1, cursor:'pointer' }}>
-                  <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:any3pOn?PSI_COLORS.authorized:'#1e293b', border:`1.5px solid ${any3pOn?PSI_COLORS.authorized:'#334155'}`, boxShadow:any3pOn?`0 0 5px ${PSI_COLORS.authorized}88`:'none', transition:'all 0.2s' }}/>
-                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:all3pOn?PSI_COLORS.authorized:'#1e293b', border:`1px solid ${any3pOn?PSI_COLORS.authorized:'#334155'}`, position:'relative', transition:'all 0.2s' }}>
-                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:all3pOn?13:2, background:all3pOn?'#020817':'#475569', transition:'left 0.2s' }}/>
+                  <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:any3pOn?PSI_COLORS.authorized:'#E2E8F0', border:`1.5px solid ${any3pOn?PSI_COLORS.authorized:'#CBD5E1'}`, boxShadow:any3pOn?`0 0 5px ${PSI_COLORS.authorized}88`:'none', transition:'all 0.2s' }}/>
+                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:all3pOn?PSI_COLORS.authorized:'#E2E8F0', border:`1px solid ${any3pOn?PSI_COLORS.authorized:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
+                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:all3pOn?13:2, background:all3pOn?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                   </div>
                   <span style={{ fontSize:12, fontWeight:600, color:any3pOn?'#e2e8f0':'#475569', transition:'color 0.2s' }}>3P Sites <span style={{ fontWeight:400, color:'#334155' }}>({PSI_3P_TOTAL})</span></span>
                 </div>
@@ -2000,11 +2001,11 @@ export default function BigFootMap() {
                 <div style={{ paddingBottom:4, background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
                   {[['authorized','PSI Authorized',397],['mg','MG Testing',33],['td','TD Testing',20],['amp','AMP Authorized',1]].map(([key,label,cnt])=>(
                     <div key={key} onClick={()=>togglePsi(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-                      <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#1e293b', border:`1.5px solid ${psiLayers[key]?PSI_COLORS[key]:'#334155'}`, boxShadow:psiLayers[key]?`0 0 4px ${PSI_COLORS[key]}88`:'none', transition:'all 0.2s' }}/>
-                      <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#1e293b', border:`1px solid ${psiLayers[key]?PSI_COLORS[key]:'#334155'}`, position:'relative', transition:'all 0.2s' }}>
-                        <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:psiLayers[key]?11:2, background:psiLayers[key]?'#020817':'#475569', transition:'left 0.2s' }}/>
+                      <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#E2E8F0', border:`1.5px solid ${psiLayers[key]?PSI_COLORS[key]:'#CBD5E1'}`, boxShadow:psiLayers[key]?`0 0 4px ${PSI_COLORS[key]}88`:'none', transition:'all 0.2s' }}/>
+                      <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#E2E8F0', border:`1px solid ${psiLayers[key]?PSI_COLORS[key]:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
+                        <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:psiLayers[key]?11:2, background:psiLayers[key]?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                       </div>
-                      <span style={{ fontSize:11, fontWeight:500, color:psiLayers[key]?THEME.textSecondary:'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
+                      <span style={{ fontSize:11, fontWeight:500, color:psiLayers[key]?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
                     </div>
                   ))}
                 </div>
@@ -2013,12 +2014,12 @@ export default function BigFootMap() {
 
             {/* 50-mile radius master toggle */}
             <div onClick={()=>setShowRadii(r=>!r)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-              <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showRadii?'#64748b':'#334155'}`, background:showRadii?'rgba(100,116,139,0.25)':'transparent', transition:'all 0.2s' }}/>
-              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showRadii?'#64748b':'#1e293b', border:`1px solid ${showRadii?'#64748b':'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:showRadii?'0 0 5px rgba(100,116,139,0.4)':'none' }}>
-                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showRadii?13:2, background:showRadii?'#020817':'#475569', transition:'left 0.2s' }}/>
+              <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showRadii?'#64748b':'#CBD5E1'}`, background:showRadii?'rgba(100,116,139,0.25)':'transparent', transition:'all 0.2s' }}/>
+              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showRadii?'#64748b':'#E2E8F0', border:`1px solid ${showRadii?'#64748b':'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:showRadii?'0 0 5px rgba(100,116,139,0.4)':'none' }}>
+                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showRadii?13:2, background:showRadii?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
               </div>
               <div>
-                <span style={{ fontSize:12, fontWeight:500, color:showRadii?THEME.textSecondary:'#475569', transition:'color 0.2s' }}>50-Mile Radius</span>
+                <span style={{ fontSize:12, fontWeight:500, color:showRadii?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>50-Mile Radius</span>
                 <span style={{ fontSize:9, color:'#334155', marginLeft:6 }}>all sites</span>
               </div>
             </div>
@@ -2027,9 +2028,9 @@ export default function BigFootMap() {
             <div>
               <div style={{ display:'flex', alignItems:'center', padding:'7px 16px', userSelect:'none' }}>
                 <div onClick={()=>setShowLeaseIntel(l=>!l)} style={{ display:'flex', alignItems:'center', gap:8, flex:1, cursor:'pointer' }}>
-                  <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showLeaseIntel?'#f97316':'#334155'}`, background:showLeaseIntel?'rgba(249,115,22,0.2)':'transparent', transition:'all 0.2s' }}/>
-                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showLeaseIntel?'#f97316':'#1e293b', border:`1px solid ${showLeaseIntel?'#f97316':'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:showLeaseIntel?'0 0 5px rgba(249,115,22,0.4)':'none' }}>
-                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showLeaseIntel?13:2, background:showLeaseIntel?'#020817':'#475569', transition:'left 0.2s' }}/>
+                  <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showLeaseIntel?'#f97316':'#CBD5E1'}`, background:showLeaseIntel?'rgba(249,115,22,0.2)':'transparent', transition:'all 0.2s' }}/>
+                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showLeaseIntel?'#f97316':'#E2E8F0', border:`1px solid ${showLeaseIntel?'#f97316':'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:showLeaseIntel?'0 0 5px rgba(249,115,22,0.4)':'none' }}>
+                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showLeaseIntel?13:2, background:showLeaseIntel?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                   </div>
                   <div>
                     <span style={{ fontSize:12, fontWeight:500, color:showLeaseIntel?'#e2e8f0':'#475569', transition:'color 0.2s' }}>Lease Intelligence</span>
@@ -2057,11 +2058,11 @@ export default function BigFootMap() {
                     const on = leaseActionFilters[key]
                     return (
                       <div key={key} onClick={()=>setLeaseActionFilters(f=>({...f,[key]:!f[key]}))} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-                        <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:on?color:'#1e293b', border:`1.5px solid ${on?color:'#334155'}`, boxShadow:on?`0 0 4px ${color}88`:'none', transition:'all 0.2s' }}/>
-                        <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:on?color:'#1e293b', border:`1px solid ${on?color:'#334155'}`, position:'relative', transition:'all 0.2s' }}>
-                          <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:on?11:2, background:on?'#020817':'#475569', transition:'left 0.2s' }}/>
+                        <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:on?color:'#E2E8F0', border:`1.5px solid ${on?color:'#CBD5E1'}`, boxShadow:on?`0 0 4px ${color}88`:'none', transition:'all 0.2s' }}/>
+                        <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:on?color:'#E2E8F0', border:`1px solid ${on?color:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
+                          <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:on?11:2, background:on?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                         </div>
-                        <span style={{ fontSize:11, fontWeight:500, color:on?THEME.textSecondary:'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
+                        <span style={{ fontSize:11, fontWeight:500, color:on?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
                       </div>
                     )
                   })}
@@ -2080,7 +2081,7 @@ export default function BigFootMap() {
 
       {/* Status Bar */}
       <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', background:THEME.panelBg, border:THEME.panelBorder, borderRadius:8, padding:'8px 20px', backdropFilter:'blur(8px)', fontFamily:FONT, display:'flex', gap:20, alignItems:'center', boxShadow:THEME.shadow }}>
-        <span style={{ fontSize:11, fontWeight:600, color:'#22d3ee', letterSpacing:'0.06em' }}>PROJECT BIG FOOT</span>
+        <span style={{ fontSize:11, fontWeight:600, color:'#0891B2', letterSpacing:'0.06em' }}>PROJECT BIG FOOT</span>
         <span style={{ color:'#334155', fontSize:10 }}>|</span>
         <span style={{ fontSize:11, color:'#64748b' }}>{Object.values(layers).filter(Boolean).length + Object.values(psiLayers).filter(Boolean).length} layers active</span>
         <span style={{ color:'#334155', fontSize:10 }}>|</span>
@@ -2095,7 +2096,7 @@ export default function BigFootMap() {
       <div style={{
         position:'fixed', top:0, right:0, width:380, height:'100vh',
         background:THEME.panelBgSolid, borderLeft:'1px solid #E2E8F0',
-        boxShadow:THEME.shadow,
+        boxShadow:'-4px 0 16px rgba(15,23,42,0.10)',
         zIndex:500, display:'flex', flexDirection:'column',
         transform: isChatOpen ? 'translateX(0)' : 'translateX(100%)',
         transition:'transform 0.25s ease',
@@ -2104,7 +2105,7 @@ export default function BigFootMap() {
         {/* Header */}
         <div style={{ height:64, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 16px', borderBottom:'1px solid #1e293b', flexShrink:0 }}>
           <div>
-            <div style={{ fontSize:14, fontWeight:700, color:'#22d3ee' }}>Big Foot Assistant</div>
+            <div style={{ fontSize:14, fontWeight:700, color:'#0891B2' }}>Big Foot Assistant</div>
             <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>Powered by Claude</div>
           </div>
           <div onClick={()=>setIsChatOpen(false)} style={{ cursor:'pointer', color:'#475569', fontSize:20, lineHeight:1, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:THEME.inset, userSelect:'none' }}>×</div>
