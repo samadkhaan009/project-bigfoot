@@ -338,7 +338,7 @@ const OPTIMUS_RADIUS_EXPR = ['case',
 
 // ── Lease Intelligence constants ─────────────────────
 // ── IRS Clearance constants ───────────────────────────
-const IRS_ACTIVATED_COLOR   = '#15803d'   // green  — ≥1 TCA cleared
+const IRS_ACTIVATED_COLOR   = '#14532D'   // green  — ≥1 TCA cleared
 const IRS_IN_PROCESS_COLOR  = '#b87708'   // amber  — TCAs in process, none cleared
 const IRS_RING_RADIUS_EXPR  = ['case', ['==',['get','category'],'OO'], 17, 15]
 
@@ -600,7 +600,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               )}
               {psiActive.filter(([k])=>PSI_3P_KEYS.includes(k)).map(([key])=>(
                 <div key={key} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
-                  <div style={{ width:10, height:10, borderRadius:'50%', background:PSI_COLORS[key], flexShrink:0 }}/>
+                  <div style={{ width:10, height:10, borderRadius:'50%', background:PSI_COLORS[key], flexShrink:0, border: key==='amp' ? '1px solid rgba(15,23,42,0.15)' : 'none' }}/>
                   <span style={{ fontSize:10, color:'#64748b' }}>{PSI_LABELS[key]}</span>
                 </div>
               ))}
@@ -628,16 +628,16 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                 <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(47 mapped)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
-                <div style={{ width:11, height:6, borderRadius:1, background:'rgba(34,197,94,0.4)', flexShrink:0, border:'1px solid #22c55e' }}/>
+                <div style={{ width:11, height:6, borderRadius:1, background:'rgba(74,222,128,0.4)', flexShrink:0, border:'1px solid #4ADE80' }}/>
                 <span style={{ fontSize:10, color:'#64748b' }}>States with activation (green fill)</span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:6 }}>
-                <div style={{ width:11, height:6, borderRadius:1, background:'rgba(239,68,68,0.2)', flexShrink:0, border:'1px solid #ef4444' }}/>
+                <div style={{ width:11, height:6, borderRadius:1, background:'rgba(252,165,165,0.2)', flexShrink:0, border:'1px solid #FCA5A5' }}/>
                 <span style={{ fontSize:10, color:'#64748b' }}>No activated sites yet (red fill)</span>
               </div>
               <div style={{ padding:'4px 8px', background:'rgba(34,211,238,0.08)', borderRadius:4 }}>
                 <div style={{ fontSize:9, color:'#0891B2', lineHeight:1.6 }}>
-                  Network: 161 activated · 188 in process (network)<br/>163 Final Clearances granted<br/>Enable State Boundaries to see choropleth
+                  Network: 161 activated · 188 in process (network)<br/>163 Final Clearances granted{!layers.states && <><br/>Enable State Boundaries to see choropleth</>}
                 </div>
               </div>
             </div>
@@ -689,7 +689,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               {/* Tier rows with size-indicating dots (larger = higher score) */}
               {[['A','#22c55e','Top Quality',0,14],['B','#818cf8','Good',49,11],['C','#fb923c','Needs Improvement',77,8]].map(([tier,color,label,count,dotR]) => (
                 <div key={tier} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:5 }}>
-                  <div style={{ width:dotR, height:dotR, borderRadius:'50%', background:color, flexShrink:0, opacity:count===0?0.3:1 }}/>
+                  <div style={{ width:dotR, height:dotR, borderRadius:'50%', background:color, flexShrink:0, opacity:count===0?0.3:1, border: tier==='A' ? '1px solid rgba(15,23,42,0.15)' : 'none' }}/>
                   <span style={{ fontSize:10, color:count===0?'#334155':'#64748b' }}>
                     Tier {tier} — {label}
                     <span style={{ color:'#334155', marginLeft:4 }}>({count})</span>
@@ -774,8 +774,8 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
     const accentColor = PSI_COLORS[typeKey]
     const catLabel    = info.psiCategory === 'OO' ? 'Owned & Operated' : '3rd Party'
     return (
-      <div style={{ position:'absolute', bottom:70, right:12, background:THEME.panelBg, border:`1px solid ${accentColor}55`, borderRadius:12, padding:0, width:270, fontFamily:FONT, boxShadow:THEME.shadowLg, backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
+      <div style={{ position:'absolute', bottom:130, right:20, zIndex:400, background:THEME.panelBg, border:`1px solid ${accentColor}55`, borderRadius:12, padding:0, width:270, fontFamily:FONT, boxShadow:THEME.shadowLg, backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto' }}>
+        <div style={{ position:'sticky', top:0, zIndex:1, background:THEME.panelBg, backdropFilter:'blur(12px)', display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
           <div>
             <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:accentColor, marginBottom:3 }}>
               📍 PSI Test Center
@@ -968,13 +968,13 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
   const accentColor = LAYER_COLORS[info.layerId] || '#60a5fa'
   return (
     <div style={{
-      position:'absolute', bottom:70, right:12,
+      position:'absolute', bottom:130, right:20, zIndex:400,
       background:THEME.panelBg, border:`1px solid ${accentColor}55`,
       borderRadius:12, padding:0, width:270,
       fontFamily:FONT, boxShadow:THEME.shadowLg,
       backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto',
     }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
+      <div style={{ position:'sticky', top:0, zIndex:1, background:THEME.panelBg, backdropFilter:'blur(12px)', display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
         <div>
           <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:accentColor, marginBottom:3 }}>
             {HUB_EMOJI[info.layerId] || '📍'} {info.type || info.layerId}
@@ -1060,10 +1060,10 @@ export default function BigFootMap() {
     fetch(`${BASE}data/data_irs_states.json`).then(r => r.json()).then(data => {
       const colorPairs = [], opacityPairs = [];
       for (const [name, info] of Object.entries(data)) {
-        colorPairs.push(name, info.stateActivated > 0 ? '#22c55e' : '#ef4444');
+        colorPairs.push(name, info.stateActivated > 0 ? '#4ADE80' : '#FCA5A5');
         opacityPairs.push(name, info.stateActivated > 0
-          ? Math.round((0.25 + info.statePctActivated * 0.30) * 100) / 100
-          : 0.20);
+          ? Math.round((0.08 + info.statePctActivated * 0.16) * 100) / 100
+          : 0.12);
       }
       setIrsStatePaint({
         color:   ['match', ['coalesce',['get','name'],['get','NAME']], ...colorPairs, '#1e40af'],
@@ -1458,15 +1458,15 @@ export default function BigFootMap() {
           <Source id="states" type="geojson" data={STATES_URL}>
             <Layer id="states-fill" type="fill" paint={irsMode && irsStatePaint
               ? {'fill-color': irsStatePaint.color, 'fill-opacity': irsStatePaint.opacity}
-              : {'fill-color':'#1e40af','fill-opacity':0.12}
+              : {'fill-color':'#64748B','fill-opacity':0.05}
             }/>
             <Layer id="states-line" type="line" paint={{'line-color':'#94a3b8','line-width':0.9,'line-opacity':0.5}}/>
           </Source>
         )}
         {layers.metros && (
           <Source id="metros" type="geojson" data={`${BASE}data/metros.geojson`}>
-            <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.13}}/>
-            <Layer id="metros-line" type="line" paint={{'line-color':'#22d3ee','line-width':1.1,'line-opacity':0.65,'line-dasharray':[4,3]}}/>
+            <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.07}}/>
+            <Layer id="metros-line" type="line" paint={{'line-color':'#22d3ee','line-width':1.1,'line-opacity':0.33,'line-dasharray':[4,3]}}/>
           </Source>
         )}
         {layers.population && (
@@ -1546,7 +1546,7 @@ export default function BigFootMap() {
               'circle-radius': IRS_RING_RADIUS_EXPR,
               'circle-color': 'rgba(0,0,0,0)',
               'circle-stroke-color': IRS_ACTIVATED_COLOR,
-              'circle-stroke-width': 2.5,
+              'circle-stroke-width': 3,
               'circle-opacity': 0,
               'circle-stroke-opacity': 0.9,
             }}
@@ -1931,7 +1931,7 @@ export default function BigFootMap() {
             <div onClick={() => toggleGroup(group.label)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 16px', cursor:'pointer', background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
               <span style={{ fontSize:11, fontWeight:700, color:THEME.textSecondary, letterSpacing:'0.04em' }}>{group.label.toUpperCase()}</span>
               <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-                <span onClick={e => {e.stopPropagation(); toggleGroupAll(group)}} style={{ fontSize:9, color:'#475569', cursor:'pointer', padding:'2px 5px', borderRadius:3, background:THEME.inset }}>
+                <span onClick={e => {e.stopPropagation(); toggleGroupAll(group)}} style={{ fontSize:9, color:THEME.textSecondary, cursor:'pointer', padding:'2px 5px', borderRadius:3, background:THEME.inset, border:`1px solid ${THEME.divider}` }}>
                   {allInGroup(group) ? 'ALL OFF' : 'ALL ON'}
                 </span>
                 <span style={{ color:'#475569', fontSize:10 }}>{collapsed[group.label] ? '▶' : '▼'}</span>
@@ -1946,7 +1946,7 @@ export default function BigFootMap() {
                   <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:layers[key]?color:'#E2E8F0', border:`1px solid ${layers[key]?color:'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:layers[key]?`0 0 5px ${color}55`:'none' }}>
                     <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:layers[key]?13:2, background:layers[key]?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                   </div>
-                  <span style={{ fontSize:12, fontWeight:500, color:layers[key]?'#e2e8f0':'#475569', transition:'color 0.2s', flex:1 }}>
+                  <span style={{ fontSize:12, fontWeight:500, color:layers[key]?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s', flex:1 }}>
                     {label}{count ? <span style={{ fontSize:9, fontWeight:400, color:'#334155', marginLeft:4 }}>({count.toLocaleString()})</span> : null}
                   </span>
                   {qualityMode && q && (
@@ -1990,7 +1990,7 @@ export default function BigFootMap() {
                   <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:all3pOn?PSI_COLORS.authorized:'#E2E8F0', border:`1px solid ${any3pOn?PSI_COLORS.authorized:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
                     <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:all3pOn?13:2, background:all3pOn?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                   </div>
-                  <span style={{ fontSize:12, fontWeight:600, color:any3pOn?'#e2e8f0':'#475569', transition:'color 0.2s' }}>3P Sites <span style={{ fontWeight:400, color:'#334155' }}>({PSI_3P_TOTAL})</span></span>
+                  <span style={{ fontSize:12, fontWeight:600, color:any3pOn?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>3P Sites <span style={{ fontWeight:400, color:'#334155' }}>({PSI_3P_TOTAL})</span></span>
                 </div>
                 <span onClick={()=>setPsiCollapsed(p=>({...p,thirdParty:!p.thirdParty}))} style={{ cursor:'pointer', color:'#475569', fontSize:10, padding:'2px 6px' }}>
                   {psiCollapsed.thirdParty ? '▶' : '▼'}
@@ -2033,7 +2033,7 @@ export default function BigFootMap() {
                     <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showLeaseIntel?13:2, background:showLeaseIntel?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                   </div>
                   <div>
-                    <span style={{ fontSize:12, fontWeight:500, color:showLeaseIntel?'#e2e8f0':'#475569', transition:'color 0.2s' }}>Lease Intelligence</span>
+                    <span style={{ fontSize:12, fontWeight:500, color:showLeaseIntel?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>Lease Intelligence</span>
                     <span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>(57 sites)</span>
                     {showLeaseIntel && <div style={{ fontSize:9, color:'#92400e', marginTop:1 }}>32 expired · 7 contract flags</div>}
                   </div>
