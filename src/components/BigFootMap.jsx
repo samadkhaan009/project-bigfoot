@@ -3,6 +3,19 @@ import Map, { Layer, Source, NavigationControl, ScaleControl, Popup } from 'reac
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+const THEME = {
+  panelBg:      'rgba(255,255,255,0.96)',
+  panelBgSolid: '#FFFFFF',
+  panelBorder:  '1px solid #E2E8F0',
+  inputBg:      '#F1F5F9',
+  inputBorder:  '#CBD5E1',
+  textPrimary:  '#0F172A',
+  textSecondary:'#64748B',
+  divider:      'rgba(15,23,42,0.08)',
+  inset:        'rgba(15,23,42,0.04)',
+  shadow:       '0 4px 16px rgba(15,23,42,0.12)',
+  shadowLg:     '0 8px 28px rgba(15,23,42,0.16)',
+};
 const INITIAL_VIEW = { longitude: -96, latitude: 39, zoom: 4, pitch: 0, bearing: 0 }
 const STATES_URL = 'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json'
 const BASE = import.meta.env.BASE_URL
@@ -401,7 +414,7 @@ function DataSourcePanel({ layerKey }) {
   const confColor = CONFIDENCE_COLORS[q.confidence]
   return (
     <div style={{
-      marginTop:10, borderTop:'1px solid rgba(255,255,255,0.06)',
+      marginTop:10, borderTop:`1px solid ${THEME.divider}`,
       paddingTop:10,
     }}>
       <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'#475569', marginBottom:8 }}>
@@ -431,7 +444,7 @@ function DataSourcePanel({ layerKey }) {
         </div>
       )}
       {q.note && (
-        <div style={{ marginTop:6, padding:'6px 8px', background:'rgba(255,255,255,0.03)', borderRadius:5, borderLeft:'2px solid #475569' }}>
+        <div style={{ marginTop:6, padding:'6px 8px', background:THEME.inset, borderRadius:5, borderLeft:'2px solid #475569' }}>
           <div style={{ fontSize:10, color:'#475569', lineHeight:1.5 }}>{q.note}</div>
         </div>
       )}
@@ -443,7 +456,7 @@ function SourceRow({ label, value }) {
   return (
     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:8 }}>
       <span style={{ fontSize:10, color:'#475569', flexShrink:0 }}>{label}</span>
-      <span style={{ fontSize:10, color:'#94a3b8', textAlign:'right', lineHeight:1.4 }}>{value}</span>
+      <span style={{ fontSize:10, color:THEME.textSecondary, textAlign:'right', lineHeight:1.4 }}>{value}</span>
     </div>
   )
 }
@@ -459,10 +472,10 @@ function QualitySummaryBar({ layers }) {
   return (
     <div style={{
       position:'absolute', top:80, left:'50%', transform:'translateX(-50%)',
-      background:'rgba(2,8,23,0.95)', border:'1px solid rgba(234,179,8,0.4)',
+      background:THEME.panelBg, border:THEME.panelBorder,
       borderRadius:8, padding:'7px 16px', fontFamily:FONT,
       display:'flex', alignItems:'center', gap:14,
-      boxShadow:'0 4px 16px rgba(0,0,0,0.5)',
+      boxShadow:THEME.shadow,
       backdropFilter:'blur(10px)',
     }}>
       <div style={{ display:'flex', alignItems:'center', gap:5 }}>
@@ -493,17 +506,17 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
   return (
     <div style={{
       position:'absolute', bottom:70, left:12,
-      background:'rgba(2,8,23,0.92)', border:'1px solid rgba(96,165,250,0.2)',
+      background:THEME.panelBg, border:THEME.panelBorder,
       borderRadius:10, fontFamily:FONT,
-      boxShadow:'0 4px 16px rgba(0,0,0,0.5)', backdropFilter:'blur(10px)',
+      boxShadow:THEME.shadow, backdropFilter:'blur(10px)',
       minWidth:190, maxWidth:230,
     }}>
       <div onClick={() => setOpen(o => !o)} style={{
         display:'flex', justifyContent:'space-between', alignItems:'center',
         padding:'9px 13px', cursor:'pointer',
-        borderBottom: open ? '1px solid rgba(255,255,255,0.05)' : 'none',
+        borderBottom: open ? `1px solid ${THEME.divider}` : 'none',
       }}>
-        <span style={{ fontSize:10, fontWeight:700, color:'#94a3b8', letterSpacing:'0.1em', textTransform:'uppercase' }}>Legend</span>
+        <span style={{ fontSize:10, fontWeight:700, color:THEME.textSecondary, letterSpacing:'0.1em', textTransform:'uppercase' }}>Legend</span>
         <span style={{ color:'#475569', fontSize:10 }}>{open ? '▼' : '▶'}</span>
       </div>
       {open && (
@@ -517,7 +530,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
             if (key === 'population') return (
               <div key={key} style={{ padding:'4px 13px' }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
-                  <span style={{ fontSize:11, color:'#94a3b8', fontWeight:600 }}>Population Density</span>
+                  <span style={{ fontSize:11, color:THEME.textSecondary, fontWeight:600 }}>Population Density</span>
                   {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
                 </div>
                 {Object.entries(DENSITY_COLORS).map(([label, color]) => (
@@ -553,7 +566,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
             if (key === 'urban_rural') return (
               <div key={key} style={{ padding:'4px 13px' }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
-                  <span style={{ fontSize:11, color:'#94a3b8', fontWeight:600 }}>Urban / Rural</span>
+                  <span style={{ fontSize:11, color:THEME.textSecondary, fontWeight:600 }}>Urban / Rural</span>
                   {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
                 </div>
                 {[['Major Urban','#38bdf8'],['Urban','#4ade80'],['Rural Hub','#92400e']].map(([label, color]) => (
@@ -581,7 +594,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               {psiLayers?.oo && (
                 <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                   <div style={{ width:12, height:12, borderRadius:'50%', background:PSI_COLORS.oo, boxShadow:`0 0 5px ${PSI_COLORS.oo}88`, flexShrink:0 }}/>
-                  <span style={{ fontSize:10, color:'#94a3b8', fontWeight:600 }}>O&O — PSI Owned</span>
+                  <span style={{ fontSize:10, color:THEME.textSecondary, fontWeight:600 }}>O&O — PSI Owned</span>
                 </div>
               )}
               {psiActive.filter(([k])=>PSI_3P_KEYS.includes(k)).map(([key])=>(
@@ -722,7 +735,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                 </div>
               ))}
               {/* Notes */}
-              <div style={{ marginTop:7, paddingTop:6, borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ marginTop:7, paddingTop:6, borderTop:`1px solid ${THEME.divider}` }}>
                 <div style={{ fontSize:9, color:'#475569', marginBottom:2 }}>Lighter shade = better performance</div>
                 <div style={{ fontSize:9, color:'#475569' }}>Circle size = exam volume delivered</div>
               </div>
@@ -734,7 +747,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
           )}
 
           {qualityMode && (
-            <div style={{ margin:'8px 13px 4px', padding:'6px 8px', background:'rgba(255,255,255,0.03)', borderRadius:6 }}>
+            <div style={{ margin:'8px 13px 4px', padding:'6px 8px', background:THEME.inset, borderRadius:6 }}>
               <div style={{ fontSize:9, color:'#475569', marginBottom:4, fontWeight:700, letterSpacing:'0.06em' }}>QUALITY LEGEND</div>
               {[['REAL','#22c55e','Real data from named source'],['REAL_PARTIAL','#86efac','Real data — partial sample'],['MODELLED','#eab308','Population-proportional model'],['CURATED','#60a5fa','Manually researched']].map(([cls,color,desc]) => (
                 <div key={cls} style={{ display:'flex', alignItems:'center', gap:6, marginBottom:3 }}>
@@ -760,15 +773,15 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
     const accentColor = PSI_COLORS[typeKey]
     const catLabel    = info.psiCategory === 'OO' ? 'Owned & Operated' : '3rd Party'
     return (
-      <div style={{ position:'absolute', bottom:70, right:12, background:'rgba(2,8,23,0.97)', border:`1px solid ${accentColor}44`, borderRadius:12, padding:0, width:270, fontFamily:FONT, boxShadow:'0 6px 30px rgba(0,0,0,0.7)', backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto' }}>
+      <div style={{ position:'absolute', bottom:70, right:12, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:12, padding:0, width:270, fontFamily:FONT, boxShadow:THEME.shadowLg, backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
           <div>
             <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:accentColor, marginBottom:3 }}>
               📍 PSI Test Center
             </div>
-            <div style={{ fontSize:14, fontWeight:700, color:'#f1f5f9', lineHeight:1.3 }}>{info.name}</div>
+            <div style={{ fontSize:14, fontWeight:700, color:THEME.textPrimary, lineHeight:1.3 }}>{info.name}</div>
           </div>
-          <div onClick={onClose} style={{ cursor:'pointer', color:'#475569', fontSize:16, width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:'rgba(255,255,255,0.05)', flexShrink:0 }}>×</div>
+          <div onClick={onClose} style={{ cursor:'pointer', color:'#475569', fontSize:16, width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:THEME.inset, flexShrink:0 }}>×</div>
         </div>
         <div style={{ padding:'10px 16px 14px' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:6, marginBottom:10, padding:'3px 10px', borderRadius:4, background:`${accentColor}18`, border:`1px solid ${accentColor}44` }}>
@@ -784,7 +797,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
 
           {/* Performance section */}
           {info.scoreBucket != null && (
-            <div style={{ marginTop:10, borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:10 }}>
+            <div style={{ marginTop:10, borderTop:`1px solid ${THEME.divider}`, paddingTop:10 }}>
               <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>VOLUME METRICS 2024–25</div>
               {(() => {
                 const tierColors = info.psiCategory === 'OO' ? PERF_OO_COLORS : PERF_3P_COLORS
@@ -837,7 +850,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
                       <span>Overall Score</span>
                       <span style={{ color:barCol, fontWeight:700 }}>{pct.toFixed(1)}%</span>
                     </div>
-                    <div style={{ height:5, background:'rgba(255,255,255,0.08)', borderRadius:3, overflow:'hidden' }}>
+                    <div style={{ height:5, background:THEME.inset, borderRadius:3, overflow:'hidden' }}>
                       <div style={{ width:`${pct}%`, height:'100%', borderRadius:3, background:barCol }}/>
                     </div>
                   </div>
@@ -859,7 +872,7 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
                             <span style={{ fontSize:8, color:'#475569' }}>{label}</span>
                             <span style={{ fontSize:8, color:c, fontWeight:600 }}>{v != null ? (v*100).toFixed(0)+'%' : '—'}</span>
                           </div>
-                          <div style={{ height:3, background:'rgba(255,255,255,0.06)', borderRadius:2, overflow:'hidden' }}>
+                          <div style={{ height:3, background:THEME.inset, borderRadius:2, overflow:'hidden' }}>
                             {v != null && <div style={{ width:`${v*100}%`, height:'100%', background:c, borderRadius:2 }}/>}
                           </div>
                         </div>
@@ -955,9 +968,9 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
   return (
     <div style={{
       position:'absolute', bottom:70, right:12,
-      background:'rgba(2,8,23,0.97)', border:`1px solid ${accentColor}44`,
+      background:THEME.panelBg, border:THEME.panelBorder,
       borderRadius:12, padding:0, width:270,
-      fontFamily:FONT, boxShadow:'0 6px 30px rgba(0,0,0,0.7)',
+      fontFamily:FONT, boxShadow:THEME.shadowLg,
       backdropFilter:'blur(12px)', maxHeight:'70vh', overflowY:'auto',
     }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', padding:'12px 16px 10px', borderBottom:`1px solid ${accentColor}22` }}>
@@ -965,9 +978,9 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
           <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:accentColor, marginBottom:3 }}>
             {HUB_EMOJI[info.layerId] || '📍'} {info.type || info.layerId}
           </div>
-          <div style={{ fontSize:14, fontWeight:700, color:'#f1f5f9', lineHeight:1.2 }}>{info.name}</div>
+          <div style={{ fontSize:14, fontWeight:700, color:THEME.textPrimary, lineHeight:1.2 }}>{info.name}</div>
         </div>
-        <div onClick={onClose} style={{ cursor:'pointer', color:'#475569', fontSize:16, width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:'rgba(255,255,255,0.05)', flexShrink:0 }}>×</div>
+        <div onClick={onClose} style={{ cursor:'pointer', color:'#475569', fontSize:16, width:24, height:24, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:THEME.inset, flexShrink:0 }}>×</div>
       </div>
       <div style={{ padding:'10px 16px 14px' }}>
         {(info.city||info.state) && <InfoRow label="Location" value={[info.city,info.state].filter(Boolean).join(', ')} />}
@@ -996,9 +1009,9 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
 
 function InfoRow({ label, value, color }) {
   return (
-    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'4px 0', borderBottom:'1px solid rgba(255,255,255,0.03)' }}>
+    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'4px 0', borderBottom:`1px solid ${THEME.divider}` }}>
       <span style={{ fontSize:11, color:'#64748b' }}>{label}</span>
-      <span style={{ fontSize:12, fontWeight:600, color:color||'#e2e8f0' }}>{value}</span>
+      <span style={{ fontSize:12, fontWeight:600, color:color||THEME.textPrimary }}>{value}</span>
     </div>
   )
 }
@@ -1424,7 +1437,7 @@ export default function BigFootMap() {
   }, [extractInfo])
 
   return (
-    <div style={{ width:'100vw', height:'100vh', position:'relative', background:'#020817' }}>
+    <div style={{ width:'100vw', height:'100vh', position:'relative', background:'#F8FAFC' }}>
       <Map
         ref={mapRef}
         {...viewState}
@@ -1581,11 +1594,11 @@ export default function BigFootMap() {
         {hoverInfo?.lon && (
           <Popup longitude={hoverInfo.lon} latitude={hoverInfo.lat} closeButton={false} closeOnClick={false} anchor="bottom" offset={16}>
             {hoverInfo.isPriorityCity ? (
-              <div style={{ fontFamily:FONT, background:'rgba(2,8,23,0.97)', border:'1px solid rgba(251,191,36,0.4)', borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
+              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
                 <div style={{ fontSize:9, fontWeight:700, color:'#f59e0b', letterSpacing:'0.1em', marginBottom:3 }}>
                   ◆ PRIORITY CITY — Level {hoverInfo.cityLevel || '?'}
                 </div>
-                <div style={{ fontSize:13, fontWeight:600, color:'#f1f5f9' }}>{hoverInfo.city}, {hoverInfo.state}</div>
+                <div style={{ fontSize:13, fontWeight:600, color:THEME.textPrimary }}>{hoverInfo.city}, {hoverInfo.state}</div>
                 <div style={{ fontSize:11, color:'#64748b', marginTop:4 }}>
                   Sites: {hoverInfo.totalSites} (O&O: {hoverInfo.ooCount} · 3P: {hoverInfo.partnerCount})
                 </div>
@@ -1616,21 +1629,21 @@ export default function BigFootMap() {
                 <div style={{ fontSize:9, color:'#334155', marginTop:4 }}>Click for details</div>
               </div>
             ) : hoverInfo.isPsi ? (
-              <div style={{ fontFamily:FONT, background:'rgba(2,8,23,0.97)', border:`1px solid ${PSI_COLORS[PSI_TYPE_MAP[hoverInfo.propertyType]||'authorized']}44`, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
+              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:7, padding:'8px 12px', maxWidth:240 }}>
                 <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:PSI_COLORS[PSI_TYPE_MAP[hoverInfo.propertyType]||'authorized'], marginBottom:3 }}>
                   📍 {hoverInfo.psiCategory==='OO'?'O&O':'3P'} · {hoverInfo.propertyType}
                 </div>
-                <div style={{ fontSize:13, fontWeight:600, color:'#f1f5f9' }}>{hoverInfo.name}</div>
+                <div style={{ fontSize:13, fontWeight:600, color:THEME.textPrimary }}>{hoverInfo.name}</div>
                 {hoverInfo.city && <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>{[hoverInfo.city,hoverInfo.state].filter(Boolean).join(', ')}</div>}
                 <div style={{ fontSize:9, color:'#334155', marginTop:4 }}>Click for details</div>
               </div>
             ) : (
-              <div style={{ fontFamily:FONT, background:'rgba(2,8,23,0.97)', border:`1px solid ${LAYER_COLORS[hoverInfo.layerId]||'#60a5fa'}44`, borderRadius:7, padding:'8px 12px', maxWidth:230 }}>
+              <div style={{ fontFamily:FONT, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:7, padding:'8px 12px', maxWidth:230 }}>
                 {qualityMode && <div style={{ marginBottom:5 }}><QualityBadge layerKey={hoverInfo.layerId} /></div>}
                 <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:LAYER_COLORS[hoverInfo.layerId]||'#60a5fa', marginBottom:3 }}>
                   {HUB_EMOJI[hoverInfo.layerId]||''} {hoverInfo.type}
                 </div>
-                <div style={{ fontSize:13, fontWeight:600, color:'#f1f5f9' }}>{hoverInfo.name}</div>
+                <div style={{ fontSize:13, fontWeight:600, color:THEME.textPrimary }}>{hoverInfo.name}</div>
                 {(hoverInfo.city||hoverInfo.state) && <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>{[hoverInfo.city,hoverInfo.state].filter(Boolean).join(', ')}</div>}
                 {hoverInfo.population && <div style={{ fontSize:11, color:'#f472b6', marginTop:3, fontWeight:600 }}>Pop: {fmt(hoverInfo.population)}</div>}
                 {qualityMode && DATA_QUALITY[hoverInfo.layerId] && (
@@ -1652,17 +1665,17 @@ export default function BigFootMap() {
       {/* Left column: header + filter panel */}
       <div style={{ position:'absolute', top:20, left:20, width:284, display:'flex', flexDirection:'column', gap:8, maxHeight:'calc(100vh - 40px)', overflowY:'auto' }}>
       {/* Header */}
-      <div style={{ background:'rgba(2,8,23,0.9)', border:'1px solid rgba(96,165,250,0.25)', borderRadius:12, padding:'14px 20px', backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)', flexShrink:0 }}>
-        <div style={{ fontSize:18, fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.02em' }}>Project Big Foot</div>
+      <div style={{ background:THEME.panelBg, border:THEME.panelBorder, borderRadius:12, padding:'14px 20px', backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:THEME.shadow, flexShrink:0 }}>
+        <div style={{ fontSize:18, fontWeight:800, color:THEME.textPrimary, letterSpacing:'-0.02em' }}>Project Big Foot</div>
         <div style={{ fontSize:10, color:'#22d3ee', marginTop:4, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase' }}>PSI / ETS &nbsp;·&nbsp; Network Intelligence</div>
 
         {/* Quality Mode Toggle */}
         <div onClick={() => setQualityMode(q => !q)} style={{
           marginTop:10, display:'flex', alignItems:'center', gap:8,
           cursor:'pointer', padding:'6px 10px',
-          background: qualityMode ? 'rgba(234,179,8,0.12)' : 'rgba(255,255,255,0.04)',
+          background: qualityMode ? 'rgba(234,179,8,0.12)' : THEME.inset,
           borderRadius:6,
-          border: qualityMode ? '1px solid rgba(234,179,8,0.4)' : '1px solid rgba(255,255,255,0.06)',
+          border: qualityMode ? '1px solid rgba(234,179,8,0.4)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
           <div style={{
@@ -1686,9 +1699,9 @@ export default function BigFootMap() {
         <div onClick={togglePerformanceMode} style={{
           marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
           padding:'6px 10px',
-          background: performanceMode ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.04)',
+          background: performanceMode ? 'rgba(34,197,94,0.1)' : THEME.inset,
           borderRadius:6,
-          border: performanceMode ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          border: performanceMode ? '1px solid rgba(34,197,94,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
           <div style={{ width:28, height:16, borderRadius:8, background:performanceMode?'#22c55e':'#1e293b', border:`1px solid ${performanceMode?'#22c55e':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:performanceMode?'0 0 8px rgba(34,197,94,0.45)':'none', flexShrink:0 }}>
@@ -1706,9 +1719,9 @@ export default function BigFootMap() {
         <div onClick={toggleOptimusMode} style={{
           marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
           padding:'6px 10px',
-          background: optimusMode ? 'rgba(168,85,247,0.1)' : 'rgba(255,255,255,0.04)',
+          background: optimusMode ? 'rgba(168,85,247,0.1)' : THEME.inset,
           borderRadius:6,
-          border: optimusMode ? '1px solid rgba(168,85,247,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          border: optimusMode ? '1px solid rgba(168,85,247,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
           <div style={{ width:28, height:16, borderRadius:8, background:optimusMode?'#a855f7':'#1e293b', border:`1px solid ${optimusMode?'#a855f7':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:optimusMode?'0 0 8px rgba(168,85,247,0.45)':'none', flexShrink:0 }}>
@@ -1726,9 +1739,9 @@ export default function BigFootMap() {
         <div onClick={toggleIrsMode} style={{
           marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
           padding:'6px 10px',
-          background: irsMode ? 'rgba(34,211,238,0.1)' : 'rgba(255,255,255,0.04)',
+          background: irsMode ? 'rgba(34,211,238,0.1)' : THEME.inset,
           borderRadius:6,
-          border: irsMode ? '1px solid rgba(34,211,238,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          border: irsMode ? '1px solid rgba(34,211,238,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
           <div style={{ width:28, height:16, borderRadius:8, background:irsMode?'#22d3ee':'#1e293b', border:`1px solid ${irsMode?'#22d3ee':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:irsMode?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
@@ -1743,7 +1756,7 @@ export default function BigFootMap() {
         </div>
         {/* Priority Cities filter — shown under IRS toggle when irsMode is on */}
         {irsMode && (
-          <div onClick={()=>setIrsFilterPriority(f=>!f)} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', padding:'5px 10px', marginTop:4, background:irsFilterPriority?'rgba(251,191,36,0.08)':'rgba(255,255,255,0.03)', borderRadius:5, border:`1px solid ${irsFilterPriority?'rgba(251,191,36,0.3)':'rgba(255,255,255,0.06)'}`, userSelect:'none' }}>
+          <div onClick={()=>setIrsFilterPriority(f=>!f)} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', padding:'5px 10px', marginTop:4, background:irsFilterPriority?'rgba(251,191,36,0.08)':THEME.inset, borderRadius:5, border:`1px solid ${irsFilterPriority?'rgba(251,191,36,0.3)':THEME.divider}`, userSelect:'none' }}>
             <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${irsFilterPriority?'#f59e0b':'#334155'}`, background:irsFilterPriority?'#f59e0b':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
               {irsFilterPriority && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
             </div>
@@ -1755,9 +1768,9 @@ export default function BigFootMap() {
         <div onClick={()=>setShowPriorityCities(s=>!s)} style={{
           marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
           padding:'6px 10px',
-          background: showPriorityCities ? 'rgba(251,191,36,0.1)' : 'rgba(255,255,255,0.04)',
+          background: showPriorityCities ? 'rgba(251,191,36,0.1)' : THEME.inset,
           borderRadius:6,
-          border: showPriorityCities ? '1px solid rgba(251,191,36,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          border: showPriorityCities ? '1px solid rgba(251,191,36,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
           <div style={{ width:28, height:16, borderRadius:8, background:showPriorityCities?'#f59e0b':'#1e293b', border:`1px solid ${showPriorityCities?'#f59e0b':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:showPriorityCities?'0 0 8px rgba(251,191,36,0.45)':'none', flexShrink:0 }}>
@@ -1775,9 +1788,9 @@ export default function BigFootMap() {
         <div onClick={()=>setIsChatOpen(o=>!o)} style={{
           marginTop:8, display:'flex', alignItems:'center', gap:8, cursor:'pointer',
           padding:'6px 10px',
-          background: isChatOpen ? 'rgba(34,211,238,0.1)' : 'rgba(255,255,255,0.04)',
+          background: isChatOpen ? 'rgba(34,211,238,0.1)' : THEME.inset,
           borderRadius:6,
-          border: isChatOpen ? '1px solid rgba(34,211,238,0.35)' : '1px solid rgba(255,255,255,0.06)',
+          border: isChatOpen ? '1px solid rgba(34,211,238,0.35)' : `1px solid ${THEME.divider}`,
           transition:'all 0.2s',
         }}>
           <div style={{ width:28, height:16, borderRadius:8, background:isChatOpen?'#22d3ee':'#1e293b', border:`1px solid ${isChatOpen?'#22d3ee':'#334155'}`, position:'relative', transition:'all 0.25s', boxShadow:isChatOpen?'0 0 8px rgba(34,211,238,0.45)':'none', flexShrink:0 }}>
@@ -1798,11 +1811,11 @@ export default function BigFootMap() {
       </div>
 
       {/* Filter Panel */}
-      <div style={{ background:'rgba(2,8,23,0.92)', border:`1px solid ${hasActiveFilters?'rgba(245,158,11,0.45)':'rgba(96,165,250,0.18)'}`, borderRadius:12, backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)', overflow:'hidden', flexShrink:0 }}>
+      <div style={{ background:THEME.panelBg, border:THEME.panelBorder, borderRadius:12, backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:THEME.shadow, overflow:'hidden', flexShrink:0 }}>
         <div onClick={()=>setFilterPanelOpen(o=>!o)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px', cursor:'pointer', userSelect:'none' }}>
           <div style={{ display:'flex', alignItems:'center', gap:6 }}>
             <span style={{ fontSize:11 }}>⚡</span>
-            <span style={{ fontSize:10, fontWeight:700, color:'#94a3b8', letterSpacing:'0.1em' }}>FILTERS</span>
+            <span style={{ fontSize:10, fontWeight:700, color:THEME.textSecondary, letterSpacing:'0.1em' }}>FILTERS</span>
             {hasActiveFilters && <div style={{ width:6, height:6, borderRadius:'50%', background:'#f59e0b', boxShadow:'0 0 5px #f59e0b', flexShrink:0 }}/>}
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
@@ -1812,18 +1825,18 @@ export default function BigFootMap() {
         </div>
 
         {filterPanelOpen && (
-          <div style={{ padding:'0 14px 14px', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ padding:'0 14px 14px', borderTop:`1px solid ${THEME.divider}` }}>
 
             {/* Filter 1: State */}
             <div style={{ marginTop:12, marginBottom:14 }}>
               <div style={{ fontSize:9, fontWeight:700, color:'#64748b', letterSpacing:'0.08em', marginBottom:6 }}>STATE</div>
-              <div onClick={()=>setStateDropOpen(o=>!o)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 10px', background:'rgba(255,255,255,0.05)', borderRadius:6, border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer', userSelect:'none' }}>
-                <span style={{ fontSize:11, color:'#94a3b8' }}>{filterStates===null?'All states':`${filterStates.size} state${filterStates.size!==1?'s':''} selected`}</span>
+              <div onClick={()=>setStateDropOpen(o=>!o)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 10px', background:THEME.inset, borderRadius:6, border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer', userSelect:'none' }}>
+                <span style={{ fontSize:11, color:THEME.textSecondary }}>{filterStates===null?'All states':`${filterStates.size} state${filterStates.size!==1?'s':''} selected`}</span>
                 <span style={{ fontSize:9, color:'#475569' }}>{stateDropOpen?'▲':'▼'}</span>
               </div>
               {stateDropOpen && (
-                <div style={{ maxHeight:150, overflowY:'auto', marginTop:4, background:'rgba(2,8,23,0.98)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:6 }}>
-                  <div onClick={()=>setFilterStates(null)} style={{ padding:'5px 10px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.06)', userSelect:'none' }}>
+                <div style={{ maxHeight:150, overflowY:'auto', marginTop:4, background:THEME.panelBgSolid, border:THEME.panelBorder, borderRadius:6, boxShadow:THEME.shadowLg }}>
+                  <div onClick={()=>setFilterStates(null)} style={{ padding:'5px 10px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
                     <span style={{ fontSize:10, color:'#60a5fa' }}>Select all</span>
                   </div>
                   {availableStates.map(state => {
@@ -1833,11 +1846,11 @@ export default function BigFootMap() {
                         if(prev===null) return new Set(availableStates.filter(s=>s!==state))
                         const ns=new Set(prev); checked?ns.delete(state):ns.add(state)
                         return ns.size===availableStates.length?null:ns
-                      })} style={{ display:'flex', alignItems:'center', gap:7, padding:'4px 10px', cursor:'pointer', userSelect:'none', borderBottom:'1px solid rgba(255,255,255,0.03)' }}>
+                      })} style={{ display:'flex', alignItems:'center', gap:7, padding:'4px 10px', cursor:'pointer', userSelect:'none', borderBottom:`1px solid ${THEME.divider}` }}>
                         <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#334155'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                           {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize:11, color:checked?'#94a3b8':'#475569' }}>{state}</span>
+                        <span style={{ fontSize:11, color:checked?THEME.textSecondary:'#475569' }}>{state}</span>
                       </div>
                     )
                   })}
@@ -1864,7 +1877,7 @@ export default function BigFootMap() {
                         <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#60a5fa':'#334155'}`, background:checked?'#60a5fa':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                           {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize:11, color:checked?'#94a3b8':'#475569' }}>
+                        <span style={{ fontSize:11, color:checked?THEME.textSecondary:'#475569' }}>
                           {label}{count!==null&&<span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>({count})</span>}
                         </span>
                       </div>
@@ -1893,7 +1906,7 @@ export default function BigFootMap() {
                         <div style={{ width:11, height:11, borderRadius:2, border:`1.5px solid ${checked?'#a855f7':'#334155'}`, background:checked?'#a855f7':'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
                           {checked && <span style={{ fontSize:7, color:'#020817', fontWeight:900 }}>✓</span>}
                         </div>
-                        <span style={{ fontSize:11, color:checked?'#94a3b8':'#475569' }}>
+                        <span style={{ fontSize:11, color:checked?THEME.textSecondary:'#475569' }}>
                           {label}{count!==null&&<span style={{ fontSize:9, color:'#334155', marginLeft:4 }}>({count})</span>}
                         </span>
                       </div>
@@ -1909,15 +1922,15 @@ export default function BigFootMap() {
       </div>{/* closes left column */}
 
       {/* Layer Panel */}
-      <div style={{ position:'absolute', top:20, right:20, background:'rgba(2,8,23,0.92)', border:'1px solid rgba(96,165,250,0.18)', borderRadius:12, padding:'14px 0', width:230, backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:'0 4px 24px rgba(0,0,0,0.5)', maxHeight:'calc(100vh - 80px)', overflowY:'auto' }}>
+      <div style={{ position:'absolute', top:20, right:20, background:THEME.panelBg, border:THEME.panelBorder, borderRadius:12, padding:'14px 0', width:230, backdropFilter:'blur(12px)', fontFamily:FONT, boxShadow:THEME.shadow, maxHeight:'calc(100vh - 80px)', overflowY:'auto' }}>
         <div style={{ fontSize:9, fontWeight:700, color:'#475569', letterSpacing:'0.14em', textTransform:'uppercase', padding:'0 16px 10px' }}>Map Layers</div>
 
         {LAYER_GROUPS.map(group => (
           <div key={group.label}>
-            <div onClick={() => toggleGroup(group.label)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 16px', cursor:'pointer', background:'rgba(255,255,255,0.03)', borderTop:'1px solid rgba(255,255,255,0.05)' }}>
-              <span style={{ fontSize:11, fontWeight:700, color:'#94a3b8', letterSpacing:'0.04em' }}>{group.label.toUpperCase()}</span>
+            <div onClick={() => toggleGroup(group.label)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 16px', cursor:'pointer', background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
+              <span style={{ fontSize:11, fontWeight:700, color:THEME.textSecondary, letterSpacing:'0.04em' }}>{group.label.toUpperCase()}</span>
               <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-                <span onClick={e => {e.stopPropagation(); toggleGroupAll(group)}} style={{ fontSize:9, color:'#475569', cursor:'pointer', padding:'2px 5px', borderRadius:3, background:'rgba(255,255,255,0.05)' }}>
+                <span onClick={e => {e.stopPropagation(); toggleGroupAll(group)}} style={{ fontSize:9, color:'#475569', cursor:'pointer', padding:'2px 5px', borderRadius:3, background:THEME.inset }}>
                   {allInGroup(group) ? 'ALL OFF' : 'ALL ON'}
                 </span>
                 <span style={{ color:'#475569', fontSize:10 }}>{collapsed[group.label] ? '▶' : '▼'}</span>
@@ -1927,7 +1940,7 @@ export default function BigFootMap() {
               const q = DATA_QUALITY[key]
               const qColor = q ? QUALITY_COLORS[q.classification] : '#475569'
               return (
-                <div key={key} onClick={() => toggle(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.03)', userSelect:'none' }}>
+                <div key={key} onClick={() => toggle(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
                   <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:layers[key]?color:'#1e293b', border:`1.5px solid ${layers[key]?color:'#334155'}`, boxShadow:layers[key]?`0 0 5px ${color}88`:'none', transition:'all 0.2s' }}/>
                   <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:layers[key]?color:'#1e293b', border:`1px solid ${layers[key]?color:'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:layers[key]?`0 0 5px ${color}55`:'none' }}>
                     <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:layers[key]?13:2, background:layers[key]?'#020817':'#475569', transition:'left 0.2s' }}/>
@@ -1958,18 +1971,18 @@ export default function BigFootMap() {
 
           {!psiCollapsed.group && (<>
             {/* O&O toggle */}
-            <div onClick={()=>togglePsi('oo')} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.03)', userSelect:'none' }}>
+            <div onClick={()=>togglePsi('oo')} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
               <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#1e293b', border:`1.5px solid ${psiLayers.oo?PSI_COLORS.oo:'#334155'}`, boxShadow:psiLayers.oo?`0 0 6px ${PSI_COLORS.oo}99`:'none', transition:'all 0.2s' }}/>
               <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#1e293b', border:`1px solid ${psiLayers.oo?PSI_COLORS.oo:'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:psiLayers.oo?`0 0 5px ${PSI_COLORS.oo}55`:'none' }}>
                 <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:psiLayers.oo?13:2, background:psiLayers.oo?'#020817':'#475569', transition:'left 0.2s' }}/>
               </div>
               <div style={{ flex:1 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:psiLayers.oo?'#f1f5f9':'#475569', transition:'color 0.2s' }}>O&O Sites <span style={{ fontWeight:400, color:'#78350f' }}>({PSI_COUNTS.oo})</span></span>
+                <span style={{ fontSize:12, fontWeight:700, color:psiLayers.oo?THEME.textPrimary:'#475569', transition:'color 0.2s' }}>O&O Sites <span style={{ fontWeight:400, color:'#78350f' }}>({PSI_COUNTS.oo})</span></span>
               </div>
             </div>
 
             {/* 3P master toggle + expand */}
-            <div style={{ borderBottom:'1px solid rgba(255,255,255,0.03)' }}>
+            <div style={{ borderBottom:`1px solid ${THEME.divider}` }}>
               <div style={{ display:'flex', alignItems:'center', padding:'7px 16px', userSelect:'none' }}>
                 <div onClick={toggle3pAll} style={{ display:'flex', alignItems:'center', gap:8, flex:1, cursor:'pointer' }}>
                   <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:any3pOn?PSI_COLORS.authorized:'#1e293b', border:`1.5px solid ${any3pOn?PSI_COLORS.authorized:'#334155'}`, boxShadow:any3pOn?`0 0 5px ${PSI_COLORS.authorized}88`:'none', transition:'all 0.2s' }}/>
@@ -1984,14 +1997,14 @@ export default function BigFootMap() {
               </div>
 
               {!psiCollapsed.thirdParty && (
-                <div style={{ paddingBottom:4, background:'rgba(255,255,255,0.01)', borderTop:'1px solid rgba(255,255,255,0.03)' }}>
+                <div style={{ paddingBottom:4, background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
                   {[['authorized','PSI Authorized',397],['mg','MG Testing',33],['td','TD Testing',20],['amp','AMP Authorized',1]].map(([key,label,cnt])=>(
-                    <div key={key} onClick={()=>togglePsi(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.02)', userSelect:'none' }}>
+                    <div key={key} onClick={()=>togglePsi(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
                       <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#1e293b', border:`1.5px solid ${psiLayers[key]?PSI_COLORS[key]:'#334155'}`, boxShadow:psiLayers[key]?`0 0 4px ${PSI_COLORS[key]}88`:'none', transition:'all 0.2s' }}/>
                       <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#1e293b', border:`1px solid ${psiLayers[key]?PSI_COLORS[key]:'#334155'}`, position:'relative', transition:'all 0.2s' }}>
                         <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:psiLayers[key]?11:2, background:psiLayers[key]?'#020817':'#475569', transition:'left 0.2s' }}/>
                       </div>
-                      <span style={{ fontSize:11, fontWeight:500, color:psiLayers[key]?'#94a3b8':'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
+                      <span style={{ fontSize:11, fontWeight:500, color:psiLayers[key]?THEME.textSecondary:'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
                     </div>
                   ))}
                 </div>
@@ -1999,13 +2012,13 @@ export default function BigFootMap() {
             </div>
 
             {/* 50-mile radius master toggle */}
-            <div onClick={()=>setShowRadii(r=>!r)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.03)', userSelect:'none' }}>
+            <div onClick={()=>setShowRadii(r=>!r)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
               <div style={{ width:10, height:10, borderRadius:2, flexShrink:0, border:`1.5px solid ${showRadii?'#64748b':'#334155'}`, background:showRadii?'rgba(100,116,139,0.25)':'transparent', transition:'all 0.2s' }}/>
               <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showRadii?'#64748b':'#1e293b', border:`1px solid ${showRadii?'#64748b':'#334155'}`, position:'relative', transition:'all 0.2s', boxShadow:showRadii?'0 0 5px rgba(100,116,139,0.4)':'none' }}>
                 <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showRadii?13:2, background:showRadii?'#020817':'#475569', transition:'left 0.2s' }}/>
               </div>
               <div>
-                <span style={{ fontSize:12, fontWeight:500, color:showRadii?'#94a3b8':'#475569', transition:'color 0.2s' }}>50-Mile Radius</span>
+                <span style={{ fontSize:12, fontWeight:500, color:showRadii?THEME.textSecondary:'#475569', transition:'color 0.2s' }}>50-Mile Radius</span>
                 <span style={{ fontSize:9, color:'#334155', marginLeft:6 }}>all sites</span>
               </div>
             </div>
@@ -2031,7 +2044,7 @@ export default function BigFootMap() {
                 )}
               </div>
               {showLeaseIntel && leaseFiltersOpen && (
-                <div style={{ paddingBottom:4, background:'rgba(255,255,255,0.01)', borderTop:'1px solid rgba(255,255,255,0.03)' }}>
+                <div style={{ paddingBottom:4, background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
                   {[
                     ['relocate',    'Relocate',     '#ef4444', 10],
                     ['refurbish',   'Refurbish',    '#f97316',  6],
@@ -2043,12 +2056,12 @@ export default function BigFootMap() {
                   ].map(([key, label, color, cnt]) => {
                     const on = leaseActionFilters[key]
                     return (
-                      <div key={key} onClick={()=>setLeaseActionFilters(f=>({...f,[key]:!f[key]}))} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:'1px solid rgba(255,255,255,0.02)', userSelect:'none' }}>
+                      <div key={key} onClick={()=>setLeaseActionFilters(f=>({...f,[key]:!f[key]}))} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
                         <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:on?color:'#1e293b', border:`1.5px solid ${on?color:'#334155'}`, boxShadow:on?`0 0 4px ${color}88`:'none', transition:'all 0.2s' }}/>
                         <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:on?color:'#1e293b', border:`1px solid ${on?color:'#334155'}`, position:'relative', transition:'all 0.2s' }}>
                           <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:on?11:2, background:on?'#020817':'#475569', transition:'left 0.2s' }}/>
                         </div>
-                        <span style={{ fontSize:11, fontWeight:500, color:on?'#94a3b8':'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
+                        <span style={{ fontSize:11, fontWeight:500, color:on?THEME.textSecondary:'#334155', transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
                       </div>
                     )
                   })}
@@ -2066,7 +2079,7 @@ export default function BigFootMap() {
       <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} />
 
       {/* Status Bar */}
-      <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', background:'rgba(2,8,23,0.9)', border:'1px solid rgba(96,165,250,0.2)', borderRadius:8, padding:'8px 20px', backdropFilter:'blur(8px)', fontFamily:FONT, display:'flex', gap:20, alignItems:'center', boxShadow:'0 4px 16px rgba(0,0,0,0.4)' }}>
+      <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', background:THEME.panelBg, border:THEME.panelBorder, borderRadius:8, padding:'8px 20px', backdropFilter:'blur(8px)', fontFamily:FONT, display:'flex', gap:20, alignItems:'center', boxShadow:THEME.shadow }}>
         <span style={{ fontSize:11, fontWeight:600, color:'#22d3ee', letterSpacing:'0.06em' }}>PROJECT BIG FOOT</span>
         <span style={{ color:'#334155', fontSize:10 }}>|</span>
         <span style={{ fontSize:11, color:'#64748b' }}>{Object.values(layers).filter(Boolean).length + Object.values(psiLayers).filter(Boolean).length} layers active</span>
@@ -2081,8 +2094,8 @@ export default function BigFootMap() {
       {/* ── AI Chat Panel ──────────────────────────────────── */}
       <div style={{
         position:'fixed', top:0, right:0, width:380, height:'100vh',
-        background:'#0f172a', borderLeft:'1px solid #1e293b',
-        boxShadow:'-8px 0 32px rgba(0,0,0,0.5)',
+        background:THEME.panelBgSolid, borderLeft:'1px solid #E2E8F0',
+        boxShadow:THEME.shadow,
         zIndex:500, display:'flex', flexDirection:'column',
         transform: isChatOpen ? 'translateX(0)' : 'translateX(100%)',
         transition:'transform 0.25s ease',
@@ -2094,7 +2107,7 @@ export default function BigFootMap() {
             <div style={{ fontSize:14, fontWeight:700, color:'#22d3ee' }}>Big Foot Assistant</div>
             <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>Powered by Claude</div>
           </div>
-          <div onClick={()=>setIsChatOpen(false)} style={{ cursor:'pointer', color:'#475569', fontSize:20, lineHeight:1, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:'rgba(255,255,255,0.05)', userSelect:'none' }}>×</div>
+          <div onClick={()=>setIsChatOpen(false)} style={{ cursor:'pointer', color:'#475569', fontSize:20, lineHeight:1, width:28, height:28, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background:THEME.inset, userSelect:'none' }}>×</div>
         </div>
 
         {/* Messages */}
@@ -2118,7 +2131,7 @@ export default function BigFootMap() {
           ))}
           {chatLoading && (
             <div style={{ display:'flex', alignItems:'flex-start' }}>
-              <div style={{ background:'#1e293b', borderRadius:'12px 12px 12px 2px', padding:'10px 14px', display:'flex', gap:5, alignItems:'center' }}>
+              <div style={{ background:THEME.inputBg, borderRadius:'12px 12px 12px 2px', padding:'10px 14px', display:'flex', gap:5, alignItems:'center' }}>
                 {[0,1,2].map(i => (
                   <div key={i} style={{
                     width:6, height:6, borderRadius:'50%', background:'#475569',
@@ -2138,7 +2151,7 @@ export default function BigFootMap() {
             onChange={e => setChatInput(e.target.value)}
             onKeyDown={e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
             placeholder="Ask about the network..."
-            style={{ flex:1, background:'#1e293b', border:'1px solid #334155', borderRadius:8, padding:'8px 12px', color:'#e2e8f0', fontSize:13, outline:'none', fontFamily:FONT }}
+            style={{ flex:1, background:THEME.inputBg, border:'1px solid '+THEME.inputBorder, borderRadius:8, padding:'8px 12px', color:THEME.textPrimary, fontSize:13, outline:'none', fontFamily:FONT }}
           />
           <div
             onClick={sendMessage}
