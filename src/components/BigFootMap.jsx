@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import Map, { Layer, Source, NavigationControl, ScaleControl, Popup } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
 const INITIAL_VIEW = { longitude: -96, latitude: 39, zoom: 4, pitch: 0, bearing: 0 }
 const STATES_URL = 'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json'
 const BASE = import.meta.env.BASE_URL
@@ -261,7 +261,7 @@ const ICON_PATHS = {
 function makeIconSVG(key, color) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
   <circle cx="20" cy="20" r="18" fill="${color}"/>
-  <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(2,8,23,0.7)" stroke-width="2.5"/>
+  <circle cx="20" cy="20" r="18" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
   ${ICON_PATHS[key]||'<circle cx="20" cy="20" r="7" fill="white"/>'}</svg>`
 }
 
@@ -324,8 +324,8 @@ const OPTIMUS_RADIUS_EXPR = ['case',
 
 // ── Lease Intelligence constants ─────────────────────
 // ── IRS Clearance constants ───────────────────────────
-const IRS_ACTIVATED_COLOR   = '#22c55e'   // green  — ≥1 TCA cleared
-const IRS_IN_PROCESS_COLOR  = '#f59e0b'   // amber  — TCAs in process, none cleared
+const IRS_ACTIVATED_COLOR   = '#15803d'   // green  — ≥1 TCA cleared
+const IRS_IN_PROCESS_COLOR  = '#b87708'   // amber  — TCAs in process, none cleared
 const IRS_RING_RADIUS_EXPR  = ['case', ['==',['get','category'],'OO'], 17, 15]
 
 // ── Priority Cities constants ─────────────────────────
@@ -1192,9 +1192,9 @@ export default function BigFootMap() {
       setIconsLoaded(true)
       // Generate priority-city diamond icons (4 color variants)
       const pcVariants = [
-        ['pc-green-gold', '#22c55e', '#f59e0b'],
+        ['pc-green-gold', '#16a34a', '#d97706'],
         ['pc-green-plain','#3b82f6', '#3b82f6'],
-        ['pc-red-gold',   '#ef4444', '#f59e0b'],
+        ['pc-red-gold',   '#ef4444', '#d97706'],
         ['pc-red-plain',  '#ef4444', '#ef4444'],
       ]
       Promise.all(pcVariants.map(([id, fill, stroke]) => new Promise(res => {
@@ -1446,38 +1446,38 @@ export default function BigFootMap() {
               ? {'fill-color': irsStatePaint.color, 'fill-opacity': irsStatePaint.opacity}
               : {'fill-color':'#1e40af','fill-opacity':0.12}
             }/>
-            <Layer id="states-line" type="line" paint={{'line-color':'#60a5fa','line-width':0.9,'line-opacity':0.7}}/>
+            <Layer id="states-line" type="line" paint={{'line-color':'#94a3b8','line-width':0.9,'line-opacity':0.5}}/>
           </Source>
         )}
         {layers.metros && (
           <Source id="metros" type="geojson" data={`${BASE}data/metros.geojson`}>
-            <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.07}}/>
+            <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.13}}/>
             <Layer id="metros-line" type="line" paint={{'line-color':'#22d3ee','line-width':1.1,'line-opacity':0.65,'line-dasharray':[4,3]}}/>
           </Source>
         )}
         {layers.population && (
           <Source id="population" type="geojson" data={`${BASE}data/data_population.geojson`}>
             <Layer id="population-fill" type="fill" paint={{'fill-color':['match',['get','density'],'Very High','#ec4899','High','#a855f7','Medium','#6366f1','#334155'],'fill-opacity':0.25}}/>
-            <Layer id="population-line" type="line" paint={{'line-color':'#f472b6','line-width':0.5,'line-opacity':0.4}}/>
+            <Layer id="population-line" type="line" paint={{'line-color':'#db2777','line-width':0.5,'line-opacity':0.4}}/>
           </Source>
         )}
         {layers.urban_rural && (
           <Source id="urban_rural" type="geojson" data={`${BASE}data/data_urban_rural.geojson`}>
-            <Layer id="urban-rural-circle" type="circle" paint={{'circle-radius':8,'circle-color':['match',['get','classification'],'Major Urban','#38bdf8','Urban','#4ade80','#92400e'],'circle-opacity':0.75,'circle-stroke-color':'#020817','circle-stroke-width':1}}/>
+            <Layer id="urban-rural-circle" type="circle" paint={{'circle-radius':8,'circle-color':['match',['get','classification'],'Major Urban','#38bdf8','Urban','#4ade80','#92400e'],'circle-opacity':0.75,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1}}/>
           </Source>
         )}
         {/* PSI 50-mile radii — type-filtered and color-coded, rendered below industry icons */}
         <Source id="psi-radii" type="geojson" data={`${BASE}data/data_psi_radii.geojson`}>
           {/* O&O — amber, bolder line */}
-          {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':'#f59e0b','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
+          {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':'#d97706','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
           {/* PSI Authorized — sky */}
-          {psiLayers.authorized && showRadii && <Layer id="psi-radii-authorized-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'line-color':'#38bdf8','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.authorized && showRadii && <Layer id="psi-radii-authorized-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'line-color':'#0284c7','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
           {/* MG Testing — purple */}
-          {psiLayers.mg && showRadii && <Layer id="psi-radii-mg-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])} paint={{'line-color':'#a855f7','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.mg && showRadii && <Layer id="psi-radii-mg-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])} paint={{'line-color':'#9333ea','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
           {/* TD Testing — rose */}
-          {psiLayers.td && showRadii && <Layer id="psi-radii-td-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])} paint={{'line-color':'#fb7185','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.td && showRadii && <Layer id="psi-radii-td-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])} paint={{'line-color':'#e11d48','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
           {/* AMP Authorized — teal */}
-          {psiLayers.amp && showRadii && <Layer id="psi-radii-amp-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])} paint={{'line-color':'#2dd4bf','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {psiLayers.amp && showRadii && <Layer id="psi-radii-amp-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])} paint={{'line-color':'#0d9488','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
         </Source>
 
         {iconsLoaded && POINT_LAYERS.map(key => layers[key] && (
@@ -1490,23 +1490,23 @@ export default function BigFootMap() {
         <Source id="psi-sites" type="geojson" data={`${BASE}data/data_psi_sites.geojson`}>
           {/* Normal mode: property-type colors */}
           {showNormalMode && psiLayers.oo && <Layer id="psi-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':13,'circle-color':PSI_COLORS.oo,'circle-opacity':0.18,'circle-blur':0.6}}/>}
-          {showNormalMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
-          {showNormalMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {showNormalMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {showNormalMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {showNormalMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {showNormalMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {showNormalMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
           {/* Optimus mode: O&O colored by tier, 3P normal colors */}
           {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':['+', OPTIMUS_RADIUS_EXPR, 5],'circle-color':OPTIMUS_OO_COLOR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
-          {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':OPTIMUS_RADIUS_EXPR,'circle-color':OPTIMUS_OO_COLOR,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
-          {optimusMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {optimusMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {optimusMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {optimusMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#020817','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':OPTIMUS_RADIUS_EXPR,'circle-color':OPTIMUS_OO_COLOR,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {optimusMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
           {/* Performance mode: score-tier colors, volume-scaled radius */}
           {performanceMode && anyPsiActive && <Layer id="psi-perf-halo" type="circle" filter={addPsiFilters(['all',['==',['get','category'],'OO'],perfLayerFilter])} paint={{'circle-radius':['case',['<=',['coalesce',['get','cdVolume'],0],0],11,['+',11,['*',_tExpr,10]]],'circle-color':PERF_COLOR_EXPR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
           {/* At Risk static red ring (scoreBucket=1) */}
           {performanceMode && anyPsiActive && <Layer id="psi-at-risk-pulse" type="circle" filter={addPsiFilters(['all', AT_RISK_FILTER, perfLayerFilter])} paint={{'circle-radius':['+', PERF_RADIUS_EXPR, 8],'circle-color':'#ef4444','circle-opacity':0.4,'circle-blur':0.5}}/>}
-          {performanceMode && anyPsiActive && <Layer id="psi-perf-circle" type="circle" filter={addPsiFilters(perfLayerFilter)} paint={{'circle-radius':PERF_RADIUS_EXPR,'circle-color':PERF_COLOR_EXPR,'circle-stroke-color':'#020817','circle-stroke-width':1.5,'circle-opacity':1}}/>}
+          {performanceMode && anyPsiActive && <Layer id="psi-perf-circle" type="circle" filter={addPsiFilters(perfLayerFilter)} paint={{'circle-radius':PERF_RADIUS_EXPR,'circle-color':PERF_COLOR_EXPR,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1.5,'circle-opacity':1}}/>}
           {/* Critical Optimus indicator — pulsing red ring, always shown when site layer is active */}
           {anyPsiActive && <Layer id="psi-critical-optimus" type="circle"
             filter={['==', ['get','criticalOptimus'], true]}
