@@ -8,7 +8,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A React/Vite web application built for PSI/ETS that maps the PSI test center network against US market intelligence layers. It is a **strategic planning and gap analysis tool** used by PSI leadership to identify coverage gaps, assess site quality, and make network decisions.
 
-The map renders on a CartoDB Dark Matter basemap using MapLibre GL / react-map-gl. All data is static GeoJSON — there is no backend.
+The map renders on a **CARTO Positron (light)** basemap using MapLibre GL / react-map-gl. All data is static GeoJSON — there is no backend.
+
+---
+
+## Theme Tokens
+
+The UI runs on a **light theme**. All chrome (panels, popups, legend, filter/layer panels, toggles, chat) is driven by a single `THEME` object defined at the top of `src/components/BigFootMap.jsx`, immediately after `MAP_STYLE` (~line 6). There are 12 tokens:
+
+| Token | Value | Purpose |
+|---|---|---|
+| `panelBg` | `rgba(255,255,255,0.96)` | Translucent panel background (header, filter, layer, legend, status bar, popups, InfoCards) |
+| `panelBgSolid` | `#FFFFFF` | Opaque surfaces (state dropdown, chat panel) |
+| `panelBorder` | `1px solid #E2E8F0` | Standard panel border |
+| `inputBg` | `#F1F5F9` | Input field + chat loading-bubble background |
+| `inputBorder` | `#CBD5E1` | Input border |
+| `textPrimary` | `#0F172A` | Primary text; active toggle/label text |
+| `textSecondary` | `#64748B` | Secondary / heading text |
+| `textInactive` | `#94A3B8` | Inactive (off) toggle/label text |
+| `divider` | `rgba(15,23,42,0.08)` | Hairline dividers and off-state control borders |
+| `inset` | `rgba(15,23,42,0.04)` | Recessed / inset backgrounds (toggle wells, close buttons) |
+| `shadow` | `0 4px 16px rgba(15,23,42,0.12)` | Standard panel drop shadow |
+| `shadowLg` | `0 8px 28px rgba(15,23,42,0.16)` | Elevated surfaces (InfoCards, dropdown) |
+
+**Rules:**
+- **All chrome colors reference `THEME` — never hardcode hex in chrome.** Map layer *paint* properties (`fill-color`, `circle-color`, `line-color`, `circle-stroke-color`, etc.) are **exempt** and stay literal — they encode data, not UI surface.
+- Basemap is **CARTO Positron (light)** (`MAP_STYLE`). New panels use `background: THEME.panelBg` + `border: THEME.panelBorder` + `boxShadow: THEME.shadow` (use `shadowLg` for floating cards/dropdowns).
+- **Label convention:** active labels use `THEME.textPrimary`, inactive labels use `THEME.textInactive`. Never invert — an active label must read heavier than an inactive one.
+- **Legend swatches intentionally run at higher opacity than the map fills they represent.** Small chips need extra weight to stay visible on white, so a swatch drawn at 0.2–0.4 opacity may represent a map fill at a much lower opacity. This mismatch is deliberate — do **not** "reconcile" legend swatch opacity down to the map fill.
+- **IRS state choropleth fill:** activated states use `#4ADE80` at a *gradient* opacity of `0.08 + statePctActivated * 0.16` (≈0.08 at 0% activated → 0.24 at 100%). The gradient encodes activation completeness and **must be preserved** through any future restyling — do not flatten it to a constant. No-activation states are flat `#FCA5A5` / `0.12`.
 
 ---
 
