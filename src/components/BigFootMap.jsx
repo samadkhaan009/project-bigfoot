@@ -621,11 +621,11 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               <div style={{ fontSize:9, fontWeight:700, color:'#164e63', letterSpacing:'0.08em', marginBottom:6 }}>IRS CLEARANCE STATUS</div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2.5px solid ${IRS_ACTIVATED_COLOR}`, flexShrink:0 }}/>
-                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(161 mapped)</span></span>
+                <span style={{ fontSize:10, color:'#64748b' }}>Activated <span style={{ color:'#334155' }}>(168 mapped)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:11, borderRadius:'50%', background:'transparent', border:`2px dashed ${IRS_IN_PROCESS_COLOR}`, flexShrink:0 }}/>
-                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(47 mapped)</span></span>
+                <span style={{ fontSize:10, color:'#64748b' }}>In Process <span style={{ color:'#334155' }}>(51 mapped)</span></span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                 <div style={{ width:11, height:6, borderRadius:1, background:'rgba(74,222,128,0.4)', flexShrink:0, border:'1px solid #4ADE80' }}/>
@@ -637,7 +637,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               </div>
               <div style={{ padding:'4px 8px', background:'rgba(34,211,238,0.08)', borderRadius:4 }}>
                 <div style={{ fontSize:9, color:'#0891B2', lineHeight:1.6 }}>
-                  Network: 161 activated · 188 in process (network)<br/>163 Final Clearances granted{!layers.states && <><br/>Enable State Boundaries to see choropleth</>}
+                  Network: 168 activated · 184 in process (network)<br/>168 sites activated (ISLA or Final Clearance){!layers.states && <><br/>Enable State Boundaries to see choropleth</>}
                 </div>
               </div>
             </div>
@@ -1054,6 +1054,12 @@ export default function BigFootMap() {
   const contextRef      = useRef(null)
   const hasBuiltContext = useRef(false)
   const messagesEndRef  = useRef(null)
+
+  // IRS clearance data freshness — reflects the last pipeline run; set at mount
+  const [irsDataDate, setIrsDataDate] = useState('')
+  useEffect(() => {
+    setIrsDataDate(new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }))
+  }, [])
 
   // Load IRS state paint + priority city lookup
   useEffect(() => {
@@ -1670,6 +1676,14 @@ export default function BigFootMap() {
         <div style={{ fontSize:18, fontWeight:800, color:THEME.textPrimary, letterSpacing:'-0.02em' }}>Project Big Foot</div>
         <div style={{ fontSize:10, color:'#0891B2', marginTop:4, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase' }}>PSI / ETS &nbsp;·&nbsp; Network Intelligence</div>
 
+        {/* Data freshness block */}
+        <div style={{ fontSize:9, color:'#475569', lineHeight:1.6, letterSpacing:'0.02em', marginTop:8 }}>
+          <div>IRS Clearance: {irsDataDate}</div>
+          <div>Performance: FY2025</div>
+          <div>Optimus: FY2025 (Aug–Oct 2025)</div>
+          <div>Lease: May 2026</div>
+        </div>
+
         {/* Quality Mode Toggle */}
         <div onClick={() => setQualityMode(q => !q)} style={{
           marginTop:10, display:'flex', alignItems:'center', gap:8,
@@ -1752,7 +1766,7 @@ export default function BigFootMap() {
             <div style={{ fontSize:10, fontWeight:700, color:irsMode?'#0891B2':'#475569', letterSpacing:'0.04em' }}>
               {irsMode ? 'IRS OVERLAY ON' : 'IRS Clearance'}
             </div>
-            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>161 activated · 188 in process</div>}
+            {irsMode && <div style={{ fontSize:9, color:'#164e63', marginTop:1 }}>168 activated · 184 in process</div>}
           </div>
         </div>
         {/* Priority Cities filter — shown under IRS toggle when irsMode is on */}
