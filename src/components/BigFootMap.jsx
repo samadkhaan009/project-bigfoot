@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import Map, { Layer, Source, NavigationControl, ScaleControl, Popup } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -36,39 +36,6 @@ const DATA_QUALITY = {
     suitable: 'Precise geographic analysis, state-level filtering, all use cases.',
     notSuitable: null,
     note: 'Official Census Bureau administrative boundaries. Most reliable layer in the platform.',
-  },
-  metros: {
-    source: 'Python-generated circular buffers (May 2026)',
-    sourceUrl: null,
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '60 metro polygons',
-    suitable: 'Market zone visualisation and strategic overview.',
-    notSuitable: 'Precise boundary analysis. Not official CBSA polygons.',
-    note: 'Circular approximations around metro centers. Real Census CBSA boundaries blocked by CORS. Will be replaced in Phase 2 via FastAPI proxy.',
-  },
-  population: {
-    source: 'US Census Bureau 2023 county population estimates',
-    sourceUrl: 'https://www.census.gov/programs-surveys/popest.html',
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: '2023',
-    features: '62 county zones',
-    suitable: 'Identifying high-density markets and demand patterns.',
-    notSuitable: 'Precise county boundary mapping. Circles are approximate, not real county shapes.',
-    note: 'Population figures are real Census data. Boundaries are circular approximations around county centers, not real county polygons.',
-  },
-  urban_rural: {
-    source: 'Manually curated — US Census urban-rural classification framework',
-    sourceUrl: 'https://www.census.gov/programs-surveys/geography/guidance/geo-areas/urban-rural.html',
-    classification: 'CURATED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '40 points (20 urban cores, 20 rural hubs)',
-    suitable: 'Strategic overview of urban-rural market segmentation.',
-    notSuitable: 'Comprehensive coverage. This is a starter set, not a complete classification.',
-    note: 'Manually researched starter set. Will be replaced with algorithmic rural hub identification once test taker ZIP data is available.',
   },
   universities: {
     source: 'NCES IPEDS HD2023 — National Center for Education Statistics',
@@ -197,7 +164,7 @@ const QUALITY_COLORS = { REAL: '#22c55e', REAL_PARTIAL: '#86efac', MODELLED: '#e
 const QUALITY_LABELS = { REAL: 'Real Data', REAL_PARTIAL: 'Real — Partial', MODELLED: 'Modelled', CURATED: 'Curated' }
 const CONFIDENCE_COLORS = { HIGH: '#22c55e', DIRECTIONAL: '#eab308', LIMITED: '#f87171' }
 
-// ── State / Metro population lookups ─────────────────────
+// ── State population lookup ──────────────────────────────
 const STATE_POPULATIONS = {
   'Alabama':2.1,'Alaska':0.7,'Arizona':7.4,'Arkansas':3.1,'California':39.0,
   'Colorado':5.9,'Connecticut':3.6,'Delaware':1.0,'Florida':22.6,'Georgia':11.0,
@@ -209,18 +176,6 @@ const STATE_POPULATIONS = {
   'Oklahoma':4.0,'Oregon':4.3,'Pennsylvania':13.0,'Rhode Island':1.1,'South Carolina':5.3,
   'South Dakota':0.9,'Tennessee':7.1,'Texas':30.5,'Utah':3.4,'Vermont':0.6,
   'Virginia':8.7,'Washington':7.8,'West Virginia':1.8,'Wisconsin':5.9,'Wyoming':0.6,
-}
-const METRO_POPULATIONS = {
-  'New York-Newark':20.1,'Los Angeles-Long Beach':13.2,'Chicago-Naperville':9.5,
-  'Dallas-Fort Worth':7.8,'Houston-The Woodlands':7.4,'Washington-Arlington':6.4,
-  'Miami-Fort Lauderdale':6.3,'Philadelphia-Camden':6.2,'Atlanta-Sandy Springs':6.2,
-  'Phoenix-Mesa':5.1,'Boston-Cambridge':4.9,'Riverside-San Bernardino':4.6,
-  'Seattle-Tacoma':4.0,'Minneapolis-St. Paul':3.7,'San Diego-Chula Vista':3.3,
-  'Tampa-St. Petersburg':3.2,'Denver-Aurora':2.9,'St. Louis':2.8,
-  'Baltimore-Columbia':2.9,'Orlando-Kissimmee':2.7,'San Antonio-New Braunfels':2.7,
-  'Portland-Vancouver':2.5,'Sacramento-Roseville':2.4,'Pittsburgh':2.4,
-  'Las Vegas-Henderson':2.3,'Cincinnati':2.3,'Austin-Round Rock':2.3,
-  'Kansas City':2.2,'Columbus':2.1,'Indianapolis-Carmel':2.1,
 }
 
 const LAYER_COLORS = {
@@ -240,12 +195,11 @@ const HUB_EMOJI = {
   technology:'💻',manufacturing:'🏭',railway:'🚉',cultural:'🎭',
   agriculture:'🌾',universities:'🎓',
 }
-const DENSITY_COLORS = {'Very High':'#ec4899','High':'#a855f7','Medium':'#6366f1'}
 
 // ── PSI Test Center constants ─────────────────────────────
 const PSI_COLORS = {
-  oo:         '#f59e0b', // amber  — O&O premium
-  authorized: '#38bdf8', // sky    — PSI Authorized
+  oo:         '#0047BB', // blue   — O&O (solid dot, no glow)
+  authorized: '#0d9488', // teal   — PSI Authorized
   mg:         '#a855f7', // purple — MG Testing
   td:         '#fb7185', // rose   — TD Testing
   amp:        '#2dd4bf', // teal   — AMP Authorized
@@ -282,11 +236,6 @@ function makeIconSVG(key, color) {
 const LAYER_GROUPS = [
   { label:'Base Layers', layers:[
     {key:'states',label:'State Boundaries',color:'#60a5fa',count:51},
-    {key:'metros',label:'Metro Areas',color:'#22d3ee',count:60},
-  ]},
-  { label:'Population', layers:[
-    {key:'population',label:'Population Density',color:'#f472b6',count:62},
-    {key:'urban_rural',label:'Urban / Rural Zones',color:'#a78bfa',count:40},
   ]},
   { label:'Education', layers:[
     {key:'universities',label:'Universities & Colleges',color:'#fbbf24',count:5987},
@@ -370,7 +319,7 @@ const PERF_RADIUS_EXPR = ['case',
 ]
 
 const DEFAULT_LAYERS = {
-  states:true,metros:true,population:false,urban_rural:false,
+  states:true,
   universities:false,airports:false,healthcare:false,financial:false,
   government:false,technology:false,manufacturing:false,
   railway:false,cultural:false,agriculture:false,
@@ -497,11 +446,37 @@ function QualitySummaryBar({ layers }) {
 }
 
 // ── Legend ────────────────────────────────────────────────
-function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel, irsMode, showPriorityCities }) {
+// Scale pre-computed 50-mile ring polygons to an arbitrary radius by scaling each
+// ring's vertices around its geographic center (bbox midpoint) by k = miles / 50.
+// Preserves feature properties (propertyType etc.) so the type filters still work.
+const EMPTY_FC = { type: 'FeatureCollection', features: [] }
+function scaleRadii(fc, k) {
+  if (!fc || !fc.features) return EMPTY_FC
+  if (k === 1) return fc
+  const scaleRing = ring => {
+    let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity
+    for (const [x, y] of ring) { if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y }
+    const cx = (minx + maxx) / 2, cy = (miny + maxy) / 2
+    return ring.map(([x, y]) => [cx + (x - cx) * k, cy + (y - cy) * k])
+  }
+  return {
+    type: 'FeatureCollection',
+    features: fc.features.map(f => {
+      const g = f.geometry
+      let coordinates
+      if (g.type === 'Polygon')       coordinates = g.coordinates.map(scaleRing)
+      else if (g.type === 'MultiPolygon') coordinates = g.coordinates.map(poly => poly.map(scaleRing))
+      else return f
+      return { type: 'Feature', properties: f.properties, geometry: { type: g.type, coordinates } }
+    }),
+  }
+}
+
+function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, optimusMode, showLeaseIntel, irsMode, showPriorityCities, showCbsa }) {
   const [open, setOpen] = useState(true)
   const active    = Object.entries(layers).filter(([k,v]) => v)
   const psiActive = Object.entries(psiLayers||{}).filter(([k,v]) => v)
-  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel && !irsMode && !showPriorityCities) return null
+  if (active.length === 0 && psiActive.length === 0 && !showRadii && !performanceMode && !optimusMode && !showLeaseIntel && !irsMode && !showPriorityCities && !showCbsa) return null
   const allInfo = {}
   LAYER_GROUPS.forEach(g => g.layers.forEach(l => { allInfo[l.key] = l }))
   return (
@@ -528,31 +503,6 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
             const q = DATA_QUALITY[key]
             const qColor = q ? QUALITY_COLORS[q.classification] : '#475569'
 
-            if (key === 'population') return (
-              <div key={key} style={{ padding:'4px 13px' }}>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
-                  <span style={{ fontSize:11, color:THEME.textSecondary, fontWeight:600 }}>Population Density</span>
-                  {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
-                </div>
-                {Object.entries(DENSITY_COLORS).map(([label, color]) => (
-                  <div key={label} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
-                    <div style={{ width:12, height:12, borderRadius:3, background:color, opacity:0.85 }}/>
-                    <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-            )
-            if (key === 'metros') return (
-              <div key={key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'4px 13px' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <svg width="24" height="12" viewBox="0 0 24 12">
-                    <line x1="0" y1="6" x2="24" y2="6" stroke="#22d3ee" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.8"/>
-                  </svg>
-                  <span style={{ fontSize:11, color:'#64748b' }}>Metro Areas</span>
-                </div>
-                {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
-              </div>
-            )
             if (key === 'states') return (
               <div key={key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'4px 13px' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:8 }}>
@@ -562,20 +512,6 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                   <span style={{ fontSize:11, color:'#64748b' }}>State Boundaries</span>
                 </div>
                 {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
-              </div>
-            )
-            if (key === 'urban_rural') return (
-              <div key={key} style={{ padding:'4px 13px' }}>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
-                  <span style={{ fontSize:11, color:THEME.textSecondary, fontWeight:600 }}>Urban / Rural</span>
-                  {qualityMode && q && <div style={{ width:6, height:6, borderRadius:'50%', background:qColor }}/>}
-                </div>
-                {[['Major Urban','#38bdf8'],['Urban','#4ade80'],['Rural Hub','#92400e']].map(([label, color]) => (
-                  <div key={label} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
-                    <div style={{ width:10, height:10, borderRadius:'50%', background:color }}/>
-                    <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
-                  </div>
-                ))}
               </div>
             )
             return (
@@ -640,6 +576,36 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                   Network: 168 activated · 184 in process (network)<br/>168 sites activated (ISLA or Final Clearance){!layers.states && <><br/>Enable State Boundaries to see choropleth</>}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* MSA Markets legend */}
+          {showCbsa && (
+            <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(59,130,246,0.2)', marginTop:4 }}>
+              <div style={{ fontSize:9, fontWeight:700, color:'#1d4ed8', letterSpacing:'0.08em', marginBottom:6 }}>MSA MARKETS</div>
+              <div style={{ fontSize:8, fontWeight:700, color:'#475569', letterSpacing:'0.06em', marginBottom:4 }}>PSI PRESENCE</div>
+              {[
+                ['#16a34a','Large market (1M+)'],
+                ['#ea580c','Mid market (250K-1M)'],
+                ['#3b82f6','Smaller market (<250K)'],
+              ].map(([color, label]) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:9, marginBottom:5 }}>
+                  <div style={{ width:11, height:11, borderRadius:2, background:color, flexShrink:0, border:'1px solid rgba(148,163,184,0.4)' }}/>
+                  <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
+                </div>
+              ))}
+              <div style={{ fontSize:8, fontWeight:700, color:'#475569', letterSpacing:'0.06em', margin:'6px 0 4px' }}>COVERAGE GAPS</div>
+              {[
+                ['#7f1d1d','Large gap (1M+) — strategic priority'],
+                ['#dc2626','Mid gap (250K-1M)'],
+                ['#374151','Smaller gap'],
+              ].map(([color, label]) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:9, marginBottom:5 }}>
+                  <div style={{ width:11, height:11, borderRadius:2, background:color, flexShrink:0, border:'1px solid rgba(148,163,184,0.4)' }}/>
+                  <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
+                </div>
+              ))}
+              <div style={{ fontSize:9, color:'#475569', marginTop:5 }}>393 metros · 294 with PSI coverage · 99 gaps</div>
             </div>
           )}
 
@@ -765,7 +731,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
 }
 
 // ── Info Card ────────────────────────────────────────────
-function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irsMode }) {
+function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irsMode, showCbsa, cbsaSummary }) {
   if (!info) return null
 
   // PSI site card
@@ -925,6 +891,21 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
             </div>
           )}
 
+          {/* MSA Market section — market context for the clicked site */}
+          {showCbsa && info.cbsaCode && cbsaSummary && cbsaSummary[info.cbsaCode] && (() => {
+            const m = cbsaSummary[info.cbsaCode]
+            const fmtPop = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v)
+            return (
+              <div style={{ marginTop:10, borderTop:'1px solid rgba(59,130,246,0.2)', paddingTop:10 }}>
+                <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#3b82f6', marginBottom:7 }}>MSA MARKET</div>
+                <InfoRow label="Market"              value={m.cbsaName} />
+                <InfoRow label="Population"          value={fmtPop(m.population2024)} />
+                <InfoRow label="PSI sites in market" value={`${m.totalSites} (OO: ${m.ooSites} · 3P: ${m.threePSites})`} />
+                <InfoRow label="Market size"         value={m.population2024 >= 1e6 ? 'Large' : m.population2024 >= 250000 ? 'Mid' : 'Small'} color={m.population2024 >= 1e6 ? '#16a34a' : m.population2024 >= 250000 ? '#ea580c' : '#3b82f6'} />
+              </div>
+            )
+          })()}
+
           {/* Lease Intelligence section */}
           {showLeaseIntel && info.leaseAction && (
             <div style={{ marginTop:10, borderTop:'1px solid rgba(249,115,22,0.2)', paddingTop:10 }}>
@@ -987,20 +968,6 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
         {(info.city||info.state) && <InfoRow label="Location" value={[info.city,info.state].filter(Boolean).join(', ')} />}
         {info.iata && <InfoRow label="IATA Code" value={info.iata} color="#34d399" />}
         {info.enrollment && <InfoRow label="Enrollment" value={fmt(info.enrollment)+' students'} color="#fbbf24" />}
-        {info.layerId === 'population' && (
-          <>
-            <InfoRow label="Density Tier" value={info.density} color={DENSITY_COLORS[info.density]||'#a855f7'} />
-            <InfoRow label="Population" value={fmt(info.population)} color="#f472b6" />
-            <div style={{ marginTop:8, padding:'7px 9px', background:'rgba(244,114,182,0.08)', borderRadius:5, borderLeft:`2px solid ${DENSITY_COLORS[info.density]||'#a855f7'}` }}>
-              <div style={{ fontSize:10, color:'#64748b', lineHeight:1.5 }}>
-                {info.density==='Very High' && 'Core metro area. High candidate density. Priority market.'}
-                {info.density==='High' && 'Significant urban population. Strong candidate demand. Review test center capacity.'}
-                {info.density==='Medium' && 'Mid-density suburban zone. Moderate demand. Gap analysis recommended.'}
-              </div>
-            </div>
-          </>
-        )}
-        {info.layerId==='metros' && info.metroPop && <InfoRow label="Metro Population" value={info.metroPop+'M people'} color="#22d3ee" />}
         {info.layerId==='states' && info.statePop && <InfoRow label="State Population" value={info.statePop+'M people'} color="#60a5fa" />}
         {qualityMode && <DataSourcePanel layerKey={info.layerId} />}
       </div>
@@ -1029,6 +996,8 @@ export default function BigFootMap() {
   const [qualityMode, setQualityMode] = useState(false)
   const [psiLayers, setPsiLayers]       = useState({oo:true,authorized:true,mg:true,td:true,amp:true})
   const [showRadii, setShowRadii]       = useState(false)
+  const [radiusMiles, setRadiusMiles]   = useState(50)
+  const [radiiBase,   setRadiiBase]     = useState(null)
   const [psiCollapsed, setPsiCollapsed] = useState({group:false,thirdParty:true})
   const [performanceMode, setPerformanceMode] = useState(false)
   const [optimusMode,     setOptimusMode]     = useState(false)
@@ -1036,6 +1005,8 @@ export default function BigFootMap() {
   const [irsMode,         setIrsMode]         = useState(false)
   const [irsStatePaint,      setIrsStatePaint]      = useState(null)
   const [showPriorityCities, setShowPriorityCities] = useState(false)
+  const [showCbsa,           setShowCbsa]           = useState(false)
+  const [cbsaSummary,        setCbsaSummary]        = useState({})
   const [irsFilterPriority,  setIrsFilterPriority]  = useState(false)
   const [pcIconsLoaded,      setPcIconsLoaded]      = useState(false)
   const [priorityCityKeys,   setPriorityCityKeys]   = useState(new Set())
@@ -1043,6 +1014,14 @@ export default function BigFootMap() {
   const [leaseActionFilters, setLeaseActionFilters] = useState({
     relocate: true, refurbish: true, assessClose: true,
     renewExpand: true, renew: true, review: true, contractFlag: true,
+  })
+  const [cbsaFilters, setCbsaFilters] = useState({
+    largePresence: true,
+    midPresence:   true,
+    smallPresence: true,
+    largeGap:      true,
+    midGap:        true,
+    smallGap:      true,
   })
   const [isChatOpen,          setIsChatOpen]          = useState(false)
   const [chatMessages,        setChatMessages]        = useState([
@@ -1059,6 +1038,26 @@ export default function BigFootMap() {
   const [irsDataDate, setIrsDataDate] = useState('')
   useEffect(() => {
     setIrsDataDate(new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }))
+  }, [])
+
+  // Load CBSA summary → lookup keyed by cbsaCode (for InfoCard market context)
+  useEffect(() => {
+    fetch(`${BASE}data/data_cbsa_summary.json`)
+      .then(r => r.json())
+      .then(arr => {
+        const m = {}
+        for (const s of arr) m[s.cbsaCode] = s
+        setCbsaSummary(m)
+      })
+      .catch(() => {})
+  }, [])
+
+  // Load the base 50-mile ring polygons once; selectable radius scales them.
+  useEffect(() => {
+    fetch(`${BASE}data/data_psi_radii.geojson`)
+      .then(r => r.json())
+      .then(fc => setRadiiBase(fc))
+      .catch(() => {})
   }, [])
 
   // Load IRS state paint + priority city lookup
@@ -1272,6 +1271,26 @@ export default function BigFootMap() {
     return ['any', ...parts]
   })()
 
+  // CBSA market category visibility — one ['all',...] clause per enabled sub-toggle.
+  // Micropolitan (population2024 === 0) is never in any clause → always hidden.
+  const cbsaVisibilityFilter = (() => {
+    const pop = ['get','population2024']
+    const P = ['>',  ['coalesce',['get','totalSites'],0], 0]   // has PSI presence
+    const G = ['==', ['coalesce',['get','totalSites'],0], 0]   // coverage gap
+    const cats = []
+    if (cbsaFilters.largePresence) cats.push(['all', P, ['>=', pop, 1000000]])
+    if (cbsaFilters.midPresence)   cats.push(['all', P, ['>=', pop, 250000], ['<', pop, 1000000]])
+    if (cbsaFilters.smallPresence) cats.push(['all', P, ['>', pop, 0], ['<', pop, 250000]])
+    if (cbsaFilters.largeGap)      cats.push(['all', G, ['>=', pop, 1000000]])
+    if (cbsaFilters.midGap)        cats.push(['all', G, ['>=', pop, 250000], ['<', pop, 1000000]])
+    if (cbsaFilters.smallGap)      cats.push(['all', G, ['>', pop, 0], ['<', pop, 250000]])
+    if (cats.length === 0) return ['==', 1, 0]   // all off → hide everything
+    return ['any', ...cats]
+  })()
+
+  // Ring polygons scaled to the selected radius (base file is 50-mile circles).
+  const radiiData = useMemo(() => scaleRadii(radiiBase, radiusMiles / 50), [radiiBase, radiusMiles])
+
   // ── Filter state ──────────────────────────────────────
   const [filterPanelOpen,  setFilterPanelOpen]  = useState(false)
   const [availableStates,  setAvailableStates]  = useState([])
@@ -1306,7 +1325,7 @@ export default function BigFootMap() {
 
   const interactiveIds = [
     ...POINT_LAYERS.map(k=>`${k}-symbol`),
-    'urban-rural-circle','population-fill','metros-fill','states-fill',
+    'states-fill',
     ...(showPriorityCities ? ['priority-cities-diamond'] : []),
     ...(performanceMode ? ['psi-perf-circle'] :
         optimusMode     ? ['psi-optimus-oo-circle','psi-authorized-circle','psi-mg-circle','psi-td-circle','psi-amp-circle'] :
@@ -1382,6 +1401,9 @@ export default function BigFootMap() {
         irsNotStarted:   props.irsNotStarted  ?? 0,
         irsIslaGranted:  props.irsIslaGranted ?? 0,
         irsSegment:      props.irsSegment    || null,
+        // CBSA / MSA market
+        cbsaCode:        props.cbsaCode      ?? null,
+        cbsaName:        props.cbsaName      || null,
         leaseAction:        props.leaseAction        || null,
         leaseStatus:        props.leaseStatus         || null,
         daysRemaining:      props.daysRemaining       ?? null,
@@ -1409,9 +1431,8 @@ export default function BigFootMap() {
       }
     }
 
-    // normalise layer ID: strip suffixes, fix urban-rural → urban_rural
-    const rawId = lid.replace('-symbol','').replace('-circle','').replace('-fill','')
-    const layerId = rawId === 'urban-rural' ? 'urban_rural' : rawId
+    // normalise layer ID: strip suffixes
+    const layerId = lid.replace('-symbol','').replace('-circle','').replace('-fill','')
     return {
       lon: coords?.[0]||null, lat: coords?.[1]||null,
       name: props.name||props.NAME||'Unknown',
@@ -1419,9 +1440,6 @@ export default function BigFootMap() {
       city: props.city||'', state: props.state||'',
       iata: props.iata||'', layerId,
       enrollment: props.enrollment||null,
-      population: props.population||null,
-      density: props.density||null,
-      metroPop: METRO_POPULATIONS[props.name||props.NAME]||null,
       statePop: STATE_POPULATIONS[props.name||props.NAME]||null,
     }
   }, [])
@@ -1469,25 +1487,45 @@ export default function BigFootMap() {
             <Layer id="states-line" type="line" paint={{'line-color':'#94a3b8','line-width':0.9,'line-opacity':0.5}}/>
           </Source>
         )}
-        {layers.metros && (
-          <Source id="metros" type="geojson" data={`${BASE}data/metros.geojson`}>
-            <Layer id="metros-fill" type="fill" paint={{'fill-color':'#0891b2','fill-opacity':0.07}}/>
-            <Layer id="metros-line" type="line" paint={{'line-color':'#22d3ee','line-width':1.1,'line-opacity':0.33,'line-dasharray':[4,3]}}/>
-          </Source>
-        )}
-        {layers.population && (
-          <Source id="population" type="geojson" data={`${BASE}data/data_population.geojson`}>
-            <Layer id="population-fill" type="fill" paint={{'fill-color':['match',['get','density'],'Very High','#ec4899','High','#a855f7','Medium','#6366f1','#334155'],'fill-opacity':0.25}}/>
-            <Layer id="population-line" type="line" paint={{'line-color':'#db2777','line-width':0.5,'line-opacity':0.4}}/>
-          </Source>
-        )}
-        {layers.urban_rural && (
-          <Source id="urban_rural" type="geojson" data={`${BASE}data/data_urban_rural.geojson`}>
-            <Layer id="urban-rural-circle" type="circle" paint={{'circle-radius':8,'circle-color':['match',['get','classification'],'Major Urban','#38bdf8','Urban','#4ade80','#92400e'],'circle-opacity':0.75,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1}}/>
+        {/* MSA / CBSA market boundaries — fill encodes PSI presence + market size (population) */}
+        {showCbsa && (
+          <Source id="cbsa-boundaries" type="geojson" data={`${BASE}data/data_cbsa_boundaries.geojson`}>
+            <Layer id="cbsa-fill" type="fill" filter={cbsaVisibilityFilter} paint={{
+              'fill-color':['case',
+                // PSI present — green / orange / blue by market size (coalesce guards null totalSites)
+                ['>',['coalesce',['get','totalSites'],0],0],
+                ['case',
+                  ['>=',['get','population2024'],1000000],'#16a34a',
+                  ['>=',['get','population2024'],250000],'#ea580c',
+                  '#3b82f6'],
+                // Coverage gap — red / amber / gray by market size; micropolitan (pop 0) transparent
+                ['case',
+                  ['>=',['get','population2024'],1000000],'#7f1d1d',
+                  ['>=',['get','population2024'],250000],'#dc2626',
+                  ['>',['get','population2024'],0],'#374151',
+                  'rgba(0,0,0,0)']
+              ],
+              'fill-opacity':0.3
+            }}/>
+            <Layer id="cbsa-line" type="line" filter={cbsaVisibilityFilter} paint={{
+              'line-color':['case',
+                // PSI present — brighter version of the fill by market size
+                ['>',['coalesce',['get','totalSites'],0],0],
+                ['case',
+                  ['>=',['get','population2024'],1000000],'#22c55e',
+                  ['>=',['get','population2024'],250000],'#f97316',
+                  '#60a5fa'],
+                // Gaps: large / mid / small by market size; micropolitan hidden
+                ['>=',['get','population2024'],1000000],'#7f1d1d',
+                ['>=',['get','population2024'],250000],'#dc2626',
+                ['>',['get','population2024'],0],'#374151',
+                'rgba(0,0,0,0)'],
+              'line-width':0.5,'line-opacity':0.5
+            }}/>
           </Source>
         )}
         {/* PSI 50-mile radii — type-filtered and color-coded, rendered below industry icons */}
-        <Source id="psi-radii" type="geojson" data={`${BASE}data/data_psi_radii.geojson`}>
+        <Source id="psi-radii" type="geojson" data={radiiData}>
           {/* O&O — amber, bolder line */}
           {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':'#d97706','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
           {/* PSI Authorized — sky */}
@@ -1509,7 +1547,6 @@ export default function BigFootMap() {
         {/* PSI sites — rendered on top of industry icons */}
         <Source id="psi-sites" type="geojson" data={`${BASE}data/data_psi_sites.geojson`}>
           {/* Normal mode: property-type colors */}
-          {showNormalMode && psiLayers.oo && <Layer id="psi-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':13,'circle-color':PSI_COLORS.oo,'circle-opacity':0.18,'circle-blur':0.6}}/>}
           {showNormalMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1.5,'circle-opacity':1}}/>}
           {showNormalMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
           {showNormalMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
@@ -1652,7 +1689,6 @@ export default function BigFootMap() {
                 </div>
                 <div style={{ fontSize:13, fontWeight:600, color:THEME.textPrimary }}>{hoverInfo.name}</div>
                 {(hoverInfo.city||hoverInfo.state) && <div style={{ fontSize:11, color:'#64748b', marginTop:2 }}>{[hoverInfo.city,hoverInfo.state].filter(Boolean).join(', ')}</div>}
-                {hoverInfo.population && <div style={{ fontSize:11, color:'#f472b6', marginTop:3, fontWeight:600 }}>Pop: {fmt(hoverInfo.population)}</div>}
                 {qualityMode && DATA_QUALITY[hoverInfo.layerId] && (
                   <div style={{ marginTop:5, fontSize:10, color:'#475569' }}>Source: {DATA_QUALITY[hoverInfo.layerId].source}</div>
                 )}
@@ -1969,6 +2005,45 @@ export default function BigFootMap() {
                 </div>
               )
             })}
+            {group.label === 'Base Layers' && (<>
+              <div onClick={() => setShowCbsa(v => !v)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
+                <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:showCbsa?'#1d6fa4':'#E2E8F0', border:`1.5px solid ${showCbsa?'#1d6fa4':'#CBD5E1'}`, boxShadow:showCbsa?'0 0 5px #1d6fa488':'none', transition:'all 0.2s' }}/>
+                <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:showCbsa?'#1d6fa4':'#E2E8F0', border:`1px solid ${showCbsa?'#1d6fa4':'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:showCbsa?'0 0 5px #1d6fa455':'none' }}>
+                  <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showCbsa?13:2, background:showCbsa?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
+                </div>
+                <span style={{ fontSize:12, fontWeight:500, color:showCbsa?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s', flex:1 }}>
+                  MSA Markets<span style={{ fontSize:9, fontWeight:400, color:'#334155', marginLeft:4 }}>MSA market coverage · strategic view</span>
+                </span>
+              </div>
+              {showCbsa && (
+                <div style={{ paddingBottom:4, background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
+                  <div style={{ fontSize:9, fontWeight:700, color:'#475569', letterSpacing:'0.06em', textTransform:'uppercase', padding:'6px 16px 3px 28px' }}>Presence</div>
+                  {[
+                    ['largePresence','Large market (1M+)',   '#16a34a'],
+                    ['midPresence',  'Mid market (250K-1M)', '#ea580c'],
+                    ['smallPresence','Small market (<250K)', '#3b82f6'],
+                    ['__gaps__','Gaps',null],
+                    ['largeGap',     'Large gap (1M+)',      '#7f1d1d'],
+                    ['midGap',       'Mid gap (250K-1M)',    '#dc2626'],
+                    ['smallGap',     'Small gap',            '#374151'],
+                  ].map(([key, label, color]) => {
+                    if (key === '__gaps__') return (
+                      <div key="gaps-hdr" style={{ fontSize:9, fontWeight:700, color:'#475569', letterSpacing:'0.06em', textTransform:'uppercase', padding:'6px 16px 3px 28px' }}>Gaps</div>
+                    )
+                    const on = cbsaFilters[key]
+                    return (
+                      <div key={key} onClick={()=>setCbsaFilters(f=>({...f,[key]:!f[key]}))} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
+                        <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:on?color:'#E2E8F0', border:`1.5px solid ${on?color:'#CBD5E1'}`, boxShadow:on?`0 0 4px ${color}88`:'none', transition:'all 0.2s' }}/>
+                        <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:on?color:'#E2E8F0', border:`1px solid ${on?color:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
+                          <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:on?11:2, background:on?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
+                        </div>
+                        <span style={{ fontSize:11, color:'#94a3b8' }}>{label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </>)}
           </div>
         ))}
         {/* ── PSI Test Centers ── */}
@@ -2033,10 +2108,32 @@ export default function BigFootMap() {
                 <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:showRadii?13:2, background:showRadii?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
               </div>
               <div>
-                <span style={{ fontSize:12, fontWeight:500, color:showRadii?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>50-Mile Radius</span>
-                <span style={{ fontSize:9, color:'#334155', marginLeft:6 }}>all sites</span>
+                <span style={{ fontSize:12, fontWeight:500, color:showRadii?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>Coverage Radius</span>
+                <span style={{ fontSize:9, color:'#334155', marginLeft:6 }}>{radiusMiles} mi</span>
               </div>
             </div>
+
+            {/* Radius selector — presets in miles, shown only when the layer is on */}
+            {showRadii && (
+              <div style={{ display:'flex', gap:4, flexWrap:'wrap', padding:'0 16px 8px 40px' }}>
+                {[25, 50, 75, 100, 125, 150].map(mi => {
+                  const sel = radiusMiles === mi
+                  return (
+                    <div key={mi}
+                      onClick={()=>setRadiusMiles(mi)}
+                      onMouseEnter={e=>{ if(!sel){ e.currentTarget.style.borderColor='#22d3ee'; e.currentTarget.style.color='#22d3ee' } }}
+                      onMouseLeave={e=>{ if(!sel){ e.currentTarget.style.borderColor='#334155'; e.currentTarget.style.color='#64748b' } }}
+                      style={{
+                        fontSize:10, padding:'2px 7px', borderRadius:4, cursor:'pointer', userSelect:'none', transition:'all 0.15s',
+                        background: sel?'#22d3ee':'transparent',
+                        border: `1px solid ${sel?'#22d3ee':'#334155'}`,
+                        color: sel?'#0f172a':'#64748b',
+                        fontWeight: sel?600:400,
+                      }}>{mi}</div>
+                  )
+                })}
+              </div>
+            )}
 
             {/* Lease Intelligence toggle + sub-toggles */}
             <div>
@@ -2088,10 +2185,10 @@ export default function BigFootMap() {
       </div>
 
       {/* Legend */}
-      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} showPriorityCities={showPriorityCities} />
+      <Legend layers={layers} psiLayers={psiLayers} showRadii={showRadii} qualityMode={qualityMode} performanceMode={performanceMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} showPriorityCities={showPriorityCities} showCbsa={showCbsa} />
 
       {/* Info Card */}
-      <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} />
+      <InfoCard info={clickInfo} onClose={() => setClickInfo(null)} qualityMode={qualityMode} optimusMode={optimusMode} showLeaseIntel={showLeaseIntel} irsMode={irsMode} showCbsa={showCbsa} cbsaSummary={cbsaSummary} />
 
       {/* Status Bar */}
       <div style={{ position:'absolute', bottom:32, left:'50%', transform:'translateX(-50%)', background:THEME.panelBg, border:THEME.panelBorder, borderRadius:8, padding:'8px 20px', backdropFilter:'blur(8px)', fontFamily:FONT, display:'flex', gap:20, alignItems:'center', boxShadow:THEME.shadow }}>
