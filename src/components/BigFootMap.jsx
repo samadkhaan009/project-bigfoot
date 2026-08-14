@@ -291,9 +291,6 @@ const IRS_ACTIVATED_COLOR   = '#14532D'   // green  — ≥1 TCA cleared
 const IRS_IN_PROCESS_COLOR  = '#b87708'   // amber  — TCAs in process, none cleared
 const IRS_RING_RADIUS_EXPR  = ['case', ['==',['get','category'],'OO'], 17, 15]
 
-// ── Priority Cities constants ─────────────────────────
-const PC_ICON_SIZE = ['match', ['coalesce',['get','cityLevel'],99], 1,0.9, 2,0.75, 3,0.6, 0.48]
-
 const LEASE_ACTION_COLORS = {
   'Relocate':'#ef4444','Refurbish':'#f97316','Assess-Close':'#7f1d1d',
   'Renew+Expand':'#22c55e','Renew':'#60a5fa','Review':'#a855f7',
@@ -614,17 +611,19 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
             <div style={{ padding:'6px 13px 8px', borderTop:'1px solid rgba(251,191,36,0.2)', marginTop:4 }}>
               <div style={{ fontSize:9, fontWeight:700, color:'#78350f', letterSpacing:'0.08em', marginBottom:6 }}>PRIORITY CITIES</div>
               {[
-                ['rgba(34,197,94,0.8)','#f59e0b','PSI present · IRS clearance within 50 mi'],
-                ['rgba(59,130,246,0.8)','#3b82f6','PSI present · no clearance within 50 mi'],
-                ['rgba(239,68,68,0.8)', '#f59e0b','No PSI center · IRS clearance within 50 mi'],
-                ['rgba(239,68,68,0.8)', '#ef4444','No PSI center · no IRS activity within 50 mi'],
-              ].map(([fill, border, label]) => (
-                <div key={label} style={{ display:'flex', alignItems:'center', gap:9, marginBottom:5 }}>
-                  <div style={{ width:10, height:10, transform:'rotate(45deg)', background:fill, border:`2px solid ${border}`, flexShrink:0 }}/>
+                [1, 'Most populous city'],
+                [2, '2nd most populous'],
+                [3, '3rd most populous'],
+              ].map(([n, label]) => (
+                <div key={n} style={{ display:'flex', alignItems:'center', gap:9, marginBottom:5 }}>
+                  <div style={{ position:'relative', width:14, height:14, flexShrink:0 }}>
+                    <div style={{ position:'absolute', inset:1, transform:'rotate(45deg)', background:'#ffffff', border:'1px solid #334155' }}/>
+                    <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:8, fontWeight:700, color:'#1e293b' }}>{n}</div>
+                  </div>
                   <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
                 </div>
               ))}
-              <div style={{ fontSize:9, color:'#475569', marginTop:5 }}>101 priority cities · 2 per state · 50-mile radius logic</div>
+              <div style={{ fontSize:9, color:'#475569', marginTop:5 }}>143 cities · top 3 per state · Census population</div>
             </div>
           )}
 
@@ -1350,18 +1349,19 @@ ${JSON.stringify(contextRef.current)}`,
       img.src = url
     }))).then(() => {
       setIconsLoaded(true)
-      // Generate priority-city diamond icons (4 color variants)
-      const pcVariants = [
-        ['pc-green-gold', '#16a34a', '#d97706'],
-        ['pc-green-plain','#3b82f6', '#3b82f6'],
-        ['pc-red-gold',   '#ef4444', '#d97706'],
-        ['pc-red-plain',  '#ef4444', '#ef4444'],
-      ]
-      Promise.all(pcVariants.map(([id, fill, stroke]) => new Promise(res => {
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="3.5"/></svg>`
+      // Generate priority-city numbered diamond icons (rank 1/2/3, no color coding).
+      // White diamond, thin dark-slate border, rank number centered. 24×24 coord
+      // space rasterized at 2× (width/height 48) for crispness.
+      const pcRanks = [1, 2, 3]
+      Promise.all(pcRanks.map(n => new Promise(res => {
+        const id = `pc-rank-${n}`
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">`
+          + `<polygon points="12,1 23,12 12,23 1,12" fill="#ffffff" fill-opacity="0.9" stroke="#334155" stroke-width="1.5"/>`
+          + `<text x="12" y="12" font-family="Arial" font-size="10" font-weight="bold" fill="#1e293b" text-anchor="middle" dominant-baseline="central">${n}</text>`
+          + `</svg>`
         const blob = new Blob([svg], { type:'image/svg+xml;charset=utf-8' })
         const url = URL.createObjectURL(blob)
-        const img = new Image(40, 40)
+        const img = new Image(48, 48)
         img.onload = () => { if (!map.hasImage(id)) map.addImage(id, img, {pixelRatio:2}); URL.revokeObjectURL(url); res() }
         img.onerror = () => { URL.revokeObjectURL(url); res() }
         img.src = url
@@ -1751,23 +1751,13 @@ ${JSON.stringify(contextRef.current)}`,
           <Source id="priority-cities" type="geojson" data={`${BASE}data/priority_cities.geojson`}>
             <Layer id="priority-cities-diamond" type="symbol"
               layout={{
-                'icon-image': ['case',
-                  ['all',
-                    ['any', ['>', ['get','totalSites'], 0], ['>', ['get','nearbyTotal'], 0]],
-                    ['any', ['>', ['get','cleared'], 0], ['==', ['get','radiusActivated'], true]]],
-                  'pc-green-gold',
-                  ['all',
-                    ['any', ['>', ['get','totalSites'], 0], ['>', ['get','nearbyTotal'], 0]],
-                    ['all', ['==', ['get','cleared'], 0], ['!=', ['get','radiusActivated'], true]]],
-                  'pc-green-plain',
-                  ['all',
-                    ['all', ['==', ['get','totalSites'], 0], ['==', ['get','nearbyTotal'], 0]],
-                    ['any', ['>', ['get','cleared'], 0], ['==', ['get','radiusActivated'], true]]],
-                  'pc-red-gold',
-                  'pc-red-plain'
+                'icon-image': ['match', ['get','cityLevel'],
+                  1, 'pc-rank-1',
+                  2, 'pc-rank-2',
+                  3, 'pc-rank-3',
+                  'pc-rank-1'
                 ],
-                'icon-size': PC_ICON_SIZE,
-                'icon-rotate': 45,
+                'icon-size': 1.2,
                 'icon-allow-overlap': true,
                 'icon-ignore-placement': true,
                 'icon-anchor': 'center',
@@ -1972,7 +1962,7 @@ ${JSON.stringify(contextRef.current)}`,
             <div style={{ fontSize:10, fontWeight:700, color:showPriorityCities?'#f59e0b':'#475569', letterSpacing:'0.04em' }}>
               {showPriorityCities ? 'PRIORITY CITIES ON' : 'Priority Cities'}
             </div>
-            {showPriorityCities && <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>101 priority cities · diamond markers</div>}
+            {showPriorityCities && <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>143 cities · top 3 per state</div>}
           </div>
         </div>
 

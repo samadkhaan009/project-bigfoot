@@ -5,8 +5,10 @@
  * Supplement: hardcoded second-city entries for the 4 states with only 1 city
  *   in the Plotly dataset (Alaska, Hawaii, Maine, Vermont).
  * DC is included with 1 city (Washington) — the only incorporated city in DC.
- * Selects top 2 cities per state (100 total + DC = 101), geocodes via Nominatim,
+ * Selects top 3 cities per state (150 total + DC = ~151), geocodes via Nominatim,
  * joins IRS city summary + PSI site counts, writes priority_cities.geojson.
+ * cityLevel is the population rank: 1 = most populous, 2 = second, 3 = third.
+ * CDP (Census Designated Place) entries in the source data are kept, not filtered.
  * Run: node tools/export_priority_cities.js
  */
 import https from 'https';
@@ -48,7 +50,15 @@ const NAME_OVERRIDES = {
   'Lexington-Fayette': 'Lexington',       // Kentucky: Census consolidated-govt name; PSI uses "Lexington"
   'Des Moines':        'West Des Moines', // Iowa: no PSI sites in Des Moines proper; site is in West Des Moines
   'Spokane':           'Spokane Valley',  // Washington: no PSI sites in Spokane proper; site is in Spokane Valley
+  'Augusta-Richmond County': 'Augusta',   // Georgia: Census consolidated city-county name; Nominatim resolves "Augusta"
   // Burlington, VT: no override — South Burlington is already VT's #2 entry; renaming would create a duplicate
+};
+
+// Hardcoded coordinate fallbacks for cities Nominatim can't resolve by name.
+// Keyed by "City|State" (name after NAME_OVERRIDES applied). Used only when the
+// live geocode returns no result — keeps otherwise-valid priority cities on the map.
+const GEO_FALLBACK = {
+  'Augusta|Georgia': { lat: 33.4735, lon: -82.0105 },
 };
 
 // PSI city name aliases: maps PSI site city|state key → canonical priority city|state key.
@@ -119,7 +129,7 @@ function parseCSV(csv) {
   });
 }
 
-// ─── STEP 1: Build top-2-per-state list ──────────────────────────────────────
+// ─── STEP 1: Build top-3-per-state list ──────────────────────────────────────
 
 console.log('Fetching Plotly top-1000 cities CSV…');
 const csvRaw  = await fetchUrl(PLOTLY_URL);
@@ -150,11 +160,11 @@ for (const [state, extras] of Object.entries(SUPPLEMENTAL)) {
   }
 }
 
-// Build final selected list: top 2 per state (1 for DC), cityLevel 1 and 2
+// Build final selected list: top 3 per state (1 for DC), cityLevel 1, 2, 3
 // Apply NAME_OVERRIDES so cityStateKey matches PSI site data exactly.
 const selected = [];
 for (const state of VALID_STATES) {
-  const cities = (byState[state] || []).slice(0, 2);
+  const cities = (byState[state] || []).slice(0, 3);
   cities.forEach((c, i) => selected.push({
     city:      NAME_OVERRIDES[c.city] || c.city,
     state,
@@ -164,9 +174,9 @@ for (const state of VALID_STATES) {
 }
 
 console.log(`\nSelected ${selected.length} cities`);
-const under2 = [...VALID_STATES].filter(s => (byState[s] || []).length < 2);
+const under3 = [...VALID_STATES].filter(s => s !== 'District of Columbia' && (byState[s] || []).length < 3);
 const zero   = [...VALID_STATES].filter(s => !(byState[s] || []).length);
-if (under2.length) console.log(`  ⚠ Fewer than 2: ${under2.map(s => `${s} (${(byState[s]||[]).length})`).join(', ')}`);
+if (under3.length) console.log(`  ⚠ Fewer than 3: ${under3.map(s => `${s} (${(byState[s]||[]).length})`).join(', ')}`);
 if (zero.length)   console.log(`  ✗ No cities:    ${zero.join(', ')}`);
 
 // ─── STEP 2: Load join sources ────────────────────────────────────────────────
@@ -247,19 +257,24 @@ function nominatimGet(city, state) {
 const geoFailed = [];
 let gDone = 0;
 for (const c of selected) {
+  let failReason = null;
   try {
     const raw = JSON.parse(await nominatimGet(c.city, c.state));
     if (raw.length > 0) {
       c.lon = parseFloat(raw[0].lon);
       c.lat = parseFloat(raw[0].lat);
     } else {
-      c.lon = null; c.lat = null;
-      geoFailed.push(`${c.city}, ${c.state} — no result`);
+      c.lon = null; c.lat = null; failReason = 'no result';
     }
   } catch (e) {
-    c.lon = null; c.lat = null;
-    geoFailed.push(`${c.city}, ${c.state} — ${e.message}`);
+    c.lon = null; c.lat = null; failReason = e.message;
   }
+  // Coordinate fallback for cities Nominatim can't resolve by name
+  if (c.lon == null || c.lat == null) {
+    const fb = GEO_FALLBACK[`${c.city}|${c.state}`];
+    if (fb) { c.lat = fb.lat; c.lon = fb.lon; failReason = null; }
+  }
+  if (failReason) geoFailed.push(`${c.city}, ${c.state} — ${failReason}`);
   gDone++;
   if (gDone % 20 === 0) process.stdout.write(`  ${gDone}/${selected.length}\n`);
   await sleep(NOM_DELAY);
