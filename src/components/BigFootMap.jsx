@@ -1094,7 +1094,12 @@ export default function BigFootMap() {
     Promise.all([
       fetch(`${BASE}data/data_psi_sites.geojson`).then(r => r.json()),
       fetch(`${BASE}data/data_irs_states.json`).then(r => r.json()),
-    ]).then(([geo, stateData]) => {
+    ]).then(async ([geo, stateData]) => {
+      const cbsaRes = await fetch(`${BASE}data/data_cbsa_summary.json`);
+      const cbsaData = await cbsaRes.json();
+      const pcRes = await fetch(`${BASE}data/priority_cities.geojson`);
+      const pcData = await pcRes.json();
+      const pcFeatures = pcData.features;
       const feats = geo.features.map(f => f.properties)
       const ns = {
         totalSites:      feats.length,
@@ -1130,20 +1135,66 @@ export default function BigFootMap() {
         expiredRevenue: Math.round(lf.filter(f => f.leaseStatus==='EXPIRED').reduce((s,f) => s+(f.monthlyRevenue||0), 0)),
         atRiskRevenue: Math.round(lf.filter(f => f.leaseStatus==='EXPIRED'||(f.daysRemaining!=null&&f.daysRemaining<365)).reduce((s,f) => s+(f.monthlyRevenue||0), 0)),
       }
-      const activated = feats.filter(f => f.irsActivated === true)
-      const leaseOnly = feats.filter(f => !f.irsActivated && f.leaseAction)
-      const others    = feats.filter(f => !f.irsActivated && !f.leaseAction)
-      const sites = [...activated, ...leaseOnly, ...others].slice(0,300).map(f => ({
-        id:f.id, name:f.name, city:f.city, state:f.state,
-        propertyType:f.propertyType, category:f.category,
-        irsActivated:f.irsActivated, irsIslaGranted:f.irsIslaGranted,
-        irsCleared:f.irsCleared, irsInProcess:f.irsInProcess, irsTotalTCAs:f.irsTotalTCAs,
-        leaseAction:f.leaseAction, leaseStatus:f.leaseStatus,
-        daysRemaining:f.daysRemaining, monthlyRevenue:f.monthlyRevenue,
-        contractFlag:f.contractFlag, optimusScore:f.optimusScore,
-        optimusTier:f.optimusTier, scoreBucket:f.scoreBucket, inPriorityCity:f.inPriorityCity,
+      const sites = feats.map(f => ({
+        id:f.id, name:f.name, city:f.city, state:f.state, zip:f.zip,
+        cbsaCode:f.cbsaCode, cbsaName:f.cbsaName,
+        category:f.category, propertyType:f.propertyType,
+        irsActivated:f.irsActivated, irsIslaGranted:f.irsIslaGranted, irsCleared:f.irsCleared,
+        irsInProcess:f.irsInProcess, irsTotalTCAs:f.irsTotalTCAs,
+        leaseAction:f.leaseAction, leaseStatus:f.leaseStatus, daysRemaining:f.daysRemaining, monthlyRevenue:f.monthlyRevenue,
+        contractFlag:f.contractFlag,
+        optimusScore:f.optimusScore, optimusTier:f.optimusTier,
+        scoreBucket:f.scoreBucket, cdVolume:f.cdVolume,
+        inPriorityCity:f.inPriorityCity,
       }))
-      contextRef.current = { networkSummary:ns, irsStateSummary:irsState, leaseSummary:lease, sites }
+      const priorityCities = pcFeatures.map(f => ({
+        city:             f.properties.city,
+        state:            f.properties.state,
+        cityLevel:        f.properties.cityLevel,
+        isPriority:       f.properties.isPriority,
+        ooCount:          f.properties.ooCount,
+        partnerCount:     f.properties.partnerCount,
+        totalSites:       f.properties.totalSites,
+        siteActivated:    f.properties.siteActivated,
+        nearbyActivated:  f.properties.nearbyActivated,
+        nearbyTotal:      f.properties.nearbyTotal,
+        nearestActivated: f.properties.nearestActivated,
+        inProcess:        f.properties.inProcess,
+        cleared:          f.properties.cleared,
+      }))
+      const now = Date.now();
+      const leaseFeatures = geo.features.filter(f => f.properties.leaseAction);
+      const leaseUrgency = {
+        expiring90:  leaseFeatures
+          .filter(f => f.properties.daysRemaining > 0 && f.properties.daysRemaining <= 90)
+          .map(f => ({ id:f.properties.id, name:f.properties.name, city:f.properties.city, state:f.properties.state, daysRemaining:f.properties.daysRemaining, monthlyRevenue:f.properties.monthlyRevenue, leaseAction:f.properties.leaseAction })),
+        expiring180: leaseFeatures
+          .filter(f => f.properties.daysRemaining > 0 && f.properties.daysRemaining <= 180)
+          .map(f => ({ id:f.properties.id, name:f.properties.name, city:f.properties.city, state:f.properties.state, daysRemaining:f.properties.daysRemaining, monthlyRevenue:f.properties.monthlyRevenue, leaseAction:f.properties.leaseAction })),
+        expired: leaseFeatures
+          .filter(f => f.properties.leaseStatus === 'EXPIRED')
+          .map(f => ({ id:f.properties.id, name:f.properties.name, city:f.properties.city, state:f.properties.state, monthlyRevenue:f.properties.monthlyRevenue, leaseAction:f.properties.leaseAction, contractFlag:f.properties.contractFlag })),
+        totalAtRisk: leaseFeatures
+          .filter(f => f.properties.leaseStatus === 'EXPIRED' || f.properties.daysRemaining <= 90)
+          .reduce((sum, f) => sum + (f.properties.monthlyRevenue || 0), 0),
+      }
+      const msaMarkets = cbsaData.map(m => ({
+        cbsaCode:       m.cbsaCode,
+        cbsaName:       m.cbsaName,
+        population2024: m.population2024,
+        totalSites:     m.totalSites,
+        ooSites:        m.ooSites,
+        threePSites:    m.threePSites,
+        irsActivated:   m.irsActivated,
+        irsInProcess:   m.irsInProcess,
+        irsNotStarted:  m.irsNotStarted,
+        totalVolume:    m.totalVolume,
+        avgScoreBucket: m.avgScoreBucket,
+        hasExpiredLease: m.hasExpiredLease,
+        pctActivated:   m.pctActivated,
+        coverageStatus: m.coverageStatus,
+      }))
+      contextRef.current = { networkSummary:ns, irsStateSummary:irsState, leaseSummary:lease, sites, msaMarkets, priorityCities, leaseUrgency }
       setChatMessages([{ role:'assistant', content:"Hi, I'm the Big Foot Assistant. I have live data on all PSI test centers — including IRS clearance status, lease intelligence, facility quality, and performance tiers. What would you like to know about the network?", time:ts() }])
     }).catch(() => {
       setChatMessages([{ role:'assistant', content:'Failed to load network data. Please refresh and try again.', time:'' }])
@@ -1181,7 +1232,85 @@ export default function BigFootMap() {
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 1024,
-          system: `You are the Big Foot Assistant, embedded in the PSI/ETS US Network Intelligence Platform. Answer questions about the PSI test center network using only the data provided. Be concise and direct. Use specific numbers from the data. Format for readability — short paragraphs or brief lists. If something is not in the data, say so. Never invent numbers.\n\nNetwork data:\n${JSON.stringify(contextRef.current)}`,
+          system: `You are the Big Foot Assistant, built into the PSI/ETS US
+Network Intelligence Platform (Project Big Foot). You answer
+questions about the PSI test center network with the same
+depth and precision as a senior analyst who built the platform.
+Be direct, cite specific numbers, and format for readability.
+
+PLATFORM CONTEXT:
+552 PSI test centers mapped across the US (544 native +
+8 synthetic IRS sites added via coordinate fallback).
+141 O&O (PSI Owned) · 411 3P partner sites.
+Built for senior leadership: Neal Baer, Matt Taylor,
+Dennis Stetzel. Key collaborators: Dwayne (Network Market
+Design) · Jim Metzger (Lease renewals).
+
+CANONICAL NUMBERS — authoritative, do not contradict:
+- IRS activated: 168 sites
+- Activation definition: ISLA Granted OR Final Clearance >= 1
+  (NOT Final-only — that older definition gave 104/161,
+  both superseded. 168 is correct as of August 2026.)
+- MOBILE TCAs: excluded from pipeline (no fixed site)
+- Duluth CBT (18897): absent from Status Query, not on map
+- 8 synthetic sites: created via coordinate fallback,
+  tagged irsSyntheticFeature=true. Includes Richmond
+  Boulders II (19241 O&O) and Missoula (5995 3P).
+- Master Tracker: PARKED. Status Query is sole authoritative
+  IRS data source.
+- Status Query refresh: August 2026
+
+MSA MARKETS (msaMarkets array):
+393 US metro boundaries (Census CBSA 2023 definitions).
+294 markets with PSI presence · 99 coverage gap markets.
+Market tiers: Large (>=1M pop) · Mid (250K-1M) · Small (<250K).
+Strategic priority: large gap markets = highest expansion
+opportunity. Use msaMarkets for all market-level questions.
+
+PRIORITY CITIES (priorityCities array):
+101 cities — top 2 per state by Census population.
+50-mile radius logic: a city is siteActivated if any PSI
+site within 50 miles has IRS clearance.
+nearestActivated gives the closest cleared site name and
+distance in miles.
+
+LEASE INTELLIGENCE (leaseUrgency object):
+60 sites with lease data.
+32 expired leases. Revenue at risk: ~$3.4M/month.
+Total monthly revenue across leased sites: $8.36M.
+leaseUrgency.expiring90 = sites expiring in 90 days.
+leaseUrgency.expiring180 = sites expiring in 180 days.
+leaseUrgency.expired = all expired sites with revenue.
+leaseUrgency.totalAtRisk = combined monthly revenue at risk.
+Key decision-maker: Jim Metzger owns lease renewals.
+
+PERFORMANCE DATA: FY2025. Score buckets 1-5 (5=best).
+524 of 552 sites have performance data (scoreBucket field).
+
+OPTIMUS (facility quality): O&O only. 126 sites audited.
+Tiers: A (>=85%) · B · C. One genuinely critical site:
+5010 Macon GA (48.3%, complete data).
+Site 5129 New Providence: 28.6% but artifact (6 of 9
+categories never submitted) — do not flag as critical.
+
+O&O BREAK-EVEN: ~6,000-8,000 exams/year (Finance figure
+pending confirmation). Use this range for O&O placement
+discussions. Label as estimate, not confirmed.
+
+ANSWERING QUESTIONS:
+- Market questions → use msaMarkets array
+- Site-specific → search sites array by name/city/state/id
+- Lease urgency → use leaseUrgency summaries
+- Priority city gaps → use priorityCities array
+- Export requests → generate a clean markdown table
+- Ranking questions → sort by the relevant field and
+  show top N with all relevant columns
+- Never invent data. If a field is missing say so clearly.
+- Use short paragraphs or brief tables, never walls of text.
+- Round large numbers: 1,234,567 → "1.2M"
+
+Network data:
+${JSON.stringify(contextRef.current)}`,
           messages: history,
         }),
       })
