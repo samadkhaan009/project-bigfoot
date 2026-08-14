@@ -1265,7 +1265,15 @@ MSA MARKETS (msaMarkets array):
 294 markets with PSI presence · 99 coverage gap markets.
 Market tiers: Large (>=1M pop) · Mid (250K-1M) · Small (<250K).
 Strategic priority: large gap markets = highest expansion
-opportunity. Use msaMarkets for all market-level questions.
+opportunity.
+IMPORTANT: In market/MSA context, 'gap market' always
+means coverageStatus === 'gap' (zero PSI sites, no presence).
+It does NOT mean IRS unactivated. A market with PSI sites
+but no IRS clearance is a 'covered market with no IRS
+activation' — never a 'gap market'. Use coverageStatus
+field to distinguish: 'covered' = PSI present, 'gap' =
+no PSI presence at all.
+Use msaMarkets for all market-level questions.
 
 PRIORITY CITIES (priorityCities array):
 101 cities — top 2 per state by Census population.
@@ -1299,6 +1307,10 @@ discussions. Label as estimate, not confirmed.
 
 ANSWERING QUESTIONS:
 - Market questions → use msaMarkets array
+- 'Gap market' or 'coverage gap' = coverageStatus gap
+  (no PSI sites). Never conflate with IRS activation status.
+  If asked about IRS gaps, respond in terms of irsActivated
+  field, not coverageStatus.
 - Site-specific → search sites array by name/city/state/id
 - Lease urgency → use leaseUrgency summaries
 - Priority city gaps → use priorityCities array

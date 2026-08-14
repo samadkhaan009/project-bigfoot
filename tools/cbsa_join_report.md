@@ -26,8 +26,8 @@ _Data pipeline: HUD ZIP-CBSA (Mar 2026) → Census delineation (2020 + 2023 supp
 | 6 | Atlanta-Sandy Springs-Roswell, GA | 12060 | 11 | 2 | 9 | 6,411,149 | 2 |
 | 7 | Dallas-Fort Worth-Arlington, TX | 19100 | 10 | 3 | 7 | 8,344,032 | 3 |
 | 8 | Washington-Arlington-Alexandria, DC-VA-MD-WV | 47900 | 9 | 0 | 9 | 6,436,489 | 1 |
-| 9 | Boston-Cambridge-Newton, MA-NH | 14460 | 7 | 0 | 7 | 5,025,517 | 1 |
-| 10 | Seattle-Tacoma-Bellevue, WA | 42660 | 7 | 0 | 7 | 4,145,494 | 1 |
+| 9 | Kansas City, MO-KS | 28140 | 7 | 5 | 2 | 2,253,579 | 1 |
+| 10 | Boston-Cambridge-Newton, MA-NH | 14460 | 7 | 0 | 7 | 5,025,517 | 1 |
 
 ## ZIPs that failed to match the HUD crosswalk (first 10)
 

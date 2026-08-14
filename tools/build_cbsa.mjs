@@ -20,6 +20,7 @@ const HUD_PATH   = path.join(DD, 'ZIP-CBSA_032026.xlsx');
 const DELIN_PATH = path.join(DD, 'cbsa_delineation_2023.xls'); // 2023 delineation (list1_2023.xlsx) — names match the 2024 pop file; same layout: sheet "List 1", header row 2, code col0/title col3
 const POP_PATH   = path.join(DD, 'cbsa-met-est2024-pop.xlsx');
 const SITES_PATH = path.join(DD, 'data_psi_sites.geojson');
+const BOUNDARIES_PATH = path.join(DD, 'data_cbsa_boundaries.geojson'); // Phase-2 output; source of gap-market codes/names/population
 const SUMMARY_OUT= path.join(DD, 'data_cbsa_summary.json');
 const REPORT_OUT = path.join(__dirname, 'cbsa_join_report.md');
 
@@ -164,10 +165,48 @@ for (const a of agg.values()) {
   delete a._scoreSum; delete a._scoreN;
   summary.push(a);
 }
-summary.sort((x, y) => y.population2024 - x.population2024);
-fs.writeFileSync(SUMMARY_OUT, JSON.stringify(summary, null, 2), 'utf8');
+// ── Second pass: add GAP markets (CBSAs with zero PSI sites) from the boundary file ──
+// The Phase-2 boundary build already joined 2024 population onto every CBSA polygon,
+// so gap markets absent from the PSI-site aggregation can be recovered here.
+const coveredCodes = new Set(summary.filter(s => s.cbsaCode !== 'NON-METRO').map(s => s.cbsaCode));
+let gapRecords = [];
+if (fs.existsSync(BOUNDARIES_PATH)) {
+  const boundaries = JSON.parse(stripBom(fs.readFileSync(BOUNDARIES_PATH, 'utf8')));
+  const seenGap = new Set();
+  for (const feat of boundaries.features) {
+    const bp = feat.properties || {};
+    const code = String(bp.GEOID ?? bp.cbsaCode ?? '').trim();
+    const pop  = Number(bp.population2024) || 0;
+    if (!code || coveredCodes.has(code) || seenGap.has(code)) continue;  // covered/dupe → skip
+    if (pop === 0) continue;                                             // micropolitan / no population → skip
+    seenGap.add(code);
+    gapRecords.push({
+      cbsaCode:       code,
+      cbsaName:       bp.NAME ?? bp.cbsaName ?? '',
+      population2024: pop,
+      totalSites:     0,
+      ooSites:        0,
+      threePSites:    0,
+      irsActivated:   0,
+      irsInProcess:   0,
+      irsNotStarted:  0,
+      hasAnyIRS:      false,
+      totalVolume:    0,
+      avgScoreBucket: null,
+      hasExpiredLease: false,
+      pctActivated:   0,
+      coverageStatus: 'gap',
+    });
+  }
+} else {
+  console.log('  (data_cbsa_boundaries.geojson not found — skipping gap markets)');
+}
+
+// Merge covered + non-metro + gap records, sorted by 2024 population descending.
+const merged = [...summary, ...gapRecords].sort((x, y) => y.population2024 - x.population2024);
+fs.writeFileSync(SUMMARY_OUT, JSON.stringify(merged, null, 2), 'utf8');
 const cbsaOnly = summary.filter(s => s.cbsaCode !== 'NON-METRO');
-console.log(`  ${summary.length} summary rows (${cbsaOnly.length} CBSAs + non-metro) → wrote ${path.basename(SUMMARY_OUT)}`);
+console.log(`  ${merged.length} summary rows (${cbsaOnly.length} covered + ${gapRecords.length} gap + non-metro) → wrote ${path.basename(SUMMARY_OUT)}`);
 
 // ─── STEP 5: join report ──────────────────────────────────────────────────────
 console.log('Step 5: writing join report…');
