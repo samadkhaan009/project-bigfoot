@@ -30,7 +30,9 @@ sites.features.forEach(f => {
   if (perf) {
     f.properties.scoreBucket   = perf.scoreBucket   || null;
     f.properties.scoreRaw      = perf.scoreRaw      || null;
-    f.properties.seats         = perf.seats         || null;
+    // Preserve seats from the source Excel (set in rebuild_sites.mjs); only fall
+    // back to the performance value when the site has no source seat count.
+    if (f.properties.seats == null) f.properties.seats = perf.seats || null;
     f.properties.cdVolume      = perf.cdVolume      || null;
     f.properties.avgMonthlyVol = perf.avgMonthlyVol || null;
     f.properties.zdTicketRate  = perf.zdTicketRate  ?? null;
@@ -39,8 +41,9 @@ sites.features.forEach(f => {
     f.properties.dmaRegion     = perf.dmaRegion     || null;
     joined++;
   } else {
-    // Ensure fields exist as null so MapLibre coalesce works cleanly
-    f.properties.scoreBucket = f.properties.scoreRaw = f.properties.seats = null;
+    // Ensure fields exist as null so MapLibre coalesce works cleanly.
+    // NOTE: seats is intentionally NOT reset — source-Excel seat counts are kept.
+    f.properties.scoreBucket = f.properties.scoreRaw = null;
     f.properties.cdVolume = f.properties.avgMonthlyVol = null;
     f.properties.zdTicketRate = f.properties.dispRate = f.properties.reschdRate = null;
     f.properties.dmaRegion = null;

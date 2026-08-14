@@ -32,7 +32,14 @@ const radiiPath = path.join(__dirname, '..', 'public', 'data', 'data_psi_radii.g
 
 const sites = JSON.parse(fs.readFileSync(sitesPath, 'utf8'));
 
-const radiiFeatures = sites.features.map(f => {
+// Radii are only meaningful for the core PSI footprint — restrict rings to
+// O&O (category OO) plus PSI Authorized. Full 4,252-ring generation is avoided.
+const ringSites = sites.features.filter(f => {
+  const p = f.properties || {};
+  return p.category === 'OO' || p.propertyType === 'PSI Authorized';
+});
+
+const radiiFeatures = ringSites.map(f => {
   const [lon, lat]  = f.geometry.coordinates;
   const { id, propertyType, category } = f.properties;
   return {
@@ -41,6 +48,7 @@ const radiiFeatures = sites.features.map(f => {
     properties: { siteId: id, propertyType, category },
   };
 });
+console.log(`Filtered to O&O + PSI Authorized: ${ringSites.length} of ${sites.features.length} sites`);
 
 fs.writeFileSync(radiiPath, JSON.stringify({ type: 'FeatureCollection', features: radiiFeatures }));
 

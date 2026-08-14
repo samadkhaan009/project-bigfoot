@@ -6,29 +6,38 @@ _Data pipeline: HUD ZIP-CBSA (Mar 2026) → Census delineation (2020 + 2023 supp
 
 | Metric | Count |
 |---|---|
-| Total PSI sites processed | 554 |
-| Matched to a CBSA (numeric code) | 529 |
-| Tagged NON-METRO | 14 |
-| Null ZIP (no match possible) | 11 |
-| Unique CBSAs with ≥1 PSI site | 294 |
-| CBSAs with irsActivated > 0 | 127 |
-| CBSAs matched to a 2024 population | 231 / 294 |
+| Total PSI sites processed | 4252 |
+| Matched to a CBSA (numeric code) | 3728 |
+| Tagged NON-METRO | 464 |
+| Null ZIP (no match possible) | 60 |
+| Unique CBSAs with ≥1 PSI site | 633 |
+| CBSAs with irsActivated > 0 | 128 |
+| CBSAs matched to a 2024 population | 350 / 633 |
 
 ## Top 10 CBSAs by site count
 
 | Rank | CBSA | Code | Sites | O&O | 3P | Pop 2024 | IRS Activated |
 |---|---|---|---|---|---|---|---|
-| 1 | New York-Newark-Jersey City, NY-NJ | 35620 | 31 | 6 | 25 | 19,940,274 | 7 |
-| 2 | Chicago-Naperville-Elgin, IL-IN | 16980 | 17 | 2 | 15 | 9,408,576 | 2 |
-| 3 | Non-Metro | NON-METRO | 14 | 2 | 12 | 0 | 2 |
-| 4 | Los Angeles-Long Beach-Anaheim, CA | 31080 | 13 | 7 | 6 | 12,927,614 | 6 |
-| 5 | Miami-Fort Lauderdale-West Palm Beach, FL | 33100 | 11 | 0 | 11 | 6,457,988 | 3 |
-| 6 | Atlanta-Sandy Springs-Roswell, GA | 12060 | 11 | 2 | 9 | 6,411,149 | 2 |
-| 7 | Dallas-Fort Worth-Arlington, TX | 19100 | 10 | 3 | 7 | 8,344,032 | 3 |
-| 8 | Washington-Arlington-Alexandria, DC-VA-MD-WV | 47900 | 9 | 0 | 9 | 6,436,489 | 1 |
-| 9 | Kansas City, MO-KS | 28140 | 7 | 5 | 2 | 2,253,579 | 1 |
-| 10 | Boston-Cambridge-Newton, MA-NH | 14460 | 7 | 0 | 7 | 5,025,517 | 1 |
+| 1 | Non-Metro | NON-METRO | 464 | 3 | 461 | 0 | 2 |
+| 2 | Los Angeles-Long Beach-Anaheim, CA | 31080 | 180 | 18 | 162 | 12,927,614 | 6 |
+| 3 | Boston-Cambridge-Newton, MA-NH | 14460 | 104 | 0 | 104 | 5,025,517 | 1 |
+| 4 | Nashville-Davidson--Murfreesboro--Franklin, TN | 34980 | 93 | 11 | 82 | 2,150,553 | 1 |
+| 5 | New York-Newark-Jersey City, NY-NJ | 35620 | 58 | 7 | 51 | 19,940,274 | 8 |
+| 6 | Chicago-Naperville-Elgin, IL-IN | 16980 | 57 | 2 | 55 | 9,408,576 | 2 |
+| 7 | Portland-South Portland, ME | 38860 | 57 | 0 | 57 | 571,534 | 0 |
+| 8 | Riverside-San Bernardino-Ontario, CA | 40140 | 50 | 1 | 49 | 4,744,214 | 1 |
+| 9 | Knoxville, TN | 28940 | 50 | 2 | 48 | 957,608 | 0 |
+| 10 | San Francisco-Oakland-Fremont, CA | 41860 | 45 | 4 | 41 | 4,648,486 | 3 |
 
 ## ZIPs that failed to match the HUD crosswalk (first 10)
 
-- 75962
+- 35609
+- 96799
+- 71656
+- 95814-5901
+- 93281
+- 93216-6000
+- 96127-0790
+- 93610-0099
+- 93610-1501
+- 95814-5901

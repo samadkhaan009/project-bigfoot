@@ -198,21 +198,42 @@ const HUB_EMOJI = {
 
 // ── PSI Test Center constants ─────────────────────────────
 const PSI_COLORS = {
-  oo:         '#0047BB', // blue   — O&O (solid dot, no glow)
-  authorized: '#0d9488', // teal   — PSI Authorized
-  mg:         '#a855f7', // purple — MG Testing
-  td:         '#fb7185', // rose   — TD Testing
-  amp:        '#2dd4bf', // teal   — AMP Authorized
-  radii:      '#64748b', // slate  — radius rings
+  oo:            '#0047BB', // navy         — O&O / PSI Owned
+  authorized:    '#0d9488', // teal         — PSI Authorized
+  hisetCss:      '#7c3aed', // purple       — HiSET CSS
+  hisetTca:      '#6d28d9', // deep purple  — HiSET TCA
+  hisetTcar:     '#8b5cf6', // violet       — HiSET TCAR
+  nbstsa:        '#d97706', // amber        — NBSTSA
+  etsStn:        '#059669', // emerald      — ETS STN
+  usps:          '#dc2626', // red          — USPS
+  oneOff:        '#0891b2', // sky blue     — ONE-OFF TESTING
+  mgTesting:     '#db2777', // pink         — MG TESTING
+  tdTesting:     '#65a30d', // lime         — TD TESTING
+  clientSite:    '#92400e', // brown        — Client Site
+  innovExams:    '#374151', // gray         — Innovative Exams
+  radii:         '#64748b', // slate        — radius rings
 }
 const PSI_LABELS = {
-  oo:'O&O Sites', authorized:'PSI Authorized', mg:'MG Testing', td:'TD Testing', amp:'AMP Authorized',
+  oo:'O&O Sites', authorized:'PSI Authorized', hisetCss:'HiSET CSS', hisetTca:'HiSET TCA',
+  hisetTcar:'HiSET TCAR', nbstsa:'NBSTSA', etsStn:'ETS STN', usps:'USPS', oneOff:'ONE-OFF Testing',
+  mgTesting:'MG Testing', tdTesting:'TD Testing', clientSite:'Client Site', innovExams:'Innovative Exams',
 }
 const PSI_TYPE_MAP = {
-  'PSI Owned':'oo', 'PSI Authorized':'authorized', 'MG TESTING':'mg', 'TD TESTING':'td', 'AMP Authorized':'amp',
+  'PSI Owned':'oo', 'PSI Authorized':'authorized', 'HiSET CSS':'hisetCss', 'HiSET TCA':'hisetTca',
+  'HiSET TCAR':'hisetTcar', 'NBSTSA':'nbstsa', 'ETS STN':'etsStn', 'USPS':'usps', 'ONE-OFF TESTING':'oneOff',
+  'MG TESTING':'mgTesting', 'TD TESTING':'tdTesting', 'Client Site':'clientSite', 'Innovative Exams':'innovExams',
 }
-const PSI_3P_KEYS = ['authorized','mg','td','amp']
-const PSI_INTERACTIVE = ['psi-oo-circle','psi-authorized-circle','psi-mg-circle','psi-td-circle','psi-amp-circle']
+// key → exact propertyType string (reverse of PSI_TYPE_MAP)
+const PSI_KEY_TO_TYPE = Object.fromEntries(Object.entries(PSI_TYPE_MAP).map(([t,k]) => [k,t]))
+// 3P = every property-type key except O&O, in display order
+const PSI_3P_KEYS = ['authorized','hisetCss','hisetTca','hisetTcar','nbstsa','etsStn','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
+const PSI_INTERACTIVE = ['psi-oo-circle','psi-3p-circle']
+// Data-driven per-type fill color for the unified 3P circle + radii layers
+const PSI_TYPE_COLOR_EXPR = ['match', ['get','propertyType'],
+  'PSI Owned','#0047BB', 'PSI Authorized','#0d9488', 'HiSET CSS','#7c3aed', 'HiSET TCA','#6d28d9',
+  'HiSET TCAR','#8b5cf6', 'NBSTSA','#d97706', 'ETS STN','#059669', 'USPS','#dc2626', 'ONE-OFF TESTING','#0891b2',
+  'MG TESTING','#db2777', 'TD TESTING','#65a30d', 'Client Site','#92400e', 'Innovative Exams','#374151',
+  '#94a3b8']
 
 const ICON_PATHS = {
   airports:`<path fill="white" d="M20 8C18 8 17 9 17 11L17 17L10 21L10 23L17 21L17 26L14 28L14 30L20 28L26 30L26 28L23 26L23 21L30 23L30 21L23 17L23 11C23 9 22 8 20 8Z"/>`,
@@ -252,7 +273,10 @@ const LAYER_GROUPS = [
     {key:'agriculture',label:'Agriculture',color:'#86efac',count:1439},
   ]},
 ]
-const PSI_COUNTS = { oo:143, authorized:397, mg:33, td:20, amp:1 }
+const PSI_COUNTS = {
+  oo:319, authorized:356, hisetCss:985, hisetTca:789, hisetTcar:798, nbstsa:527, etsStn:233,
+  usps:95, oneOff:67, mgTesting:52, tdTesting:19, clientSite:8, innovExams:2,
+}
 const PSI_3P_TOTAL = PSI_3P_KEYS.reduce((s,k) => s + (PSI_COUNTS[k]||0), 0)
 
 // ── Performance Mode constants ────────────────────────
@@ -528,13 +552,13 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
               {psiLayers?.oo && (
                 <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
                   <div style={{ width:12, height:12, borderRadius:'50%', background:PSI_COLORS.oo, boxShadow:`0 0 5px ${PSI_COLORS.oo}88`, flexShrink:0 }}/>
-                  <span style={{ fontSize:10, color:THEME.textSecondary, fontWeight:600 }}>O&O — PSI Owned</span>
+                  <span style={{ fontSize:10, color:THEME.textSecondary, fontWeight:600 }}>O&O — PSI Owned <span style={{ fontWeight:400, color:'#334155' }}>({PSI_COUNTS.oo})</span></span>
                 </div>
               )}
               {psiActive.filter(([k])=>PSI_3P_KEYS.includes(k)).map(([key])=>(
                 <div key={key} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
-                  <div style={{ width:10, height:10, borderRadius:'50%', background:PSI_COLORS[key], flexShrink:0, border: key==='amp' ? '1px solid rgba(15,23,42,0.15)' : 'none' }}/>
-                  <span style={{ fontSize:10, color:'#64748b' }}>{PSI_LABELS[key]}</span>
+                  <div style={{ width:10, height:10, borderRadius:'50%', background:PSI_COLORS[key], flexShrink:0, border:'1px solid rgba(15,23,42,0.15)' }}/>
+                  <span style={{ fontSize:10, color:'#64748b' }}>{PSI_LABELS[key]} <span style={{ color:'#334155' }}>({PSI_COUNTS[key] ?? 0})</span></span>
                 </div>
               ))}
               {showRadii && (
@@ -602,7 +626,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
                   <span style={{ fontSize:10, color:'#64748b' }}>{label}</span>
                 </div>
               ))}
-              <div style={{ fontSize:9, color:'#475569', marginTop:5 }}>393 metros · 294 with PSI coverage · 99 gaps</div>
+              <div style={{ fontSize:9, color:'#475569', marginTop:5 }}>393 metros · coverage driven by active site toggles</div>
             </div>
           )}
 
@@ -993,7 +1017,10 @@ export default function BigFootMap() {
   const [cursor, setCursor] = useState('grab')
   const [iconsLoaded, setIconsLoaded] = useState(false)
   const [qualityMode, setQualityMode] = useState(false)
-  const [psiLayers, setPsiLayers]       = useState({oo:true,authorized:true,mg:true,td:true,amp:true})
+  const [psiLayers, setPsiLayers]       = useState({
+    oo:true, authorized:true, hisetCss:true, hisetTca:true, hisetTcar:true, nbstsa:true, etsStn:true,
+    usps:true, oneOff:true, mgTesting:true, tdTesting:true, clientSite:true, innovExams:true,
+  })
   const [showRadii, setShowRadii]       = useState(false)
   const [radiusMiles, setRadiusMiles]   = useState(50)
   const [radiiBase,   setRadiiBase]     = useState(null)
@@ -1009,6 +1036,9 @@ export default function BigFootMap() {
   const [irsFilterPriority,  setIrsFilterPriority]  = useState(false)
   const [pcIconsLoaded,      setPcIconsLoaded]      = useState(false)
   const [priorityCityKeys,   setPriorityCityKeys]   = useState(new Set())
+  // Site features held in memory so the MSA layer can recompute coverage from
+  // the currently-active PSI site toggles (FIX 3 — dynamic CBSA presence).
+  const [siteFeatures,       setSiteFeatures]       = useState([])
   const [leaseFiltersOpen,   setLeaseFiltersOpen]   = useState(true)
   const [leaseActionFilters, setLeaseActionFilters] = useState({
     relocate: true, refurbish: true, assessClose: true,
@@ -1261,7 +1291,9 @@ CANONICAL NUMBERS — authoritative, do not contradict:
 
 MSA MARKETS (msaMarkets array):
 393 US metro boundaries (Census CBSA 2023 definitions).
-294 markets with PSI presence · 99 coverage gap markets.
+The summary (457 records) covers 294 markets with PSI
+presence · 162 coverage gap markets (all with population
+data, ranging 58K to 973K).
 Market tiers: Large (>=1M pop) · Mid (250K-1M) · Small (<250K).
 Strategic priority: large gap markets = highest expansion
 opportunity.
@@ -1272,6 +1304,10 @@ but no IRS clearance is a 'covered market with no IRS
 activation' — never a 'gap market'. Use coverageStatus
 field to distinguish: 'covered' = PSI present, 'gap' =
 no PSI presence at all.
+There are 162 gap markets, all with population > 0. To find
+them: filter msaMarkets where coverageStatus === 'gap', then
+sort by population2024 descending. These records ARE present
+in the msaMarkets array — do not say you cannot find them.
 Use msaMarkets for all market-level questions.
 
 PRIORITY CITIES (priorityCities array):
@@ -1381,13 +1417,12 @@ ${JSON.stringify(contextRef.current)}`,
 
   const showNormalMode = !performanceMode && !optimusMode
 
-  const activePsiPropTypes = [
-    ...(psiLayers.oo         ? ['PSI Owned']      : []),
-    ...(psiLayers.authorized ? ['PSI Authorized'] : []),
-    ...(psiLayers.mg         ? ['MG TESTING']     : []),
-    ...(psiLayers.td         ? ['TD TESTING']     : []),
-    ...(psiLayers.amp        ? ['AMP Authorized'] : []),
-  ]
+  const activePsiPropTypes = ['oo', ...PSI_3P_KEYS]
+    .filter(k => psiLayers[k])
+    .map(k => PSI_KEY_TO_TYPE[k])
+  const active3pPropTypes = PSI_3P_KEYS
+    .filter(k => psiLayers[k])
+    .map(k => PSI_KEY_TO_TYPE[k])
   const anyPsiActive   = activePsiPropTypes.length > 0
   const perfLayerFilter = anyPsiActive
     ? ['in', ['get','propertyType'], ['literal', activePsiPropTypes]]
@@ -1412,12 +1447,38 @@ ${JSON.stringify(contextRef.current)}`,
     return ['any', ...parts]
   })()
 
+  // FIX 3 — derive the set of CBSA codes that are "covered" under the CURRENTLY
+  // active PSI site toggles. A CBSA is covered if ≥1 active-type site sits in it.
+  // Recomputes whenever psiLayers or the loaded site set changes.
+  const cbsaDynamic = useMemo(() => {
+    const activeTypes = new Set(
+      Object.entries(psiLayers).filter(([, v]) => v).map(([k]) => PSI_KEY_TO_TYPE[k]).filter(Boolean)
+    )
+    const byCode = {}
+    for (const f of siteFeatures) {
+      const p = f.properties || {}
+      const code = p.cbsaCode
+      if (!code || code === 'NON-METRO') continue
+      if (!activeTypes.has(p.propertyType)) continue
+      if (!byCode[code]) byCode[code] = { totalSites: 0, irsActivated: 0 }
+      byCode[code].totalSites++
+      if (p.irsActivated === true) byCode[code].irsActivated++
+    }
+    return byCode
+  }, [psiLayers, siteFeatures])
+  // Array of covered CBSA codes for use inside MapLibre ['in', …, ['literal', …]] tests.
+  const coveredCbsaCodes = useMemo(() => Object.keys(cbsaDynamic), [cbsaDynamic])
+  // Dynamic presence / gap tests — a polygon is "present" iff its code is covered
+  // by the active toggles (not the static totalSites baked into the boundary file).
+  const cbsaPresenceExpr = ['in', ['get','cbsaCode'], ['literal', coveredCbsaCodes]]
+  const cbsaGapExpr      = ['!', cbsaPresenceExpr]
+
   // CBSA market category visibility — one ['all',...] clause per enabled sub-toggle.
   // Micropolitan (population2024 === 0) is never in any clause → always hidden.
   const cbsaVisibilityFilter = (() => {
     const pop = ['get','population2024']
-    const P = ['>',  ['coalesce',['get','totalSites'],0], 0]   // has PSI presence
-    const G = ['==', ['coalesce',['get','totalSites'],0], 0]   // coverage gap
+    const P = cbsaPresenceExpr   // has PSI presence under active toggles
+    const G = cbsaGapExpr        // coverage gap under active toggles
     const cats = []
     if (cbsaFilters.largePresence) cats.push(['all', P, ['>=', pop, 1000000]])
     if (cbsaFilters.midPresence)   cats.push(['all', P, ['>=', pop, 250000], ['<', pop, 1000000]])
@@ -1442,7 +1503,10 @@ ${JSON.stringify(contextRef.current)}`,
 
   useEffect(() => {
     fetch(`${BASE}data/data_psi_sites.geojson`).then(r => r.json())
-      .then(d => setAvailableStates([...new Set(d.features.map(f => f.properties.state).filter(Boolean))].sort()))
+      .then(d => {
+        setAvailableStates([...new Set(d.features.map(f => f.properties.state).filter(Boolean))].sort())
+        setSiteFeatures(d.features)   // keep in memory for dynamic MSA coverage
+      })
       .catch(() => {})
   }, [])
 
@@ -1469,7 +1533,7 @@ ${JSON.stringify(contextRef.current)}`,
     'states-fill',
     ...(showPriorityCities ? ['priority-cities-diamond'] : []),
     ...(performanceMode ? ['psi-perf-circle'] :
-        optimusMode     ? ['psi-optimus-oo-circle','psi-authorized-circle','psi-mg-circle','psi-td-circle','psi-amp-circle'] :
+        optimusMode     ? ['psi-optimus-oo-circle','psi-3p-circle'] :
         PSI_INTERACTIVE),
   ]
 
@@ -1633,8 +1697,8 @@ ${JSON.stringify(contextRef.current)}`,
           <Source id="cbsa-boundaries" type="geojson" data={`${BASE}data/data_cbsa_boundaries.geojson`}>
             <Layer id="cbsa-fill" type="fill" filter={cbsaVisibilityFilter} paint={{
               'fill-color':['case',
-                // PSI present — green / orange / blue by market size (coalesce guards null totalSites)
-                ['>',['coalesce',['get','totalSites'],0],0],
+                // PSI present under active toggles — green / orange / blue by market size
+                cbsaPresenceExpr,
                 ['case',
                   ['>=',['get','population2024'],1000000],'#16a34a',
                   ['>=',['get','population2024'],250000],'#ea580c',
@@ -1650,8 +1714,8 @@ ${JSON.stringify(contextRef.current)}`,
             }}/>
             <Layer id="cbsa-line" type="line" filter={cbsaVisibilityFilter} paint={{
               'line-color':['case',
-                // PSI present — brighter version of the fill by market size
-                ['>',['coalesce',['get','totalSites'],0],0],
+                // PSI present under active toggles — brighter version of the fill
+                cbsaPresenceExpr,
                 ['case',
                   ['>=',['get','population2024'],1000000],'#22c55e',
                   ['>=',['get','population2024'],250000],'#f97316',
@@ -1667,16 +1731,10 @@ ${JSON.stringify(contextRef.current)}`,
         )}
         {/* PSI 50-mile radii — type-filtered and color-coded, rendered below industry icons */}
         <Source id="psi-radii" type="geojson" data={radiiData}>
-          {/* O&O — amber, bolder line */}
-          {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':'#d97706','line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
-          {/* PSI Authorized — sky */}
-          {psiLayers.authorized && showRadii && <Layer id="psi-radii-authorized-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'line-color':'#0284c7','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
-          {/* MG Testing — purple */}
-          {psiLayers.mg && showRadii && <Layer id="psi-radii-mg-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])} paint={{'line-color':'#9333ea','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
-          {/* TD Testing — rose */}
-          {psiLayers.td && showRadii && <Layer id="psi-radii-td-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])} paint={{'line-color':'#e11d48','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
-          {/* AMP Authorized — teal */}
-          {psiLayers.amp && showRadii && <Layer id="psi-radii-amp-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])} paint={{'line-color':'#0d9488','line-width':1,'line-opacity':0.45,'line-dasharray':[4,3]}}/>}
+          {/* O&O — navy, bolder line */}
+          {psiLayers.oo && showRadii && <Layer id="psi-radii-oo-line" type="line" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'line-color':PSI_COLORS.oo,'line-width':1.5,'line-opacity':0.6,'line-dasharray':[5,3]}}/>}
+          {/* All 3P types — per-type color via match expression */}
+          {anyPsiActive && showRadii && active3pPropTypes.length > 0 && <Layer id="psi-radii-3p-line" type="line" filter={addPsiFilters(['in',['get','propertyType'],['literal', active3pPropTypes]])} paint={{'line-color':PSI_TYPE_COLOR_EXPR,'line-width':1,'line-opacity':0.4,'line-dasharray':[4,3]}}/>}
         </Source>
 
         {iconsLoaded && POINT_LAYERS.map(key => layers[key] && (
@@ -1687,19 +1745,13 @@ ${JSON.stringify(contextRef.current)}`,
 
         {/* PSI sites — rendered on top of industry icons */}
         <Source id="psi-sites" type="geojson" data={`${BASE}data/data_psi_sites.geojson`}>
-          {/* Normal mode: property-type colors */}
+          {/* Normal mode: O&O + unified 3P layer colored per-type via match expression */}
           {showNormalMode && psiLayers.oo && <Layer id="psi-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])}    paint={{'circle-radius':7,'circle-color':PSI_COLORS.oo,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1.5,'circle-opacity':1}}/>}
-          {showNormalMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {showNormalMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {showNormalMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {showNormalMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {/* Optimus mode: O&O colored by tier, 3P normal colors */}
+          {showNormalMode && active3pPropTypes.length > 0 && <Layer id="psi-3p-circle" type="circle" filter={addPsiFilters(['in',['get','propertyType'],['literal', active3pPropTypes]])} paint={{'circle-radius':5,'circle-color':PSI_TYPE_COLOR_EXPR,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {/* Optimus mode: O&O colored by tier, all 3P normal per-type colors */}
           {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-halo"   type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':['+', OPTIMUS_RADIUS_EXPR, 5],'circle-color':OPTIMUS_OO_COLOR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
           {optimusMode && psiLayers.oo && <Layer id="psi-optimus-oo-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Owned'])} paint={{'circle-radius':OPTIMUS_RADIUS_EXPR,'circle-color':OPTIMUS_OO_COLOR,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1.5,'circle-opacity':1}}/>}
-          {optimusMode && psiLayers.authorized && <Layer id="psi-authorized-circle" type="circle" filter={addPsiFilters(['==',['get','propertyType'],'PSI Authorized'])} paint={{'circle-radius':5,'circle-color':PSI_COLORS.authorized,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {optimusMode && psiLayers.mg         && <Layer id="psi-mg-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'MG TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.mg,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {optimusMode && psiLayers.td         && <Layer id="psi-td-circle"         type="circle" filter={addPsiFilters(['==',['get','propertyType'],'TD TESTING'])}      paint={{'circle-radius':5,'circle-color':PSI_COLORS.td,        'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
-          {optimusMode && psiLayers.amp        && <Layer id="psi-amp-circle"        type="circle" filter={addPsiFilters(['==',['get','propertyType'],'AMP Authorized'])}  paint={{'circle-radius':5,'circle-color':PSI_COLORS.amp,       'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
+          {optimusMode && active3pPropTypes.length > 0 && <Layer id="psi-3p-circle" type="circle" filter={addPsiFilters(['in',['get','propertyType'],['literal', active3pPropTypes]])} paint={{'circle-radius':5,'circle-color':PSI_TYPE_COLOR_EXPR,'circle-stroke-color':'#FFFFFF','circle-stroke-width':1,'circle-opacity':0.9}}/>}
           {/* Performance mode: score-tier colors, volume-scaled radius */}
           {performanceMode && anyPsiActive && <Layer id="psi-perf-halo" type="circle" filter={addPsiFilters(['all',['==',['get','category'],'OO'],perfLayerFilter])} paint={{'circle-radius':['case',['<=',['coalesce',['get','cdVolume'],0],0],11,['+',11,['*',_tExpr,10]]],'circle-color':PERF_COLOR_EXPR,'circle-opacity':0.2,'circle-blur':0.6}}/>}
           {/* At Risk static red ring (scoreBucket=1) */}
@@ -2219,7 +2271,7 @@ ${JSON.stringify(contextRef.current)}`,
 
               {!psiCollapsed.thirdParty && (
                 <div style={{ paddingBottom:4, background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
-                  {[['authorized','PSI Authorized',397],['mg','MG Testing',33],['td','TD Testing',20],['amp','AMP Authorized',1]].map(([key,label,cnt])=>(
+                  {PSI_3P_KEYS.map((key)=>{ const label = PSI_LABELS[key]; const cnt = PSI_COUNTS[key] ?? 0; return (
                     <div key={key} onClick={()=>togglePsi(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
                       <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#E2E8F0', border:`1.5px solid ${psiLayers[key]?PSI_COLORS[key]:'#CBD5E1'}`, boxShadow:psiLayers[key]?`0 0 4px ${PSI_COLORS[key]}88`:'none', transition:'all 0.2s' }}/>
                       <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#E2E8F0', border:`1px solid ${psiLayers[key]?PSI_COLORS[key]:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
@@ -2227,7 +2279,7 @@ ${JSON.stringify(contextRef.current)}`,
                       </div>
                       <span style={{ fontSize:11, fontWeight:500, color:psiLayers[key]?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
                     </div>
-                  ))}
+                  )})}
                 </div>
               )}
             </div>
@@ -2241,6 +2293,7 @@ ${JSON.stringify(contextRef.current)}`,
               <div>
                 <span style={{ fontSize:12, fontWeight:500, color:showRadii?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>Coverage Radius</span>
                 <span style={{ fontSize:9, color:'#334155', marginLeft:6 }}>{radiusMiles} mi</span>
+                <div style={{ fontSize:9, color:'#78350f', marginTop:1 }}>O&O + PSI Authorized · selectable radius</div>
               </div>
             </div>
 
