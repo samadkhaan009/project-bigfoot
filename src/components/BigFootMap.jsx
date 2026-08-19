@@ -139,30 +139,34 @@ const PSI_COLORS = {
   tdTesting:     '#65a30d', // lime         — TD TESTING
   clientSite:    '#92400e', // brown        — Client Site
   innovExams:    '#374151', // gray         — Innovative Exams
+  faa:           '#0ea5e9', // sky blue     — FAA/AKT (aviation)
   radii:         '#64748b', // slate        — radius rings
 }
 const PSI_LABELS = {
   oo:'O&O Sites', authorized:'PSI Authorized', hisetCss:'HiSET CSS', hisetTca:'HiSET TCA',
   hisetTcar:'HiSET TCAR', nbstsa:'NBSTSA', etsStn:'ETS STN', usps:'USPS', oneOff:'ONE-OFF Testing',
   mgTesting:'MG Testing', tdTesting:'TD Testing', clientSite:'Client Site', innovExams:'Innovative Exams',
+  faa:'FAA/AKT Sites',
 }
 const PSI_TYPE_MAP = {
   'PSI Owned':'oo', 'PSI Authorized':'authorized', 'HiSET CSS':'hisetCss', 'HiSET TCA':'hisetTca',
   'HiSET TCAR':'hisetTcar', 'NBSTSA':'nbstsa', 'ETS STN':'etsStn', 'USPS':'usps', 'ONE-OFF TESTING':'oneOff',
   'MG TESTING':'mgTesting', 'TD TESTING':'tdTesting', 'Client Site':'clientSite', 'Innovative Exams':'innovExams',
+  'FAA/AKT':'faa',
 }
 // key → exact propertyType string (reverse of PSI_TYPE_MAP)
 const PSI_KEY_TO_TYPE = Object.fromEntries(Object.entries(PSI_TYPE_MAP).map(([t,k]) => [k,t]))
 // 3P = every property-type key except O&O, in display order
-const PSI_3P_KEYS = ['authorized','hisetCss','hisetTca','hisetTcar','nbstsa','etsStn','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
+const PSI_3P_KEYS = ['authorized','hisetCss','hisetTca','hisetTcar','nbstsa','etsStn','faa','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
 // Flat channel-type display order for the panel + legend (most sites first)
-const PSI_DISPLAY_ORDER = ['hisetCss','hisetTca','hisetTcar','nbstsa','authorized','oo','etsStn','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
+const PSI_DISPLAY_ORDER = ['hisetCss','hisetTca','hisetTcar','nbstsa','authorized','oo','etsStn','faa','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
 const PSI_INTERACTIVE = ['psi-oo-circle','psi-3p-circle']
 // Data-driven per-type fill color for the unified 3P circle + radii layers
 const PSI_TYPE_COLOR_EXPR = ['match', ['get','propertyType'],
   'PSI Owned','#0047BB', 'PSI Authorized','#0d9488', 'HiSET CSS','#7c3aed', 'HiSET TCA','#6d28d9',
   'HiSET TCAR','#8b5cf6', 'NBSTSA','#d97706', 'ETS STN','#059669', 'USPS','#dc2626', 'ONE-OFF TESTING','#0891b2',
   'MG TESTING','#db2777', 'TD TESTING','#65a30d', 'Client Site','#92400e', 'Innovative Exams','#374151',
+  'FAA/AKT','#0ea5e9',
   '#94a3b8']
 
 const ICON_PATHS = {
@@ -193,7 +197,7 @@ const LAYER_GROUPS = [
 ]
 const PSI_COUNTS = {
   oo:135, authorized:356, hisetCss:985, hisetTca:789, hisetTcar:798, nbstsa:527, etsStn:233,
-  usps:95, oneOff:67, mgTesting:52, tdTesting:19, clientSite:8, innovExams:2,
+  usps:95, oneOff:67, mgTesting:52, tdTesting:19, clientSite:8, innovExams:2, faa:668,
 }
 const PSI_3P_TOTAL = PSI_3P_KEYS.reduce((s,k) => s + (PSI_COUNTS[k]||0), 0)
 
@@ -695,6 +699,17 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
           {info.zip   && <InfoRow label="ZIP"   value={info.zip} />}
           {info.country !== 'USA' && info.country && <InfoRow label="Territory" value={info.country} />}
 
+          {/* FAA/AKT testing section */}
+          {info.propertyType === 'FAA/AKT' && (
+            <div style={{ marginTop:10, borderTop:'1px solid rgba(14,165,233,0.25)', paddingTop:10 }}>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#0ea5e9', marginBottom:7 }}>FAA/AKT TESTING</div>
+              <InfoRow label="AKT Vol 2025"  value={(info.aktVol25 ?? 0).toLocaleString()} />
+              <InfoRow label="2026 YTD Vol"  value={info.faaYtd2026 > 0 ? info.faaYtd2026.toLocaleString() : 'No data'} color={info.faaYtd2026 > 0 ? undefined : '#94a3b8'} />
+              {info.aktAudScore !== null && info.aktAudScore !== undefined && <InfoRow label="Audit Score" value={Number(info.aktAudScore).toFixed(3)} />}
+              <InfoRow label="ADA Compliant" value={info.adaCompliant ? 'Yes' : 'No'} color={info.adaCompliant ? '#22c55e' : '#94a3b8'} />
+            </div>
+          )}
+
           {/* Performance section */}
           {info.scoreBucket != null && (
             <div style={{ marginTop:10, borderTop:`1px solid ${THEME.divider}`, paddingTop:10 }}>
@@ -722,6 +737,14 @@ function InfoCard({ info, onClose, qualityMode, optimusMode, showLeaseIntel, irs
               {info.dispRate    != null && <InfoRow label="Displacement"   value={(info.dispRate*100).toFixed(1)+'%'}   color={info.dispRate>0.03?'#f97316':info.dispRate>0.01?'#eab308':'#94a3b8'} />}
               {info.reschdRate  != null && <InfoRow label="Reschedule"     value={(info.reschdRate*100).toFixed(1)+'%'} color={info.reschdRate>0.05?'#f97316':info.reschdRate>0.02?'#eab308':'#94a3b8'} />}
               {info.dmaRegion               && <InfoRow label="DMA Region" value={info.dmaRegion} />}
+            </div>
+          )}
+
+          {/* Volume data unavailable — fallback for non-FAA PSI sites with no performance data */}
+          {info.scoreBucket == null && info.cdVolume == null && info.propertyType !== 'FAA/AKT' && (
+            <div style={{ marginTop:10, borderTop:`1px solid ${THEME.divider}`, paddingTop:10 }}>
+              <div style={{ fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#475569', marginBottom:7 }}>VOLUME METRICS</div>
+              <div style={{ fontSize:11, color:'#64748b' }}>Volume data not available for this site</div>
             </div>
           )}
 
@@ -929,7 +952,7 @@ export default function BigFootMap() {
   const [qualityMode, setQualityMode] = useState(false)
   const [psiLayers, setPsiLayers]       = useState({
     oo:true, authorized:true, hisetCss:true, hisetTca:true, hisetTcar:true, nbstsa:true, etsStn:true,
-    usps:true, oneOff:true, mgTesting:true, tdTesting:true, clientSite:true, innovExams:true,
+    faa:true, usps:true, oneOff:true, mgTesting:true, tdTesting:true, clientSite:true, innovExams:true,
   })
   const [showRadii, setShowRadii]       = useState(false)
   const [radiusMiles, setRadiusMiles]   = useState(50)
@@ -1544,6 +1567,11 @@ ${JSON.stringify(contextRef.current)}`,
         oc07: props.oc07 ?? null, oc08: props.oc08 ?? null, oc09: props.oc09 ?? null,
         adaFlag:      props.adaFlag      === true,
         brandingFlag: props.brandingFlag === true,
+        // FAA/AKT fields
+        aktVol25:     props.aktVol25     ?? null,
+        faaYtd2026:   props.faaYtd2026   ?? null,
+        aktAudScore:  props.aktAudScore  ?? null,
+        adaCompliant: props.adaCompliant === true,
       }
     }
 
