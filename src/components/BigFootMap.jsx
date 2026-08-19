@@ -60,92 +60,26 @@ const DATA_QUALITY = {
     note: 'Real airport names, IATA codes, and coordinates. Filtered to US commercial airports with valid IATA codes.',
   },
   healthcare: {
-    source: 'CMS reference list (flagship) + city population model',
+    source: 'CMS Provider of Services (POS) file — hospitals (Q2 2026)',
     sourceUrl: 'https://data.cms.gov',
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '2,215 facilities',
-    suitable: 'Healthcare workforce density analysis and market prioritisation.',
-    notSuitable: 'Identifying specific hospitals or making facility-level decisions.',
-    note: '20 major flagship hospitals use real coordinates. Remaining 2,195 are modelled from city populations. Will be replaced with CMS Provider of Services data in Phase 2.',
-  },
-  technology: {
-    source: 'City population model with BLS-informed state-level boost',
-    sourceUrl: 'https://www.bls.gov/oes/',
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '2,737 hub points',
-    suitable: 'Identifying technology workforce density for professional certification demand.',
-    notSuitable: 'Locating specific tech employers or campuses.',
-    note: 'Population-proportional model. State boost applied to CA, WA, TX, NY, MA, VA, CO, GA, IL, FL, NC, PA based on BLS computer occupation employment share.',
-  },
-  government: {
-    source: 'City population model — all 50 state capitals included',
-    sourceUrl: null,
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '2,698 hub points',
-    suitable: 'Government workforce density analysis. All cities 25k+ have government presence.',
-    notSuitable: 'Locating specific federal buildings or government facilities.',
-    note: 'Modelled from city populations. Future replacement: GSA Federal Real Property Profile (FRPP) database.',
-  },
-  financial: {
-    source: 'FDIC BankFind Suite — Federal Deposit Insurance Corporation',
-    sourceUrl: 'https://banks.data.fdic.gov',
-    classification: 'REAL_PARTIAL',
-    confidence: 'HIGH',
-    lastUpdated: '2026',
-    features: '8,557 real bank institutions (10k API sample)',
-    suitable: 'Identifying real bank and financial institution locations. High confidence for included records.',
-    notSuitable: 'Complete national coverage. FDIC API caps at 10,000 records. US has ~70,000+ total branches.',
-    note: 'Real institution names and verified coordinates from the FDIC registry. 10k-record sample due to API limit. Full coverage requires paginated calls across all states — planned for Phase 2 backend.',
-  },
-  manufacturing: {
-    source: 'WRI Global Power Plant Database — World Resources Institute',
-    sourceUrl: 'https://github.com/wri/global-power-plant-database',
     classification: 'REAL',
     confidence: 'HIGH',
-    lastUpdated: '2021',
-    features: '3,579 energy facilities (Gas, Coal, Oil, Biomass, Waste, Nuclear)',
-    suitable: 'Identifying energy-intensive industrial site locations as a proxy for heavy-industry workforce concentration.',
-    notSuitable: 'Light manufacturing, food processing, textiles. This layer shows power plants and energy facilities, not factories.',
-    note: 'Data source: WRI Global Power Plant Database (2021). Contains real facility names, fuel type, capacity (MW), and verified coordinates. Used as a proxy for heavy-industry workforce presence. This is energy infrastructure data — the layer is labeled "Energy / Industrial Infrastructure" in the UI.',
+    lastUpdated: 'Q2 2026',
+    features: '20,184 eligible hospitals (subtype 01)',
+    suitable: 'Identifying real hospital locations and healthcare facility density.',
+    notSuitable: 'Non-hospital providers (SNFs, clinics). Street-level precision — sites are placed at ZIP centroid.',
+    note: 'CMS POS file filtered to hospital subtype 01 with active eligibility. Geocoded by ZIP centroid (midwire free_zipcode_data) at 99.3% match; real facility names, addresses, phone, and CMS provider IDs.',
   },
-  railway: {
-    source: 'City population model — Amtrak station logic',
-    sourceUrl: null,
-    classification: 'MODELLED',
-    confidence: 'LIMITED',
-    lastUpdated: 'May 2026',
-    features: '1,545 hub points',
-    suitable: 'Transit accessibility overview at national level.',
-    notSuitable: 'Station-level analysis. Specific locations are approximate.',
-    note: 'Weakest layer in the platform. Future replacement: Amtrak open data + GTFS feeds from major transit agencies.',
-  },
-  cultural: {
-    source: 'City population model',
-    sourceUrl: null,
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '1,916 hub points',
-    suitable: 'Civic infrastructure density overview.',
-    notSuitable: 'Specific museum or venue locations.',
-    note: 'Future replacement: IMLS Museum Data Files (35,000+ US museums with real addresses).',
-  },
-  agriculture: {
-    source: 'City population model — 30 agricultural states only',
-    sourceUrl: 'https://www.usda.gov/topics/data',
-    classification: 'MODELLED',
-    confidence: 'DIRECTIONAL',
-    lastUpdated: 'May 2026',
-    features: '1,439 hub points',
-    suitable: 'Agricultural workforce density in farming states.',
-    notSuitable: 'Non-agricultural states. Specific facility locations.',
-    note: 'Restricted to 30 states with significant agricultural GDP share. Future replacement: USDA NASS data.',
+  financial: {
+    source: 'FDIC BankFind Suite — full branch-locations download (Aug 2026)',
+    sourceUrl: 'https://banks.data.fdic.gov',
+    classification: 'REAL',
+    confidence: 'HIGH',
+    lastUpdated: 'Aug 2026',
+    features: '4,189 full-service main offices (national)',
+    suitable: 'Identifying real bank / financial institution main-office locations nationwide with verified coordinates.',
+    notSuitable: 'Branch-level coverage (branches excluded — main offices only) or non-full-service offices.',
+    note: 'Full FDIC locations export filtered to full-service brick-and-mortar / retail MAIN offices (MAINOFF=1) with valid coordinates — one HQ location per institution. Real names, addresses, and FDIC-verified lat/long; thinned from 73.5k branches to keep the layer light.',
   },
   psi_sites: {
     source: 'PSI Internal — Test Center List (March 2026)',
@@ -180,20 +114,14 @@ const STATE_POPULATIONS = {
 
 const LAYER_COLORS = {
   universities:'#fbbf24',airports:'#34d399',healthcare:'#f87171',
-  financial:'#4ade80',government:'#60a5fa',technology:'#818cf8',
-  manufacturing:'#fb923c',railway:'#e2e8f0',cultural:'#c084fc',agriculture:'#86efac',
+  financial:'#4ade80',
 }
 const HUB_LABELS = {
   universities:'Universities & Colleges',airports:'Airports',
   healthcare:'Healthcare',financial:'Financial',
-  government:'Government',technology:'Technology',
-  manufacturing:'Energy / Industrial Infrastructure',railway:'Railway & Transit',
-  cultural:'Cultural',agriculture:'Agriculture',
 }
 const HUB_EMOJI = {
-  airports:'✈',healthcare:'🏥',financial:'🏦',government:'🏛',
-  technology:'💻',manufacturing:'🏭',railway:'🚉',cultural:'🎭',
-  agriculture:'🌾',universities:'🎓',
+  airports:'✈',healthcare:'🏥',financial:'🏦',universities:'🎓',
 }
 
 // ── PSI Test Center constants ─────────────────────────────
@@ -227,6 +155,8 @@ const PSI_TYPE_MAP = {
 const PSI_KEY_TO_TYPE = Object.fromEntries(Object.entries(PSI_TYPE_MAP).map(([t,k]) => [k,t]))
 // 3P = every property-type key except O&O, in display order
 const PSI_3P_KEYS = ['authorized','hisetCss','hisetTca','hisetTcar','nbstsa','etsStn','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
+// Flat channel-type display order for the panel + legend (most sites first)
+const PSI_DISPLAY_ORDER = ['hisetCss','hisetTca','hisetTcar','nbstsa','authorized','oo','etsStn','usps','oneOff','mgTesting','tdTesting','clientSite','innovExams']
 const PSI_INTERACTIVE = ['psi-oo-circle','psi-3p-circle']
 // Data-driven per-type fill color for the unified 3P circle + radii layers
 const PSI_TYPE_COLOR_EXPR = ['match', ['get','propertyType'],
@@ -240,12 +170,6 @@ const ICON_PATHS = {
   healthcare:`<path fill="white" d="M24 17H28V23H24V27H16V23H12V17H16V13H24V17Z"/>`,
   universities:`<path fill="white" d="M20 11L31 17L20 23L9 17ZM13 19.5L13 25C13 25 16 27 20 27C24 27 27 25 27 25L27 19.5L20 23ZM29 18L29 24L31 25L31 18Z"/>`,
   financial:`<path fill="white" d="M11 28H29V30H11ZM12 16H16V28H12ZM18 16H22V28H18ZM24 16H28V28H24ZM11 14H29V16H11ZM17 11H23V14H17Z"/>`,
-  government:`<path fill="white" d="M20 9C16 9 12 12.5 12 17H28C28 12.5 24 9 20 9ZM10 17H30V19H10ZM12 19H16V27H12ZM18 19H22V27H18ZM24 19H28V27H24ZM10 27H30V29H10Z"/>`,
-  technology:`<path fill="white" d="M14 14H26V26H14V14ZM16 16V24H24V16ZM18 18V22H22V18ZM12 17H14V19H12ZM12 21H14V23H12ZM26 17H28V19H26ZM26 21H28V23H26ZM17 12V14H19V12ZM21 12V14H23V12ZM17 26V28H19V26ZM21 26V28H23V26Z"/>`,
-  manufacturing:`<path fill="white" d="M20 15C17.2 15 15 17.2 15 20C15 22.8 17.2 25 20 25C22.8 25 25 22.8 25 20C25 17.2 22.8 15 20 15ZM20 17.5C21.4 17.5 22.5 18.6 22.5 20C22.5 21.4 21.4 22.5 20 22.5C18.6 22.5 17.5 21.4 17.5 20C17.5 18.6 18.6 17.5 20 17.5ZM18 10L17 12.5C16 13 15 13.7 14.2 14.5L11.5 14L10 16.5L12 18C11.9 18.6 11.8 19.3 11.8 20C11.8 20.7 11.9 21.4 12 22L10 23.5L11.5 26L14.2 25.5C15 26.3 16 27 17 27.5L18 30H22L23 27.5C24 27 25 26.3 25.8 25.5L28.5 26L30 23.5L28 22C28.1 21.4 28.2 20.7 28.2 20C28.2 19.3 28.1 18.6 28 18L30 16.5L28.5 14L25.8 14.5C25 13.7 24 13 23 12.5L22 10Z"/>`,
-  railway:`<path fill="white" d="M14 10H26C27.1 10 28 10.9 28 12V24C28 25.1 27.1 26 26 26H14C12.9 26 12 25.1 12 24V12C12 10.9 12.9 10 14 10ZM14 12V19H26V12ZM17 16H23V18H17ZM15 22C15 22.6 14.6 23 14 23C13.4 23 13 22.6 13 22C13 21.4 13.4 21 14 21C14.6 21 15 21.4 15 22ZM27 22C27 22.6 26.6 23 26 23C25.4 23 25 22.6 25 22C25 21.4 25.4 21 26 21C26.6 21 27 21.4 27 22ZM11 26L13 28H27L29 26Z"/>`,
-  cultural:`<path fill="white" d="M20 9L22.9 15.9L30.5 16.5L25 21.3L26.8 28.7L20 24.5L13.2 28.7L15 21.3L9.5 16.5L17.1 15.9Z"/>`,
-  agriculture:`<path stroke="white" stroke-width="2" stroke-linecap="round" fill="none" d="M20 28L20 15M20 15C20 15 15 12 12 8C15.5 10 19 13 20 15ZM20 15C20 15 25 12 28 8C24.5 10 21 13 20 15ZM20 19C20 19 15 16 12 12C15.5 14 19 17 20 19ZM20 19C20 19 25 16 28 12C24.5 14 21 17 20 19ZM20 23C20 23 15 20 12 16C15.5 18 19 21 20 23ZM20 23C20 23 25 20 28 16C24.5 18 21 21 20 23"/>`,
 }
 function makeIconSVG(key, color) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
@@ -263,14 +187,8 @@ const LAYER_GROUPS = [
   ]},
   { label:'Industry Hubs', layers:[
     {key:'airports',label:'Airports',color:'#34d399',count:1054},
-    {key:'healthcare',label:'Healthcare',color:'#f87171',count:2215},
-    {key:'financial',label:'Financial',color:'#4ade80',count:8557},
-    {key:'government',label:'Government',color:'#60a5fa',count:2698},
-    {key:'technology',label:'Technology',color:'#818cf8',count:2737},
-    {key:'manufacturing',label:'Energy / Industrial Infrastructure',color:'#fb923c',count:3579},
-    {key:'railway',label:'Railway & Transit',color:'#e2e8f0',count:1545},
-    {key:'cultural',label:'Cultural',color:'#c084fc',count:1916},
-    {key:'agriculture',label:'Agriculture',color:'#86efac',count:1439},
+    {key:'healthcare',label:'Healthcare',color:'#f87171',count:20184},
+    {key:'financial',label:'Financial',color:'#4ade80',count:4189},
   ]},
 ]
 const PSI_COUNTS = {
@@ -342,10 +260,8 @@ const PERF_RADIUS_EXPR = ['case',
 const DEFAULT_LAYERS = {
   states:true,
   universities:false,airports:false,healthcare:false,financial:false,
-  government:false,technology:false,manufacturing:false,
-  railway:false,cultural:false,agriculture:false,
 }
-const POINT_LAYERS = ['universities','airports','healthcare','financial','government','technology','manufacturing','railway','cultural','agriculture']
+const POINT_LAYERS = ['universities','airports','healthcare','financial']
 const FONT = '"Segoe UI", system-ui, sans-serif'
 
 function fmt(n) {
@@ -549,13 +465,7 @@ function Legend({ layers, psiLayers, showRadii, qualityMode, performanceMode, op
           {(psiActive.length > 0 || showRadii) && (
             <div style={{ padding:'6px 13px 4px', borderTop:'1px solid rgba(245,158,11,0.15)', marginTop:4 }}>
               <div style={{ fontSize:9, fontWeight:700, color:'#78350f', letterSpacing:'0.08em', marginBottom:5 }}>PSI TEST CENTERS</div>
-              {psiLayers?.oo && (
-                <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:4 }}>
-                  <div style={{ width:12, height:12, borderRadius:'50%', background:PSI_COLORS.oo, boxShadow:`0 0 5px ${PSI_COLORS.oo}88`, flexShrink:0 }}/>
-                  <span style={{ fontSize:10, color:THEME.textSecondary, fontWeight:600 }}>O&O — PSI Owned <span style={{ fontWeight:400, color:'#334155' }}>({PSI_COUNTS.oo})</span></span>
-                </div>
-              )}
-              {psiActive.filter(([k])=>PSI_3P_KEYS.includes(k)).map(([key])=>(
+              {PSI_DISPLAY_ORDER.filter(k => psiLayers?.[k]).map((key)=>(
                 <div key={key} style={{ display:'flex', alignItems:'center', gap:7, marginBottom:3 }}>
                   <div style={{ width:10, height:10, borderRadius:'50%', background:PSI_COLORS[key], flexShrink:0, border:'1px solid rgba(15,23,42,0.15)' }}/>
                   <span style={{ fontSize:10, color:'#64748b' }}>{PSI_LABELS[key]} <span style={{ color:'#334155' }}>({PSI_COUNTS[key] ?? 0})</span></span>
@@ -2243,46 +2153,17 @@ ${JSON.stringify(contextRef.current)}`,
           </div>
 
           {!psiCollapsed.group && (<>
-            {/* O&O toggle */}
-            <div onClick={()=>togglePsi('oo')} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-              <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#E2E8F0', border:`1.5px solid ${psiLayers.oo?PSI_COLORS.oo:'#CBD5E1'}`, boxShadow:psiLayers.oo?`0 0 6px ${PSI_COLORS.oo}99`:'none', transition:'all 0.2s' }}/>
-              <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:psiLayers.oo?PSI_COLORS.oo:'#E2E8F0', border:`1px solid ${psiLayers.oo?PSI_COLORS.oo:'#CBD5E1'}`, position:'relative', transition:'all 0.2s', boxShadow:psiLayers.oo?`0 0 5px ${PSI_COLORS.oo}55`:'none' }}>
-                <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:psiLayers.oo?13:2, background:psiLayers.oo?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
-              </div>
-              <div style={{ flex:1 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:psiLayers.oo?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>O&O Sites <span style={{ fontWeight:400, color:'#78350f' }}>({PSI_COUNTS.oo})</span></span>
-              </div>
-            </div>
-
-            {/* 3P master toggle + expand */}
-            <div style={{ borderBottom:`1px solid ${THEME.divider}` }}>
-              <div style={{ display:'flex', alignItems:'center', padding:'7px 16px', userSelect:'none' }}>
-                <div onClick={toggle3pAll} style={{ display:'flex', alignItems:'center', gap:8, flex:1, cursor:'pointer' }}>
-                  <div style={{ width:10, height:10, borderRadius:'50%', flexShrink:0, background:any3pOn?PSI_COLORS.authorized:'#E2E8F0', border:`1.5px solid ${any3pOn?PSI_COLORS.authorized:'#CBD5E1'}`, boxShadow:any3pOn?`0 0 5px ${PSI_COLORS.authorized}88`:'none', transition:'all 0.2s' }}/>
-                  <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:all3pOn?PSI_COLORS.authorized:'#E2E8F0', border:`1px solid ${any3pOn?PSI_COLORS.authorized:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
-                    <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:all3pOn?13:2, background:all3pOn?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
-                  </div>
-                  <span style={{ fontSize:12, fontWeight:600, color:any3pOn?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>3P Sites <span style={{ fontWeight:400, color:'#334155' }}>({PSI_3P_TOTAL})</span></span>
+            {/* CHANNEL TYPES — flat list, all 13 types as equal-weight toggles */}
+            <div style={{ fontSize:9, fontWeight:700, color:'#475569', letterSpacing:'0.06em', textTransform:'uppercase', padding:'6px 16px 3px' }}>Channel Types</div>
+            {PSI_DISPLAY_ORDER.map((key)=>{ const label = PSI_LABELS[key]; const cnt = PSI_COUNTS[key] ?? 0; const on = psiLayers[key]; return (
+              <div key={key} onClick={()=>togglePsi(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
+                <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:on?PSI_COLORS[key]:'#E2E8F0', border:`1.5px solid ${on?PSI_COLORS[key]:'#CBD5E1'}`, boxShadow:on?`0 0 4px ${PSI_COLORS[key]}88`:'none', transition:'all 0.2s' }}/>
+                <div style={{ width:26, height:15, borderRadius:8, flexShrink:0, background:on?PSI_COLORS[key]:'#E2E8F0', border:`1px solid ${on?PSI_COLORS[key]:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
+                  <div style={{ position:'absolute', top:2, width:9, height:9, borderRadius:'50%', left:on?13:2, background:on?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
                 </div>
-                <span onClick={()=>setPsiCollapsed(p=>({...p,thirdParty:!p.thirdParty}))} style={{ cursor:'pointer', color:'#475569', fontSize:10, padding:'2px 6px' }}>
-                  {psiCollapsed.thirdParty ? '▶' : '▼'}
-                </span>
+                <span style={{ fontSize:12, fontWeight:500, color:on?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s', flex:1 }}>{label} <span style={{ fontWeight:400, color:'#334155' }}>({cnt})</span></span>
               </div>
-
-              {!psiCollapsed.thirdParty && (
-                <div style={{ paddingBottom:4, background:THEME.inset, borderTop:`1px solid ${THEME.divider}` }}>
-                  {PSI_3P_KEYS.map((key)=>{ const label = PSI_LABELS[key]; const cnt = PSI_COUNTS[key] ?? 0; return (
-                    <div key={key} onClick={()=>togglePsi(key)} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 16px 5px 28px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
-                      <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#E2E8F0', border:`1.5px solid ${psiLayers[key]?PSI_COLORS[key]:'#CBD5E1'}`, boxShadow:psiLayers[key]?`0 0 4px ${PSI_COLORS[key]}88`:'none', transition:'all 0.2s' }}/>
-                      <div style={{ width:22, height:12, borderRadius:6, flexShrink:0, background:psiLayers[key]?PSI_COLORS[key]:'#E2E8F0', border:`1px solid ${psiLayers[key]?PSI_COLORS[key]:'#CBD5E1'}`, position:'relative', transition:'all 0.2s' }}>
-                        <div style={{ position:'absolute', top:1.5, width:7, height:7, borderRadius:'50%', left:psiLayers[key]?11:2, background:psiLayers[key]?'#020817':'#94A3B8', transition:'left 0.2s' }}/>
-                      </div>
-                      <span style={{ fontSize:11, fontWeight:500, color:psiLayers[key]?THEME.textPrimary:THEME.textInactive, transition:'color 0.2s' }}>{label} <span style={{ fontSize:9, fontWeight:400, color:'#334155' }}>({cnt})</span></span>
-                    </div>
-                  )})}
-                </div>
-              )}
-            </div>
+            )})}
 
             {/* 50-mile radius master toggle */}
             <div onClick={()=>setShowRadii(r=>!r)} style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 16px', cursor:'pointer', borderBottom:`1px solid ${THEME.divider}`, userSelect:'none' }}>
