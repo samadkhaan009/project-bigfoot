@@ -192,7 +192,7 @@ const LAYER_GROUPS = [
   ]},
 ]
 const PSI_COUNTS = {
-  oo:319, authorized:356, hisetCss:985, hisetTca:789, hisetTcar:798, nbstsa:527, etsStn:233,
+  oo:135, authorized:356, hisetCss:985, hisetTca:789, hisetTcar:798, nbstsa:527, etsStn:233,
   usps:95, oneOff:67, mgTesting:52, tdTesting:19, clientSite:8, innovExams:2,
 }
 const PSI_3P_TOTAL = PSI_3P_KEYS.reduce((s,k) => s + (PSI_COUNTS[k]||0), 0)
@@ -1178,9 +1178,10 @@ depth and precision as a senior analyst who built the platform.
 Be direct, cite specific numbers, and format for readability.
 
 PLATFORM CONTEXT:
-552 PSI test centers mapped across the US (544 native +
-8 synthetic IRS sites added via coordinate fallback).
-141 O&O (PSI Owned) · 411 3P partner sites.
+4,069 PSI test centers mapped across the US (4,066 native +
+3 synthetic IRS sites added via coordinate fallback).
+135 O&O (PSI Owned, authoritative GPS/OPS list) · 3,931 3P
+partner sites.
 Built for senior leadership: Neal Baer, Matt Taylor,
 Dennis Stetzel. Key collaborators: Dwayne (Network Market
 Design) · Jim Metzger (Lease renewals).
