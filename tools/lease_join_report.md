@@ -1,6 +1,6 @@
 # Project Big Foot — Lease Join Report
 
-_Generated: 2026-06-03 20:02 UTC — joined by Site Code (exact match)_
+_Generated: 2026-08-19 17:22 UTC — joined by Site Code (exact match)_
 
 ---
 
@@ -9,12 +9,12 @@ _Generated: 2026-06-03 20:02 UTC — joined by Site Code (exact match)_
 | Metric | Value |
 |---|---|
 | Lease rows in file | **62** |
-| Rows joined to a feature | **60** |
-| Rows unplaced | **1** |
+| Rows joined to a feature | **58** |
+| Rows unplaced | **3** |
 | Duplicate site codes (first kept) | 9677 |
-| **O&O sites with lease data** | **58** |
+| **O&O sites with lease data** | **56** |
 | **3P sites under lease** (pending confirmation) | **2** |
-| Total sites with lease data | **60** |
+| Total sites with lease data | **58** |
 
 ---
 
@@ -23,7 +23,7 @@ _Generated: 2026-06-03 20:02 UTC — joined by Site Code (exact match)_
 | Action | Sites |
 |---|---|
 | Renew | 38 |
-| Relocate | 10 |
+| Relocate | 8 |
 | Refurbish | 6 |
 | Renew+Expand | 3 |
 | Assess-Close | 2 |
@@ -35,16 +35,16 @@ _Generated: 2026-06-03 20:02 UTC — joined by Site Code (exact match)_
 
 | Status | Sites |
 |---|---|
-| EXPIRED | 32 |
+| EXPIRED | 31 |
 | Expiring 2026 | 14 |
 | < 180 days | 8 |
 | < 90 days | 3 |
-| COMPLETE | 2 |
 | CONFIRMED RENEW | 1 |
+| COMPLETE | 1 |
 
 ---
 
-## Expired Lease Sites (32 sites)
+## Expired Lease Sites (31 sites)
 
 | ID | Name | City, State | Type | Days Overdue | Monthly Revenue |
 |---|---|---|---|---|---|
@@ -68,8 +68,8 @@ _Generated: 2026-06-03 20:02 UTC — joined by Site Code (exact match)_
 | 142 | WOODWARD | Woodward, Oklahoma | PSI Owned | -4288 | $19,701 |
 | 49 | BEND | Bend, Oregon | PSI Owned | -1609 | $74,555 |
 | 50 | EUGENE | Eugene, Oregon | PSI Owned | -362 | $116,214 |
-| 65 | SCRANTON | Clarks Summit, Pennsylvania | PSI Owned | -1793 | $56,026 |
 | 59 | ERIE | Erie, Pennsylvania | PSI Owned | -1793 | $43,115 |
+| 65 | SCRANTON | Clarks Summit, Pennsylvania | PSI Owned | -1793 | $56,026 |
 | 73 | CHARLESTON | Charleston, South Carolina | PSI Owned | -270 | $242,822 |
 | 71 | COLUMBIA | COLUMBIA, South Carolina | PSI Owned | -58 | $179,739 |
 | 72 | MYRTLE BEACH | MYRTLE BEACH, South Carolina | PSI Owned | -3345 | $128,116 |
@@ -79,19 +79,18 @@ _Generated: 2026-06-03 20:02 UTC — joined by Site Code (exact match)_
 | 15 | CORPUS CHRISTI | Corpus Christi, Texas | PSI Owned | -2615 | $76,435 |
 | 18 | FORT WORTH | Fort Worth, Texas | PSI Owned | -89 | $164,439 |
 | 152 | MIDLAND - WESTWOOD VILLAGE SHOPPING CENTER | Midland, Texas | PSI Owned | -3192 | $91,886 |
-| 5643 | RICHMOND | Richmond, Virginia | PSI Owned | -3496 | $241,464 |
 
 ### Revenue at Risk
 
 | Category | Sites | Monthly Revenue |
 |---|---|---|
-| Expired (O&O) | 32 | $3.43M |
+| Expired (O&O) | 31 | $3.19M |
 | Expired (3P-under-lease) | 0 | $0.00M |
-| Expired (all) | 32 | **$3.43M** |
+| Expired (all) | 31 | **$3.19M** |
 | Contract flagged | 7 | $1.00M |
-| **At risk total (expired + contract flag)** | **35** | **$3.82M** |
+| **At risk total (expired + contract flag)** | **34** | **$3.58M** |
 
-> Total monthly revenue across all 60 leased sites: **$8.36M**
+> Total monthly revenue across all 58 leased sites: **$8.02M**
 
 ---
 
@@ -104,10 +103,12 @@ These sites resolved to PSI Authorized (Partner) features, not O&O. Included in 
 
 ---
 
-## Unplaced Lease Rows (1)
+## Unplaced Lease Rows (3)
 
 | Site Code | Test Center | City, State | Reason |
 |---|---|---|---|
+| 5131 | Parsippany | Parsippany, NJ | No feature with this id |
+| 5643 | RICHMOND | Richmond, VA | No feature with this id |
 | (none) | Towson | Towson, MD | No Site Code in file |
 
 > **Towson, MD** has no Site Code in the file and no matching feature in the GeoJSON. It has been confirmed as unplaceable.
